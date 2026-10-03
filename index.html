@@ -1,0 +1,1820 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Servicios de Nadia Lagoa</title>
+<meta name="description" content="Muestrario visual de los servicios digitales de Nadia Lagoa Vilela, desarrolladora de software en A Coruña y la Costa da Morte. Todos los negocios de las demos son ficticios.">
+<meta name="theme-color" content="#1F4D4A">
+
+<!-- Única dependencia externa permitida: Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=Fraunces:ital,opsz,wght@1,9..144,400..600&family=IBM+Plex+Mono:wght@400;500;600&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* =========================================================
+   1. TOKENS DE DISEÑO
+   Paleta "papel cálido + verde marino" definida una sola vez.
+   ========================================================= */
+:root {
+  --paper: #EDE5D6;        /* fondo de la página */
+  --card: #FFFBF3;         /* tarjetas */
+  --ink: #1B2624;          /* texto principal */
+  --ink-soft: #4A5552;     /* texto secundario (contraste AA sobre papel) */
+  --green: #1F4D4A;        /* verde marino */
+  --green-dark: #173B39;
+  --green-tint: #DCE6E1;
+  --terra: #C0522B;        /* acento terracota (fondos y textos grandes) */
+  --terra-ink: #9C3E1B;    /* terracota oscurecido para texto pequeño */
+  --terra-tint: #F5DDD0;
+  --line: #D6CBB6;
+  --wa-bg: #E9E1D4;        /* fondo del chat */
+  --wa-out: #D7EBDD;       /* burbuja enviada */
+
+  --f-display: "Archivo", "Arial Narrow", sans-serif;
+  --f-serif: "Fraunces", Georgia, serif;
+  --f-body: "Work Sans", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  --radius: 14px;
+  --shadow: 0 1px 0 rgba(27,38,36,.06), 0 12px 30px -18px rgba(27,38,36,.45);
+  --gutter: 16px;
+}
+
+/* =========================================================
+   2. BASE
+   ========================================================= */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 1rem;
+  line-height: 1.55;
+  overflow-x: hidden;
+}
+img, svg { display: block; max-width: 100%; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+a { color: var(--green); }
+p { margin: 0 0 .75em; }
+h1, h2, h3, h4 { margin: 0; overflow-wrap: break-word; }
+
+/* Foco visible y consistente en todos los controles */
+:focus-visible {
+  outline: 3px solid var(--terra);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.visually-hidden {
+  position: absolute !important; width: 1px; height: 1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+}
+.skip-link {
+  position: absolute; left: var(--gutter); top: -100px; z-index: 50;
+  background: var(--green); color: #fff; padding: .6rem 1rem; border-radius: 8px;
+}
+.skip-link:focus { top: var(--gutter); }
+
+.wrap { width: 100%; max-width: 1180px; margin-inline: auto; padding-inline: var(--gutter); }
+@media (min-width: 700px) { :root { --gutter: 28px; } }
+
+/* Tipografía de apoyo */
+.display {
+  font-family: var(--f-display);
+  font-stretch: 72%;
+  font-weight: 800;
+  text-transform: uppercase;
+  line-height: .95;
+  letter-spacing: .005em;
+}
+.serif-i { font-family: var(--f-serif); font-style: italic; font-weight: 400; }
+.mono {
+  font-family: var(--f-mono);
+  font-size: .75rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+/* Sello "EJEMPLO FICTICIO" */
+.stamp {
+  display: inline-flex; align-items: center; gap: .4rem;
+  font-family: var(--f-mono); font-weight: 600; font-size: .72rem;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--terra-ink);
+  border: 2px solid var(--terra);
+  border-radius: 6px;
+  padding: .2rem .55rem;
+  background: var(--card);
+  transform: rotate(-1.5deg);
+}
+.stamp--sm { font-size: .6rem; padding: .05rem .35rem; border-width: 1.5px; transform: none; }
+
+/* Botones genéricos */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .45rem;
+  border: 0; border-radius: 999px;
+  padding: .7rem 1.2rem;
+  font-weight: 600; text-decoration: none;
+  background: var(--green); color: #fff;
+  transition: background .15s, transform .15s;
+}
+.btn:hover { background: var(--green-dark); }
+.btn:active { transform: translateY(1px); }
+.btn--terra { background: var(--terra); }
+.btn--terra:hover { background: var(--terra-ink); }
+.btn--ghost { background: transparent; color: var(--green); box-shadow: inset 0 0 0 2px var(--green); }
+.btn--ghost:hover { background: var(--green-tint); }
+.btn--sm { padding: .45rem .85rem; font-size: .85rem; }
+.btn[disabled] { opacity: .45; cursor: not-allowed; }
+
+/* =========================================================
+   3. CABECERA
+   ========================================================= */
+.site-head { padding-block: 1.25rem 2.5rem; }
+.topbar {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .5rem 1rem;
+  padding-bottom: 1rem; border-bottom: 1.5px solid var(--ink);
+}
+.brand { font-family: var(--f-display); font-stretch: 80%; font-weight: 800; text-transform: uppercase; font-size: 1.05rem; letter-spacing: .02em; }
+.brand span { color: var(--terra-ink); }
+.hero { padding-top: 2.25rem; display: grid; gap: 1.5rem; }
+.hero h1 { font-size: clamp(2.6rem, 11.5vw, 6.4rem); max-width: 14ch; }
+.hero h1 em { font-family: var(--f-serif); font-style: italic; font-weight: 400; text-transform: none; color: var(--terra-ink); font-stretch: normal; letter-spacing: -.01em; }
+.hero__lead { font-size: 1.1rem; max-width: 52ch; }
+.hero__note {
+  display: flex; gap: .6rem; align-items: flex-start;
+  background: var(--card); border: 1.5px dashed var(--terra); border-radius: var(--radius);
+  padding: .75rem 1rem; font-size: .92rem; max-width: 60ch;
+}
+
+/* Índice de servicios */
+.toc { margin-top: 2rem; }
+.toc ol { list-style: none; margin: .75rem 0 0; padding: 0; display: grid; gap: .6rem; grid-template-columns: 1fr; }
+@media (min-width: 560px) { .toc ol { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 980px) { .toc ol { grid-template-columns: repeat(3, 1fr); } }
+.toc a {
+  display: flex; align-items: baseline; gap: .75rem;
+  background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
+  padding: .85rem 1rem; text-decoration: none; color: var(--ink);
+  transition: transform .15s;
+}
+.toc a:hover { transform: translateY(-2px); }
+.toc__n { font-family: var(--f-mono); color: var(--terra-ink); font-weight: 600; }
+.toc__t { font-family: var(--f-display); font-stretch: 78%; font-weight: 700; text-transform: uppercase; font-size: 1.05rem; line-height: 1.1; }
+.toc__p { margin-left: auto; font-family: var(--f-mono); font-size: .78rem; white-space: nowrap; color: var(--ink-soft); }
+
+/* =========================================================
+   4. PATRÓN DE SECCIÓN DE SERVICIO
+   Columna de texto + demo en marco de móvil.
+   ========================================================= */
+.service { padding-block: 3.5rem; border-top: 1.5px solid var(--ink); scroll-margin-top: 12px; }
+.service__grid { display: grid; gap: 2rem; align-items: start; }
+.service__grid > * { min-width: 0; } /* evita que un titular largo ensanche la columna */
+@media (min-width: 920px) {
+  .service__grid { grid-template-columns: minmax(0, 1fr) 380px; gap: 3.5rem; }
+  .service__info { position: sticky; top: 24px; }
+}
+.service__kicker { color: var(--terra-ink); margin-bottom: .6rem; display: block; }
+.service h2 { font-size: clamp(2.1rem, 8.4vw, 4.4rem); overflow-wrap: anywhere; }
+.service__tag { font-size: 1.25rem; margin: .6rem 0 1.25rem; color: var(--green); }
+
+.price {
+  display: flex; flex-wrap: wrap; align-items: flex-end; gap: .35rem 1rem;
+  background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
+  padding: 1rem 1.1rem; margin-bottom: 1rem;
+}
+.price__amount { font-family: var(--f-display); font-stretch: 70%; font-weight: 800; font-size: 3.2rem; line-height: .9; color: var(--green); }
+.price__amount small { font-size: 1.1rem; font-stretch: 85%; color: var(--ink); }
+.price__label { font-size: .9rem; color: var(--ink-soft); line-height: 1.3; }
+.price__label b { color: var(--terra-ink); font-family: var(--f-mono); font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; display: block; }
+
+.meta { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.4rem; }
+.chip {
+  display: inline-flex; align-items: center; gap: .4rem;
+  font-size: .85rem; padding: .35rem .7rem; border-radius: 999px;
+  background: var(--green-tint); color: var(--green-dark);
+}
+.chip svg { width: 15px; height: 15px; flex: none; }
+
+.includes h3 { margin-bottom: .6rem; }
+.includes ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .5rem; }
+.includes li { display: grid; grid-template-columns: 22px 1fr; gap: .55rem; align-items: start; }
+.includes li::before {
+  content: ""; width: 20px; height: 20px; margin-top: 2px; border-radius: 50%;
+  background: var(--green) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5.5 10.5l3 3 6-7' fill='none' stroke='%23fff' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+.fineprint { font-size: .85rem; color: var(--ink-soft); margin-top: 1rem; }
+.warning {
+  display: flex; gap: .6rem; align-items: flex-start;
+  background: var(--terra-tint); color: #5C2410;
+  border-left: 4px solid var(--terra); border-radius: 8px;
+  padding: .7rem .9rem; font-size: .9rem; margin-top: 1rem; font-weight: 500;
+}
+
+/* ---------- Marco de móvil ---------- */
+.demo { width: 100%; max-width: 380px; margin-inline: auto; }
+.demo__head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .5rem; margin-bottom: .8rem; }
+.demo__hint { font-size: .85rem; color: var(--ink-soft); }
+.phone {
+  background: var(--ink);
+  border-radius: 42px;
+  padding: 11px;
+  box-shadow: 0 30px 60px -30px rgba(23,59,57,.7), inset 0 0 0 2px #34413E;
+}
+.phone__screen {
+  position: relative;
+  height: 640px;
+  max-height: 82vh;
+  min-height: 520px;
+  border-radius: 32px;
+  overflow: hidden;
+  background: var(--card);
+  display: flex; flex-direction: column;
+}
+.phone__status {
+  flex: none; height: 30px; display: flex; justify-content: space-between; align-items: center;
+  padding: 0 22px; font-size: .72rem; font-weight: 600; position: relative; z-index: 3;
+}
+.phone__status::after { /* "isla" de la cámara */
+  content: ""; position: absolute; left: 50%; top: 7px; translate: -50% 0;
+  width: 78px; height: 18px; background: var(--ink); border-radius: 12px;
+}
+.phone__app { flex: 1; overflow-y: auto; position: relative; overscroll-behavior: contain; scrollbar-width: thin; }
+
+/* =========================================================
+   5. DEMO 1 · ESTUDIO TINTA NORTE (web + reservas)
+   ========================================================= */
+.tn { --tn-ink: #1d1a1a; --tn-cream: #f6efe3; background: var(--tn-cream); color: var(--tn-ink); font-size: .9rem; }
+.tn .phone__status { background: var(--tn-ink); color: #fff; }
+.tn-nav { position: sticky; top: 0; z-index: 2; display: flex; justify-content: space-between; align-items: center; padding: .6rem .9rem; background: var(--tn-ink); color: var(--tn-cream); }
+.tn-logo { font-family: var(--f-display); font-stretch: 65%; font-weight: 900; text-transform: uppercase; letter-spacing: .04em; font-size: 1.05rem; }
+.tn-nav a { color: var(--tn-cream); font-size: .75rem; margin-left: .7rem; text-decoration: none; border-bottom: 1px solid rgba(246,239,227,.4); }
+.tn-hero { position: relative; color: #fff; padding: 1.5rem 1rem 1.3rem; min-height: 250px; display: flex; flex-direction: column; justify-content: flex-end; }
+.tn-hero svg.tn-hero__bg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.tn-hero > *:not(svg) { position: relative; }
+.tn-hero h3 { font-family: var(--f-display); font-stretch: 65%; font-weight: 900; text-transform: uppercase; font-size: 2rem; line-height: .95; margin-bottom: .4rem; }
+.tn-hero p { font-family: var(--f-serif); font-style: italic; font-size: 1rem; margin-bottom: .9rem; color: #f3e7d4; }
+.tn-btn { background: var(--terra); color: #fff; border: 0; border-radius: 6px; padding: .6rem 1rem; font-weight: 600; font-size: .85rem; align-self: flex-start; }
+.tn-btn:hover { background: var(--terra-ink); }
+.tn-sec { padding: 1.1rem .9rem; }
+.tn-sec + .tn-sec { border-top: 1px solid #e2d6c3; }
+.tn-h { font-family: var(--f-display); font-stretch: 70%; font-weight: 800; text-transform: uppercase; font-size: 1.25rem; margin-bottom: .7rem; }
+.tn-gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: .5rem; list-style: none; padding: 0; margin: 0; }
+.tn-gallery li { border-radius: 8px; overflow: hidden; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+.tn-gallery .art { aspect-ratio: 1; display: grid; place-items: center; }
+.tn-gallery .art svg { width: 58%; height: 58%; }
+.tn-gallery span { display: block; font-size: .72rem; padding: .35rem .45rem; line-height: 1.25; }
+
+/* Widget de reservas */
+.bk-label { font-family: var(--f-mono); font-size: .66rem; letter-spacing: .08em; text-transform: uppercase; color: #5b514a; margin: .9rem 0 .4rem; display: block; }
+.bk-services { display: grid; gap: .35rem; border: 0; padding: 0; margin: 0; }
+.bk-service { display: flex; justify-content: space-between; align-items: center; gap: .5rem; background: #fff; border: 1.5px solid #e2d6c3; border-radius: 8px; padding: .5rem .65rem; cursor: pointer; }
+.bk-service:has(input:checked) { border-color: var(--tn-ink); box-shadow: inset 0 0 0 1px var(--tn-ink); }
+.bk-service:has(input:focus-visible) { outline: 3px solid var(--terra); outline-offset: 2px; }
+.bk-service input { accent-color: var(--tn-ink); margin: 0 .45rem 0 0; }
+.bk-service b { font-family: var(--f-mono); font-size: .8rem; }
+.bk-days { display: grid; grid-template-columns: repeat(6, 1fr); gap: .25rem; }
+.bk-day { border: 1.5px solid #e2d6c3; background: #fff; border-radius: 8px; padding: .3rem 0; line-height: 1.1; font-size: .68rem; }
+.bk-day strong { display: block; font-size: .95rem; }
+.bk-day[aria-pressed="true"] { background: var(--tn-ink); color: #fff; border-color: var(--tn-ink); }
+.bk-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: .35rem; }
+.bk-slot { border: 1.5px solid var(--tn-ink); background: #fff; border-radius: 8px; padding: .45rem 0; font-weight: 600; font-size: .82rem; }
+.bk-slot[aria-pressed="true"] { background: var(--terra); border-color: var(--terra); color: #fff; }
+.bk-slot:disabled { border-color: #ddd2c2; color: #8a8178; background: repeating-linear-gradient(135deg, #f3ece1 0 6px, #ece3d5 6px 12px); text-decoration: line-through; cursor: not-allowed; }
+.bk-legend { font-size: .7rem; color: #5b514a; margin-top: .35rem; }
+.bk-result { margin-top: .9rem; display: grid; gap: .6rem; }
+.bk-result[hidden] { display: none; }
+.bk-ok { background: #e4efe9; border: 1.5px solid var(--green); border-radius: 10px; padding: .65rem .75rem; font-size: .82rem; }
+.bk-ok strong { color: var(--green-dark); }
+.notif {
+  background: #fff; border-radius: 14px; padding: .7rem .8rem; box-shadow: 0 8px 22px -10px rgba(0,0,0,.4);
+  border: 1px solid #e5ddd0; font-size: .82rem; animation: drop .35s ease-out;
+}
+@keyframes drop { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+.notif__head { display: flex; align-items: center; gap: .4rem; font-size: .66rem; color: #5b514a; margin-bottom: .3rem; font-family: var(--f-mono); text-transform: uppercase; letter-spacing: .05em; }
+.notif__icon { width: 18px; height: 18px; border-radius: 5px; background: var(--tn-ink); display: grid; place-items: center; flex: none; }
+.notif__actions { display: flex; gap: .4rem; margin-top: .55rem; }
+.notif__actions button { flex: 1; border-radius: 8px; border: 1.5px solid var(--tn-ink); background: #fff; padding: .4rem; font-weight: 600; font-size: .8rem; }
+.notif__actions .yes { background: var(--tn-ink); color: #fff; }
+.notif__status { margin: .45rem 0 0; font-weight: 600; color: var(--green-dark); }
+.tn-map { border-radius: 10px; overflow: hidden; border: 1px solid #e2d6c3; }
+.tn-hours { width: 100%; border-collapse: collapse; font-size: .8rem; margin: .7rem 0; }
+.tn-hours th { text-align: left; font-weight: 500; }
+.tn-hours td { text-align: right; font-family: var(--f-mono); font-size: .75rem; }
+.tn-hours th, .tn-hours td { padding: .2rem 0; border-bottom: 1px dashed #e2d6c3; }
+.wa-btn { display: flex; width: 100%; justify-content: center; align-items: center; gap: .45rem; background: #1F7A4D; color: #fff; border: 0; border-radius: 8px; padding: .65rem; font-weight: 600; font-size: .85rem; }
+.wa-btn:hover { background: #17603c; }
+.tn-foot { padding: .9rem; background: var(--tn-ink); color: #cfc5b6; font-size: .7rem; text-align: center; }
+.demo-note { font-size: .74rem; margin-top: .4rem; color: #5b514a; }
+
+/* =========================================================
+   6. DEMO 2 · WHATSAPP PELUQUERÍA MAR DE FONDO
+   ========================================================= */
+.wa { background: var(--wa-bg); }
+.wa .phone__status { background: #0F3F3B; color: #fff; }
+.wa-head { flex: none; display: flex; align-items: center; gap: .6rem; padding: .55rem .75rem; background: #0F3F3B; color: #fff; }
+.wa-avatar { width: 38px; height: 38px; border-radius: 50%; flex: none; display: grid; place-items: center; background: linear-gradient(140deg, #7FB8C9, #2C6E7F); font-family: var(--f-serif); font-style: italic; font-size: 1.05rem; }
+.wa-head__txt { min-width: 0; line-height: 1.2; }
+.wa-head__name { font-weight: 600; font-size: .86rem; line-height: 1.15; }
+.wa-head__sub { font-size: .7rem; opacity: .85; }
+.wa-lang { margin-left: auto; display: flex; border-radius: 999px; background: rgba(255,255,255,.15); padding: 2px; flex: none; }
+.wa-lang button { border: 0; background: transparent; color: #fff; font-family: var(--f-mono); font-size: .7rem; font-weight: 600; padding: .25rem .5rem; border-radius: 999px; }
+.wa-lang button[aria-pressed="true"] { background: #fff; color: #0F3F3B; }
+.wa-log {
+  flex: 1; overflow-y: auto; padding: .75rem .6rem; display: flex; flex-direction: column; gap: .35rem;
+  overscroll-behavior: contain;
+  background-color: var(--wa-bg);
+  background-image: radial-gradient(rgba(31,77,74,.07) 1px, transparent 1.4px);
+  background-size: 14px 14px;
+}
+.wa-sys { align-self: center; background: #FFF4D6; color: #5a4a1a; font-size: .7rem; text-align: center; padding: .3rem .6rem; border-radius: 8px; margin: .2rem 0 .4rem; max-width: 92%; }
+.msg { max-width: 84%; padding: .4rem .55rem .25rem; border-radius: 10px; font-size: .84rem; line-height: 1.4; box-shadow: 0 1px 1px rgba(0,0,0,.08); overflow-wrap: anywhere; animation: pop .2s ease-out; }
+@keyframes pop { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: none; } }
+.msg--in { align-self: flex-start; background: #fff; border-top-left-radius: 2px; }
+.msg--out { align-self: flex-end; background: var(--wa-out); border-top-right-radius: 2px; }
+.msg__bot { display: block; font-size: .64rem; font-family: var(--f-mono); color: var(--green); letter-spacing: .04em; text-transform: uppercase; margin-bottom: .1rem; }
+.msg__time { display: block; text-align: right; font-size: .64rem; color: #5f6b68; margin-top: .1rem; }
+.msg__opts { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .4rem; }
+.msg__opts button { border: 1.5px solid var(--green); background: #fff; color: var(--green); border-radius: 999px; padding: .2rem .65rem; font-size: .78rem; font-weight: 600; }
+.msg__opts button:hover:not(:disabled) { background: var(--green-tint); }
+.msg__opts button:disabled { opacity: .5; cursor: default; }
+.msg--handoff { border-left: 3px solid var(--terra); }
+.typing { align-self: flex-start; background: #fff; border-radius: 10px; padding: .55rem .7rem; display: flex; gap: 4px; }
+.typing i { width: 6px; height: 6px; border-radius: 50%; background: #8a9693; animation: blink 1s infinite; }
+.typing i:nth-child(2) { animation-delay: .15s; } .typing i:nth-child(3) { animation-delay: .3s; }
+@keyframes blink { 0%, 80%, 100% { opacity: .3; } 40% { opacity: 1; } }
+.wa-quick { flex: none; display: flex; gap: .35rem; padding: .45rem .5rem 0; overflow-x: auto; background: var(--wa-bg); scrollbar-width: none; }
+.wa-quick button { flex: none; border: 0; background: #fff; color: var(--green-dark); border-radius: 999px; padding: .35rem .75rem; font-size: .78rem; font-weight: 600; box-shadow: 0 1px 1px rgba(0,0,0,.1); }
+.wa-form { flex: none; display: flex; gap: .4rem; padding: .45rem .5rem .6rem; background: var(--wa-bg); }
+.wa-form input { flex: 1; min-width: 0; border: 0; border-radius: 999px; padding: .55rem .85rem; font-size: .85rem; background: #fff; }
+.wa-form button { flex: none; width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--green); color: #fff; display: grid; place-items: center; }
+
+/* =========================================================
+   7. DEMO 3 · FORNO DO CANTÓN (tienda)
+   ========================================================= */
+.fc { background: #FBF4E8; }
+.fc .phone__status { background: #FBF4E8; }
+.fc-head { position: sticky; top: 0; z-index: 2; display: flex; justify-content: space-between; align-items: center; gap: .5rem; padding: .55rem .8rem; background: #FBF4E8; border-bottom: 1px solid #eadfcb; }
+.fc-logo { font-family: var(--f-serif); font-style: italic; font-weight: 600; font-size: 1.15rem; color: #6B3A1E; line-height: 1.1; }
+.fc-logo small { display: block; font-family: var(--f-mono); font-style: normal; font-size: .58rem; letter-spacing: .1em; text-transform: uppercase; color: #6b5d4c; font-weight: 500; }
+.fc-cart-btn { position: relative; border: 0; background: #6B3A1E; color: #fff; border-radius: 999px; padding: .4rem .75rem; display: flex; align-items: center; gap: .35rem; font-size: .8rem; font-weight: 600; }
+.fc-count { background: #fff; color: #6B3A1E; border-radius: 999px; min-width: 20px; height: 20px; font-size: .72rem; display: grid; place-items: center; padding: 0 .3rem; }
+.fc-count.bump { animation: bump .3s; }
+@keyframes bump { 50% { transform: scale(1.35); } }
+.fc-intro { padding: .8rem .8rem .2rem; font-size: .82rem; color: #5a4c3c; }
+.fc-grid { list-style: none; margin: 0; padding: .6rem .8rem 1rem; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6rem; }
+.fc-item { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.08); display: flex; flex-direction: column; }
+.fc-item .pic { aspect-ratio: 4/3; display: grid; place-items: center; }
+.fc-item .pic svg { width: 62%; height: 70%; }
+.fc-item__body { padding: .45rem .55rem .55rem; display: flex; flex-direction: column; gap: .3rem; flex: 1; }
+.fc-item h4 { font-size: .8rem; font-weight: 600; line-height: 1.25; }
+.fc-item__row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .3rem; margin-top: auto; }
+.fc-item__price { font-family: var(--f-mono); font-weight: 600; font-size: .8rem; }
+.fc-add { border: 0; background: var(--green); color: #fff; border-radius: 999px; padding: .3rem .6rem; font-size: .74rem; font-weight: 600; }
+.fc-add:hover { background: var(--green-dark); }
+.fc-toast { position: absolute; left: 50%; bottom: 14px; translate: -50% 0; background: var(--ink); color: #fff; font-size: .78rem; padding: .45rem .8rem; border-radius: 999px; opacity: 0; transition: opacity .2s; pointer-events: none; white-space: nowrap; z-index: 4; }
+.fc-toast.show { opacity: 1; }
+
+/* Carrito lateral dentro del móvil */
+.fc-drawer {
+  position: absolute; inset: 30px 0 0 12%; z-index: 5;
+  background: #fff; box-shadow: -10px 0 30px rgba(0,0,0,.25);
+  display: flex; flex-direction: column;
+  transform: translateX(105%); visibility: hidden;
+  transition: transform .28s ease, visibility .28s;
+}
+.fc-drawer.open { transform: none; visibility: visible; }
+.fc-scrim { position: absolute; inset: 30px 0 0; background: rgba(27,38,36,.35); z-index: 4; opacity: 0; visibility: hidden; transition: opacity .25s, visibility .25s; border: 0; padding: 0; cursor: default; }
+.fc-scrim.open { opacity: 1; visibility: visible; }
+.fc-drawer__head { display: flex; justify-content: space-between; align-items: center; padding: .7rem .8rem; border-bottom: 1px solid #eee4d4; }
+.fc-drawer__head h4 { font-family: var(--f-display); font-stretch: 75%; text-transform: uppercase; font-size: 1.1rem; }
+.fc-close { border: 0; background: #f2ebdf; border-radius: 50%; width: 32px; height: 32px; display: grid; place-items: center; }
+.fc-drawer__body { flex: 1; overflow-y: auto; padding: .7rem .8rem; font-size: .82rem; }
+.fc-lines { list-style: none; padding: 0; margin: 0 0 .8rem; display: grid; gap: .5rem; }
+.fc-line { display: grid; grid-template-columns: 1fr auto; gap: .2rem .5rem; align-items: center; padding-bottom: .5rem; border-bottom: 1px dashed #eadfcb; }
+.fc-line__name { font-weight: 500; line-height: 1.25; }
+.fc-line__sum { font-family: var(--f-mono); font-size: .78rem; }
+.fc-qty { display: flex; align-items: center; gap: .3rem; }
+.fc-qty button { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--green); background: #fff; color: var(--green); font-weight: 700; line-height: 1; padding: 0; }
+.fc-qty span { min-width: 1.2em; text-align: center; font-family: var(--f-mono); }
+.fc-empty { color: #6b5d4c; font-style: italic; }
+.fc-opts { border: 0; padding: 0; margin: 0 0 .8rem; display: grid; gap: .35rem; }
+.fc-opts legend { font-family: var(--f-mono); font-size: .64rem; letter-spacing: .08em; text-transform: uppercase; color: #6b5d4c; margin-bottom: .35rem; padding: 0; }
+.fc-opt { display: flex; align-items: center; gap: .5rem; border: 1.5px solid #eadfcb; border-radius: 10px; padding: .45rem .6rem; cursor: pointer; }
+.fc-opt:has(input:checked) { border-color: var(--green); background: #f1f6f3; }
+.fc-opt:has(input:focus-visible) { outline: 3px solid var(--terra); outline-offset: 2px; }
+.fc-opt input { accent-color: var(--green); margin: 0; }
+.fc-opt small { margin-left: auto; font-family: var(--f-mono); font-size: .72rem; color: #5a4c3c; }
+.fc-totals { display: grid; grid-template-columns: 1fr auto; gap: .2rem; font-size: .82rem; margin-bottom: .6rem; }
+.fc-totals dt, .fc-totals dd { margin: 0; }
+.fc-totals dd { font-family: var(--f-mono); text-align: right; }
+.fc-totals .total { font-weight: 700; font-size: .95rem; padding-top: .3rem; border-top: 1.5px solid var(--ink); }
+.fc-pay-methods { display: grid; grid-template-columns: 1fr 1fr; gap: .4rem; }
+.fc-pay-methods .fc-opt { justify-content: center; font-weight: 600; }
+.fc-drawer__foot { padding: .7rem .8rem .9rem; border-top: 1px solid #eee4d4; }
+.fc-pay { width: 100%; }
+.fc-sim { font-size: .7rem; text-align: center; color: #6b5d4c; margin: .4rem 0 0; }
+.fc-done { text-align: center; padding: 1.2rem .4rem; }
+.fc-done svg { width: 56px; height: 56px; margin: 0 auto .6rem; }
+.fc-done h5 { font-family: var(--f-display); font-stretch: 75%; text-transform: uppercase; font-size: 1.3rem; margin: 0 0 .4rem; }
+
+/* Panel del negocio bajo el móvil */
+.biz {
+  margin-top: 1rem; background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
+  padding: .9rem 1rem; font-size: .88rem;
+}
+.biz__head { display: flex; justify-content: space-between; align-items: center; gap: .5rem; margin-bottom: .5rem; }
+.biz__empty { color: var(--ink-soft); margin: 0; }
+.order-alert { display: grid; grid-template-columns: 36px 1fr; gap: .65rem; align-items: start; animation: drop .4s ease-out; }
+.order-alert__icon { width: 36px; height: 36px; border-radius: 10px; background: var(--terra); display: grid; place-items: center; }
+.order-alert p { margin: 0; }
+.order-alert strong { font-size: .95rem; }
+.order-alert ul { margin: .3rem 0 0; padding-left: 1.1rem; font-size: .82rem; color: var(--ink-soft); }
+
+/* =========================================================
+   8. DEMO 4 · FRUTERÍA A HORTA (ficha de Google)
+   ========================================================= */
+.gm { background: #fff; color: #202124; font-size: .84rem; }
+.gm .phone__status { background: #fff; }
+.tabs { flex: none; display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid #e3e3e3; background: #fff; }
+.tabs [role="tab"] { border: 0; background: transparent; padding: .65rem .2rem; font-weight: 600; font-size: .8rem; color: #50585a; border-bottom: 3px solid transparent; }
+.tabs [role="tab"][aria-selected="true"] { color: var(--green); border-bottom-color: var(--green); }
+.tabs--page { background: var(--card); border-radius: 12px 12px 0 0; }
+.gm-panel { padding: .8rem .85rem 1.2rem; }
+.gm-panel[hidden] { display: none; }
+.gm-badge { display: inline-block; font-family: var(--f-mono); font-size: .62rem; letter-spacing: .08em; text-transform: uppercase; padding: .15rem .45rem; border-radius: 4px; margin-bottom: .6rem; font-weight: 600; }
+.gm-badge--before { background: #F2E3DC; color: #7A2E12; }
+.gm-badge--after { background: #DDEDE4; color: #154D33; }
+.gm-cover { display: grid; grid-template-columns: 2fr 1fr; gap: 3px; border-radius: 10px; overflow: hidden; height: 120px; margin-bottom: .7rem; }
+.gm-cover > div { display: grid; place-items: center; font-size: .66rem; color: rgba(255,255,255,.95); text-align: center; padding: .2rem; }
+.gm-cover--poor > div { background: #cfcac2; color: #555; }
+.gm-name { font-size: 1.15rem; font-weight: 600; line-height: 1.2; }
+.gm-rating { display: flex; align-items: center; flex-wrap: wrap; gap: .3rem; color: #50585a; margin: .2rem 0; }
+.stars { color: #C98A12; letter-spacing: 1px; }
+.gm-cat { color: #50585a; }
+.gm-rows { list-style: none; padding: 0; margin: .7rem 0; border-top: 1px solid #eee; }
+.gm-rows li { display: grid; grid-template-columns: 22px 1fr; gap: .55rem; padding: .5rem 0; border-bottom: 1px solid #eee; align-items: start; }
+.gm-rows svg { width: 18px; height: 18px; margin-top: 1px; color: #50585a; }
+.gm-missing { color: #A2361A; font-style: italic; }
+.gm-hours { width: 100%; border-collapse: collapse; font-size: .78rem; margin-top: .2rem; }
+.gm-hours td { padding: .08rem 0; }
+.gm-hours td:last-child { text-align: right; font-family: var(--f-mono); font-size: .72rem; }
+.gm-open { color: #137333; font-weight: 600; }
+mark { background: #FFF0B3; color: inherit; padding: 0 .1em; border-radius: 2px; }
+.gm-photos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; list-style: none; padding: 0; margin: .4rem 0 .8rem; }
+.gm-photos li { aspect-ratio: 1; border-radius: 5px; display: flex; align-items: flex-end; padding: 2px 3px; font-size: .55rem; line-height: 1.1; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.5); overflow: hidden; }
+.gm-sub { font-weight: 600; font-size: .9rem; margin: .8rem 0 .3rem; }
+.review { border-top: 1px solid #eee; padding: .6rem 0; }
+.review__head { display: flex; align-items: center; gap: .45rem; flex-wrap: wrap; }
+.review__av { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-weight: 600; font-size: .75rem; flex: none; }
+.review p { margin: .3rem 0 0; }
+.review__none { font-size: .74rem; color: #A2361A; margin-top: .3rem; font-style: italic; }
+.review__reply { margin-top: .45rem; background: #F3F6F4; border-left: 3px solid var(--green); padding: .4rem .55rem; border-radius: 4px; font-size: .8rem; }
+.review__reply b { display: block; font-size: .72rem; }
+.gm-search { display: flex; align-items: center; gap: .5rem; border: 1px solid #dadce0; border-radius: 999px; padding: .5rem .8rem; margin-bottom: .7rem; box-shadow: 0 1px 4px rgba(0,0,0,.1); }
+.gm-search svg { width: 16px; height: 16px; flex: none; color: #50585a; }
+.gm-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; background: #f1f3f4; border-radius: 999px; padding: 3px; margin-bottom: .7rem; }
+.gm-switch button { border: 0; border-radius: 999px; background: transparent; padding: .35rem; font-size: .75rem; font-weight: 600; color: #50585a; }
+.gm-switch button[aria-pressed="true"] { background: #fff; color: var(--green); box-shadow: 0 1px 2px rgba(0,0,0,.15); }
+.gm-mini-map { height: 90px; border-radius: 10px; overflow: hidden; margin-bottom: .6rem; }
+.gm-results { list-style: none; margin: 0; padding: 0; counter-reset: r; }
+.gm-results li { display: grid; grid-template-columns: 24px 1fr; gap: .5rem; padding: .5rem .3rem; border-bottom: 1px solid #eee; align-items: start; transition: background .3s; }
+.gm-results li::before { counter-increment: r; content: counter(r); width: 22px; height: 22px; border-radius: 50%; background: #eceff1; display: grid; place-items: center; font-size: .7rem; font-weight: 700; }
+.gm-results li.is-us { background: #EAF3EE; border-radius: 8px; }
+.gm-results li.is-us::before { background: var(--green); color: #fff; }
+.gm-results small { display: block; color: #50585a; }
+.gm-disclaimer { font-size: .74rem; background: #FFF4D6; border-radius: 8px; padding: .45rem .6rem; margin-top: .7rem; color: #4d3d0a; }
+
+/* =========================================================
+   9. PACK + MANTENIMIENTO
+   ========================================================= */
+.pack { background: var(--green); color: #F4EEE2; border-top: 0; }
+.pack .service__kicker { color: #F2B79C; }
+.pack h2 { color: #fff; }
+.pack .service__tag { color: #CFE0DA; }
+.pack-grid { display: grid; gap: 2rem; }
+@media (min-width: 920px) { .pack-grid { grid-template-columns: 340px 1fr; gap: 3rem; align-items: start; } }
+.pack .price { background: var(--green-dark); box-shadow: none; }
+.pack .price__amount { color: #fff; }
+.pack .price__amount small, .pack .price__label { color: #DCE6E1; }
+.pack .price__label b { color: #F2B79C; }
+.pack .chip { background: rgba(255,255,255,.12); color: #fff; }
+.pack .includes li::before { background-color: var(--terra); }
+.save { display: inline-block; background: var(--terra); color: #fff; font-family: var(--f-mono); font-size: .75rem; letter-spacing: .06em; text-transform: uppercase; padding: .25rem .6rem; border-radius: 6px; margin-bottom: 1rem; }
+
+/* Esquema de conexión */
+.flow-card { background: var(--card); color: var(--ink); border-radius: 18px; padding: 1.2rem; }
+.flow-card__head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .5rem; margin-bottom: 1rem; }
+.flow { display: grid; grid-template-columns: 1fr; gap: 0; align-items: center; }
+@media (min-width: 700px) { .flow { grid-template-columns: 1fr minmax(90px, .8fr) 1.15fr minmax(90px, .8fr) 1fr; } }
+.flow__node { background: #fff; border: 2px solid var(--ink); border-radius: 14px; padding: .8rem; text-align: center; }
+.flow__node svg { width: 36px; height: 36px; margin: 0 auto .4rem; color: var(--green); }
+.flow__node h3 { font-family: var(--f-display); font-stretch: 75%; text-transform: uppercase; font-size: 1.15rem; line-height: 1; }
+.flow__node p { font-size: .8rem; color: var(--ink-soft); margin: .35rem 0 0; line-height: 1.35; }
+.flow__node--core { background: var(--green); color: #fff; border-color: var(--green); }
+.flow__node--core svg { color: #fff; }
+.flow__node--core p { color: #DCE6E1; }
+.flow__link { position: relative; text-align: center; font-size: .78rem; font-family: var(--f-serif); font-style: italic; color: var(--terra-ink); padding: 1.6rem .4rem; line-height: 1.3; }
+/* Flecha: vertical en móvil, horizontal en escritorio */
+.flow__link::before { content: ""; position: absolute; left: 50%; top: 4px; bottom: 4px; border-left: 2px dashed var(--terra); }
+.flow__link span { position: relative; background: var(--card); padding: .1rem .3rem; display: inline-block; }
+@media (min-width: 700px) {
+  .flow__link { padding: .4rem .2rem; }
+  .flow__link::before { left: 4px; right: 4px; top: 50%; bottom: auto; border-left: 0; border-top: 2px dashed var(--terra); }
+}
+.flow__out { margin-top: 1rem; display: grid; gap: .6rem; }
+@media (min-width: 700px) { .flow__out { grid-template-columns: repeat(3, 1fr); } }
+.flow__step { display: grid; grid-template-columns: 28px 1fr; gap: .5rem; align-items: start; font-size: .85rem; background: var(--paper); border-radius: 10px; padding: .6rem .7rem; }
+.flow__step b { width: 26px; height: 26px; border-radius: 50%; background: var(--terra); color: #fff; display: grid; place-items: center; font-family: var(--f-mono); font-size: .75rem; }
+
+/* Panel de mantenimiento */
+.maint { padding-block: 3.5rem; scroll-margin-top: 12px; }
+.maint-card { background: var(--card); border-radius: 20px; box-shadow: var(--shadow); padding: 1.4rem; display: grid; gap: 1.5rem; }
+@media (min-width: 920px) { .maint-card { grid-template-columns: 1fr 1.3fr; padding: 2rem; gap: 2.5rem; } }
+.maint h2 { font-size: clamp(2.1rem, 8vw, 3.6rem); }
+.maint-prices { list-style: none; padding: 0; margin: 1rem 0 0; display: grid; gap: .35rem; }
+.maint-prices li { display: flex; justify-content: space-between; gap: 1rem; border-bottom: 1px dashed var(--line); padding: .35rem 0; font-size: .92rem; }
+.maint-prices b { font-family: var(--f-mono); white-space: nowrap; }
+.maint-list { list-style: none; padding: 0; margin: 0; display: grid; gap: .8rem; grid-template-columns: 1fr; }
+@media (min-width: 560px) { .maint-list { grid-template-columns: 1fr 1fr; } }
+.maint-list li { display: grid; grid-template-columns: 44px 1fr; gap: .7rem; align-items: start; background: var(--paper); border-radius: 12px; padding: .8rem; }
+.maint-list .ico { width: 44px; height: 44px; border-radius: 12px; background: var(--green); display: grid; place-items: center; }
+.maint-list .ico svg { width: 24px; height: 24px; color: #fff; }
+.maint-list strong { display: block; line-height: 1.2; margin-bottom: .2rem; }
+.maint-list span { font-size: .85rem; color: var(--ink-soft); }
+.not-included { margin-top: 1rem; padding: .8rem 1rem; border: 1.5px dashed var(--terra); border-radius: 12px; font-size: .92rem; }
+.not-included b { color: var(--terra-ink); }
+
+/* =========================================================
+   10. PIE
+   ========================================================= */
+.site-foot { background: var(--ink); color: #E6DED0; padding-block: 3rem 2rem; }
+.site-foot h2 { font-size: clamp(2.4rem, 10vw, 4.6rem); color: #fff; }
+.site-foot h2 em { font-family: var(--f-serif); font-style: italic; font-weight: 400; text-transform: none; color: #F2B79C; font-stretch: normal; }
+.contact { display: grid; gap: .8rem; margin: 1.5rem 0 2rem; }
+@media (min-width: 700px) { .contact { grid-template-columns: repeat(3, 1fr); } }
+.contact a, .contact div { display: block; background: #26332F; border-radius: 12px; padding: .9rem 1rem; color: #fff; text-decoration: none; overflow-wrap: anywhere; }
+.contact a:hover { background: #2E3D39; }
+.contact .mono { color: #F2B79C; display: block; margin-bottom: .2rem; }
+.foot-note { font-size: .82rem; color: #B9B1A3; border-top: 1px solid #34413E; padding-top: 1rem; }
+</style>
+</head>
+
+<body>
+<a class="skip-link" href="#web">Saltar al primer servicio</a>
+
+<!-- =========================================================
+     CABECERA + ÍNDICE
+     ========================================================= -->
+<header class="site-head">
+  <div class="wrap">
+    <div class="topbar">
+      <span class="brand">Nadia Lagoa <span>·</span> Servicios digitais</span>
+      <span class="mono">A Coruña · Costa da Morte</span>
+    </div>
+
+    <div class="hero">
+      <h1 class="display">Así quedaría en un negocio <em>como el tuyo</em></h1>
+      <p class="hero__lead">Cuatro servicios pensados para negocios pequeños, explicados con un ejemplo que puedes tocar: reserva una cita, escribe al asistente de WhatsApp, haz un pedido o compara una ficha de Google antes y después.</p>
+      <p class="hero__note">
+        <span class="stamp stamp--sm">Aviso</span>
+        <span>Todos los negocios, personas, teléfonos y reseñas de esta página son <strong>ficticios</strong>. Sirven solo para que veas qué recibirías; no son trabajos ni clientes reales.</span>
+      </p>
+    </div>
+
+    <nav class="toc" aria-labelledby="toc-title">
+      <h2 id="toc-title" class="mono">Índice de servicios</h2>
+      <ol>
+        <li><a href="#web"><span class="toc__n">01</span><span class="toc__t">Web con galería y reservas</span><span class="toc__p">375 €</span></a></li>
+        <li><a href="#whatsapp"><span class="toc__n">02</span><span class="toc__t">Asistente de WhatsApp</span><span class="toc__p">275 €</span></a></li>
+        <li><a href="#tienda"><span class="toc__n">03</span><span class="toc__t">Tienda online pequeña</span><span class="toc__p">575 €</span></a></li>
+        <li><a href="#google"><span class="toc__n">04</span><span class="toc__t">Google Maps y SEO local</span><span class="toc__p">175 €</span></a></li>
+        <li><a href="#pack"><span class="toc__n">05</span><span class="toc__t">Pack web + WhatsApp</span><span class="toc__p">575 €</span></a></li>
+        <li><a href="#mantenimiento"><span class="toc__n">06</span><span class="toc__t">Mantenimiento opcional</span><span class="toc__p">desde 20 €/mes</span></a></li>
+      </ol>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- =========================================================
+     SERVICIO 1 · WEB CON GALERÍA Y RESERVAS
+     ========================================================= -->
+<section class="service" id="web" aria-labelledby="web-title">
+  <div class="wrap service__grid">
+    <div class="service__info">
+      <span class="service__kicker mono">Servicio 01</span>
+      <h2 id="web-title" class="display">Web con galería y reservas</h2>
+      <p class="service__tag serif-i">Tu escaparate abierto las 24 horas, con agenda incluida.</p>
+
+      <div class="price">
+        <span class="price__amount">375 €<small> + IVA</small></span>
+        <span class="price__label"><b>Precio de lanzamiento</b>pago único</span>
+      </div>
+      <div class="meta">
+        <span class="chip"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.5V8l2.5 1.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Plazo: 3 a 4 semanas</span>
+        <span class="chip">Mantenimiento opcional: 20 €/mes</span>
+      </div>
+
+      <div class="includes">
+        <h3 class="mono">Qué incluye</h3>
+        <ul>
+          <li>Web de una página con varias secciones, pensada primero para el móvil.</li>
+          <li>Galería de trabajos que puedes ampliar tú.</li>
+          <li>Reservas online por servicio, día y hora, con huecos ocupados bloqueados.</li>
+          <li>Recordatorio automático el día anterior para reducir las ausencias.</li>
+          <li>Contacto con mapa, horario y botón directo a WhatsApp.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="demo">
+      <div class="demo__head">
+        <span class="stamp">Ejemplo ficticio</span>
+        <span class="demo__hint">Prueba a reservar una cita</span>
+      </div>
+      <div class="phone">
+        <div class="phone__screen tn">
+          <div class="phone__status" aria-hidden="true"><span>9:41</span><span>5G ▮▮▮</span></div>
+          <div class="phone__app" id="tn-app" tabindex="0" aria-label="Demo: web del Estudio Tinta Norte (ejemplo ficticio)">
+
+            <div class="tn-nav">
+              <span class="tn-logo">Tinta Norte</span>
+              <span><a href="#tn-galeria">Trabajos</a><a href="#tn-reserva">Citas</a></span>
+            </div>
+
+            <!-- Portada con ilustración SVG en lugar de foto -->
+            <div class="tn-hero">
+              <svg class="tn-hero__bg" viewBox="0 0 300 250" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Ilustración: interior del estudio con lámpara y vistas al mar de noche">
+                <defs>
+                  <linearGradient id="tnSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a1f1c"/><stop offset="1" stop-color="#5a2f22"/></linearGradient>
+                  <radialGradient id="tnLamp" cx=".72" cy=".25" r=".5"><stop offset="0" stop-color="#f6c98a" stop-opacity=".75"/><stop offset="1" stop-color="#f6c98a" stop-opacity="0"/></radialGradient>
+                </defs>
+                <rect width="300" height="250" fill="url(#tnSky)"/>
+                <rect width="300" height="250" fill="url(#tnLamp)"/>
+                <!-- ventana con el mar -->
+                <rect x="22" y="26" width="110" height="92" rx="4" fill="#1d3a3f" stroke="#c9a77a" stroke-width="3"/>
+                <path d="M22 92 Q50 84 77 92 T132 92 V118 H22Z" fill="#244b50"/>
+                <path d="M100 58 l5 -22 5 22z" fill="#e9dcc6"/><rect x="101" y="58" width="8" height="34" fill="#e9dcc6"/>
+                <circle cx="105" cy="40" r="10" fill="#f6c98a" opacity=".35"/>
+                <line x1="77" y1="26" x2="77" y2="118" stroke="#c9a77a" stroke-width="2"/>
+                <!-- lámpara -->
+                <line x1="216" y1="0" x2="216" y2="44" stroke="#c9a77a" stroke-width="2"/>
+                <path d="M200 44 h32 l-6 16 h-20z" fill="#c9a77a"/>
+                <!-- camilla y plantas -->
+                <rect x="160" y="168" width="140" height="18" rx="6" fill="#3b2a24"/>
+                <rect x="172" y="186" width="6" height="64" fill="#2b1e1a"/><rect x="282" y="186" width="6" height="64" fill="#2b1e1a"/>
+                <path d="M30 250 q8 -40 22 -52 M52 250 q-2 -36 12 -60 M44 250 q14 -30 30 -38" stroke="#5f7d5a" stroke-width="5" fill="none" stroke-linecap="round"/>
+                <linearGradient id="tnShade" x1="0" y1="0" x2="0" y2="1"><stop offset=".25" stop-color="#140f0d" stop-opacity="0"/><stop offset=".85" stop-color="#140f0d" stop-opacity=".85"/></linearGradient>
+                <rect width="300" height="250" fill="url(#tnShade)"/>
+              </svg>
+              <span class="mono" style="color:#f3e7d4">Monte Alto · A Coruña</span>
+              <h3>Estudio Tinta Norte <small style="font-size:.55em;display:block">(ejemplo)</small></h3>
+              <p>Tatuaje de línea fina y motivos del mar, sin prisas.</p>
+              <button type="button" class="tn-btn" data-scroll-to="tn-reserva">Reservar cita</button>
+            </div>
+
+            <!-- Galería -->
+            <div class="tn-sec" id="tn-galeria">
+              <h4 class="tn-h">Trabajos recientes</h4>
+              <ul class="tn-gallery" id="tn-gallery"><!-- generado por JS --></ul>
+            </div>
+
+            <!-- Reservas -->
+            <div class="tn-sec" id="tn-reserva">
+              <h4 class="tn-h">Reserva tu cita</h4>
+              <fieldset class="bk-services">
+                <legend class="bk-label">1 · Servicio</legend>
+                <div id="bk-services"><!-- generado por JS --></div>
+              </fieldset>
+
+              <span class="bk-label" id="bk-days-label">2 · Día (semana del 12 al 17 de octubre)</span>
+              <div class="bk-days" id="bk-days" role="group" aria-labelledby="bk-days-label"></div>
+
+              <span class="bk-label" id="bk-slots-label">3 · Hora</span>
+              <div class="bk-slots" id="bk-slots" role="group" aria-labelledby="bk-slots-label"></div>
+              <p class="bk-legend">Las horas tachadas ya están ocupadas.</p>
+
+              <div class="bk-result" id="bk-result" hidden aria-live="polite">
+                <div class="bk-ok" id="bk-ok"></div>
+                <div class="notif" id="bk-reminder">
+                  <div class="notif__head">
+                    <span class="notif__icon" aria-hidden="true"><svg viewBox="0 0 12 12" width="10" height="10"><path d="M6 1.5a3 3 0 0 0-3 3v2L2 8h8L9 6.5v-2a3 3 0 0 0-3-3zM5 9.5a1 1 0 0 0 2 0" fill="#fff"/></svg></span>
+                    Recordatorio automático · el día antes
+                  </div>
+                  <p id="bk-reminder-text" style="margin:0"></p>
+                  <div class="notif__actions">
+                    <button type="button" class="yes" id="bk-confirm">Confirmar</button>
+                    <button type="button" id="bk-change">Cambiar</button>
+                  </div>
+                  <p class="notif__status" id="bk-status" hidden></p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Contacto -->
+            <div class="tn-sec" id="tn-contacto">
+              <h4 class="tn-h">Dónde estamos</h4>
+              <div class="tn-map">
+                <svg viewBox="0 0 300 150" role="img" aria-label="Mapa ilustrativo de Monte Alto con la ubicación del estudio">
+                  <rect width="300" height="150" fill="#efe6d6"/>
+                  <path d="M0 0 H300 V38 Q220 52 150 34 T0 44Z" fill="#a9c9cc"/>
+                  <text x="14" y="22" font-size="10" fill="#2c5b60" font-family="IBM Plex Mono, monospace">Océano Atlántico</text>
+                  <g stroke="#fff" stroke-width="9" stroke-linecap="round" fill="none">
+                    <path d="M0 90 H300"/><path d="M40 50 L80 150"/><path d="M150 46 V150"/><path d="M230 52 L210 150"/><path d="M0 128 Q120 118 300 132"/>
+                  </g>
+                  <g fill="#dcd0bb"><rect x="90" y="56" width="50" height="26" rx="3"/><rect x="160" y="98" width="42" height="22" rx="3"/><rect x="242" y="98" width="50" height="24" rx="3"/><rect x="14" y="98" width="40" height="22" rx="3"/></g>
+                  <path d="M178 58 c-11 0 -16 9 -16 15 c0 11 16 25 16 25 s16 -14 16 -25 c0 -6 -5 -15 -16 -15z" fill="#C0522B"/>
+                  <circle cx="178" cy="73" r="5.5" fill="#fff"/>
+                  <text x="200" y="76" font-size="10" fill="#1d1a1a" font-weight="600" font-family="Work Sans, sans-serif">Tinta Norte</text>
+                </svg>
+              </div>
+              <p class="demo-note">Rúa do Exemplo, 12 · Monte Alto, A Coruña (dirección ficticia)</p>
+              <table class="tn-hours">
+                <caption class="visually-hidden">Horario del estudio</caption>
+                <tr><th scope="row">Lunes a viernes</th><td>11:00–14:00 · 16:00–20:00</td></tr>
+                <tr><th scope="row">Sábados</th><td>10:00–14:00</td></tr>
+                <tr><th scope="row">Domingos</th><td>Cerrado</td></tr>
+              </table>
+              <button type="button" class="wa-btn" id="tn-wa">
+                <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="#fff" d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-3.9-4.7-4.1-.1-.2-1.1-1.5-1.1-2.9s.7-2.1 1-2.4c.3-.3.6-.3.8-.3h.6c.2 0 .4 0 .6.5l.9 2.1c.1.2.1.3 0 .5l-.3.5-.4.5c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.3 2.4 1.5.3.1.5.1.6-.1l.9-1c.2-.3.4-.2.6-.1l2 .9c.3.1.5.2.5.3.1.2.1.7-.1 1.4z"/></svg>
+                Escríbenos por WhatsApp
+              </button>
+              <p class="demo-note" id="tn-wa-note" aria-live="polite"></p>
+            </div>
+
+            <div class="tn-foot">© Estudio Tinta Norte (ejemplo) · 600 000 000 · ejemplo@ejemplo.gal</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================
+     SERVICIO 2 · ASISTENTE DE WHATSAPP
+     ========================================================= -->
+<section class="service" id="whatsapp" aria-labelledby="wa-title">
+  <div class="wrap service__grid">
+    <div class="service__info">
+      <span class="service__kicker mono">Servicio 02</span>
+      <h2 id="wa-title" class="display">Asistente de WhatsApp</h2>
+      <p class="service__tag serif-i">Responde a las 22:47 aunque tú ya estés en el sofá.</p>
+
+      <div class="price">
+        <span class="price__amount">275 €<small> + IVA</small></span>
+        <span class="price__label"><b>Precio de lanzamiento</b>pago único</span>
+      </div>
+      <div class="meta">
+        <span class="chip"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.5V8l2.5 1.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Plazo: 2 a 3 semanas</span>
+        <span class="chip">Mantenimiento opcional: 25 €/mes</span>
+      </div>
+
+      <div class="includes">
+        <h3 class="mono">Qué incluye</h3>
+        <ul>
+          <li>Respuestas automáticas a las preguntas de siempre: horario, precios, dirección.</li>
+          <li>Reserva de citas desde el chat, con recordatorio antes de la cita.</li>
+          <li>En castellano y en gallego, según escriba el cliente.</li>
+          <li>Cuando no sabe algo, lo dice y te pasa la conversación a ti.</li>
+          <li>Funciona con WhatsApp Business en tu mismo número.</li>
+        </ul>
+      </div>
+      <p class="fineprint">Las posibles tarifas de mensajería de WhatsApp Business no están incluidas en el precio.</p>
+    </div>
+
+    <div class="demo">
+      <div class="demo__head">
+        <span class="stamp">Ejemplo ficticio</span>
+        <span class="demo__hint">Escribe o usa los botones</span>
+      </div>
+      <div class="phone">
+        <div class="phone__screen wa">
+          <div class="phone__status" aria-hidden="true"><span id="wa-clock">22:47</span><span>4G ▮▮▮</span></div>
+          <div class="wa-head">
+            <span class="wa-avatar" aria-hidden="true">Mf</span>
+            <div class="wa-head__txt">
+              <div class="wa-head__name">Peluquería Mar de Fondo (ejemplo)</div>
+              <div class="wa-head__sub" id="wa-sub">Asistente automático</div>
+            </div>
+            <div class="wa-lang" role="group" aria-label="Idioma del chat">
+              <button type="button" data-lang="es" aria-pressed="true">ES</button>
+              <button type="button" data-lang="gl" aria-pressed="false">GL</button>
+            </div>
+          </div>
+          <div class="wa-log" id="wa-log" role="log" aria-live="polite" aria-label="Conversación de ejemplo" tabindex="0"></div>
+          <div class="wa-quick" id="wa-quick" role="group" aria-label="Preguntas rápidas"></div>
+          <form class="wa-form" id="wa-form" autocomplete="off">
+            <label for="wa-input" class="visually-hidden">Escribe un mensaje</label>
+            <input id="wa-input" type="text" maxlength="160" placeholder="Escribe un mensaje">
+            <button type="submit" aria-label="Enviar mensaje">
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M3 20l18-8L3 4v6l12 2-12 2z" fill="currentColor"/></svg>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================
+     SERVICIO 3 · TIENDA ONLINE PEQUEÑA
+     ========================================================= -->
+<section class="service" id="tienda" aria-labelledby="shop-title">
+  <div class="wrap service__grid">
+    <div class="service__info">
+      <span class="service__kicker mono">Servicio 03</span>
+      <h2 id="shop-title" class="display">Tienda online pequeña</h2>
+      <p class="service__tag serif-i">Pedidos de la empanada del domingo, sin llamadas.</p>
+
+      <div class="price">
+        <span class="price__amount">575 €<small> + IVA</small></span>
+        <span class="price__label"><b>Precio de lanzamiento</b>pago único</span>
+      </div>
+      <div class="meta">
+        <span class="chip"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.5V8l2.5 1.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Plazo: 4 a 6 semanas</span>
+        <span class="chip">Mantenimiento opcional: 25 €/mes</span>
+      </div>
+
+      <div class="includes">
+        <h3 class="mono">Qué incluye</h3>
+        <ul>
+          <li>Catálogo con fotos, precios y categorías que gestionas tú.</li>
+          <li>Carrito con recogida en tienda o envío a domicilio.</li>
+          <li>Pago con Bizum o tarjeta a través de la pasarela de tu banco.</li>
+          <li>Aviso al momento de cada pedido nuevo, por email o en el móvil.</li>
+          <li>Una sesión de formación para que subas productos sin ayuda.</li>
+        </ul>
+      </div>
+      <p class="fineprint">Las comisiones de la pasarela de pago y los gastos de envío dependen de tu banco y transportista.</p>
+    </div>
+
+    <div class="demo">
+      <div class="demo__head">
+        <span class="stamp">Ejemplo ficticio</span>
+        <span class="demo__hint">Añade productos y paga (simulado)</span>
+      </div>
+      <div class="phone">
+        <div class="phone__screen fc">
+          <div class="phone__status" aria-hidden="true"><span>11:02</span><span>5G ▮▮▮</span></div>
+          <div class="phone__app" tabindex="0" aria-label="Demo: tienda online de Forno do Cantón (ejemplo ficticio)">
+            <div class="fc-head">
+              <span class="fc-logo">Forno do Cantón<small>Obradoiro · (ejemplo)</small></span>
+              <button type="button" class="fc-cart-btn" id="fc-open" aria-haspopup="dialog" aria-controls="fc-drawer" aria-expanded="false">
+                <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M3 4h2l2.4 10.2a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.8L20 7H6.2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="19" r="1.6" fill="currentColor"/><circle cx="17" cy="19" r="1.6" fill="currentColor"/></svg>
+                Carrito <span class="fc-count" id="fc-count" aria-label="0 productos">0</span>
+              </button>
+            </div>
+            <p class="fc-intro">Pan de masa madre e doces da casa. Encarga hoy, recoge mañana.</p>
+            <ul class="fc-grid" id="fc-grid"><!-- generado por JS --></ul>
+          </div>
+
+          <div class="fc-toast" id="fc-toast" role="status" aria-live="polite"></div>
+
+          <!-- Carrito lateral -->
+          <button type="button" class="fc-scrim" id="fc-scrim" tabindex="-1" aria-label="Cerrar carrito"></button>
+          <div class="fc-drawer" id="fc-drawer" role="dialog" aria-modal="true" aria-labelledby="fc-drawer-title">
+            <div class="fc-drawer__head">
+              <h4 id="fc-drawer-title">Tu pedido</h4>
+              <button type="button" class="fc-close" id="fc-close" aria-label="Cerrar carrito">
+                <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+            <div class="fc-drawer__body" id="fc-body">
+              <ul class="fc-lines" id="fc-lines"></ul>
+
+              <fieldset class="fc-opts">
+                <legend>Entrega</legend>
+                <label class="fc-opt"><input type="radio" name="fc-delivery" value="pickup" checked> Recoger en tienda <small>gratis</small></label>
+                <label class="fc-opt"><input type="radio" name="fc-delivery" value="ship"> Envío a domicilio <small>3,50 €</small></label>
+              </fieldset>
+
+              <dl class="fc-totals">
+                <dt>Subtotal</dt><dd id="fc-sub">0,00 €</dd>
+                <dt>Entrega</dt><dd id="fc-ship">0,00 €</dd>
+                <dt class="total">Total</dt><dd class="total" id="fc-total">0,00 €</dd>
+              </dl>
+
+              <fieldset class="fc-opts">
+                <legend>Pago</legend>
+                <div class="fc-pay-methods">
+                  <label class="fc-opt"><input type="radio" name="fc-pay" value="Bizum" checked> Bizum</label>
+                  <label class="fc-opt"><input type="radio" name="fc-pay" value="Tarjeta"> Tarjeta</label>
+                </div>
+              </fieldset>
+            </div>
+            <div class="fc-drawer__foot" id="fc-foot">
+              <button type="button" class="btn btn--terra fc-pay" id="fc-pay" disabled>Pagar</button>
+              <p class="fc-sim">Pago simulado: no se cobra nada.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lo que ve el dueño del negocio -->
+      <div class="biz" aria-live="polite">
+        <div class="biz__head">
+          <strong>Panel del negocio</strong>
+          <span class="stamp stamp--sm">Ejemplo</span>
+        </div>
+        <div id="biz-body"><p class="biz__empty">Aquí te llegaría el aviso de cada pedido. Haz uno en la demo para verlo.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================
+     SERVICIO 4 · GOOGLE MAPS Y SEO LOCAL
+     ========================================================= -->
+<section class="service" id="google" aria-labelledby="gm-title">
+  <div class="wrap service__grid">
+    <div class="service__info">
+      <span class="service__kicker mono">Servicio 04</span>
+      <h2 id="gm-title" class="display">Google Maps y SEO local</h2>
+      <p class="service__tag serif-i">Que te encuentren cuando buscan “cerca de mí”.</p>
+
+      <div class="price">
+        <span class="price__amount">175 €<small> + IVA</small></span>
+        <span class="price__label"><b>Precio de lanzamiento</b>pago único</span>
+      </div>
+      <div class="meta">
+        <span class="chip"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.5V8l2.5 1.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Plazo: 1 semana</span>
+        <span class="chip">Sin cuota mensual</span>
+      </div>
+
+      <div class="includes">
+        <h3 class="mono">Qué incluye</h3>
+        <ul>
+          <li>Revisión completa de tu ficha de empresa en Google.</li>
+          <li>Categoría correcta, horario completo y festivos.</li>
+          <li>Descripción con las palabras que usan tus clientes al buscar.</li>
+          <li>Fotos ordenadas: fachada, interior, producto y equipo (las que tú aportes).</li>
+          <li>Plantilla amable para responder reseñas, y respuesta a las pendientes.</li>
+        </ul>
+      </div>
+      <p class="warning" role="note">
+        <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" style="flex:none"><path d="M10 2l9 16H1z" fill="#C0522B"/><path d="M10 8v4.5M10 14.6v.4" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+        <span>Mejoramos tu visibilidad; no se puede garantizar una posición concreta en Google.</span>
+      </p>
+    </div>
+
+    <div class="demo">
+      <div class="demo__head">
+        <span class="stamp">Ejemplo ficticio</span>
+        <span class="demo__hint">Cambia entre pestañas</span>
+      </div>
+      <div class="phone">
+        <div class="phone__screen gm">
+          <div class="phone__status" aria-hidden="true"><span>10:15</span><span>5G ▮▮▮</span></div>
+          <div class="tabs" role="tablist" aria-label="Ficha de Frutería A Horta">
+            <button type="button" role="tab" id="gm-tab-before" aria-controls="gm-before" aria-selected="true">Antes</button>
+            <button type="button" role="tab" id="gm-tab-after" aria-controls="gm-after" aria-selected="false" tabindex="-1">Después</button>
+            <button type="button" role="tab" id="gm-tab-search" aria-controls="gm-search" aria-selected="false" tabindex="-1">Búsqueda</button>
+          </div>
+          <div class="phone__app">
+
+            <!-- ANTES -->
+            <div class="gm-panel" id="gm-before" role="tabpanel" aria-labelledby="gm-tab-before" tabindex="0">
+              <span class="gm-badge gm-badge--before">Antes</span>
+              <div class="gm-cover gm-cover--poor">
+                <div>Foto borrosa de la fachada</div>
+                <div>Sin foto</div>
+              </div>
+              <div class="gm-name">Frutería A Horta (ejemplo)</div>
+              <div class="gm-rating"><b>3,7</b> <span class="stars" aria-label="3,7 de 5 estrellas">★★★★☆</span> <span>(3)</span></div>
+              <div class="gm-cat">Tienda</div>
+              <ul class="gm-rows">
+                <li><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 6v4l3 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span class="gm-missing">Horario sin añadir</span></li>
+                <li><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 5h12M4 10h12M4 15h7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span class="gm-missing">Sin descripción</span></li>
+                <li><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2c-3.3 0-6 2.5-6 5.8C4 12 10 18 10 18s6-6 6-10.2C16 4.5 13.3 2 10 2z" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="10" cy="8" r="2" fill="currentColor"/></svg><span>Rúa Exemplo, 3, A Coruña</span></li>
+                <li><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="4" width="14" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="8" cy="9" r="1.6" fill="currentColor"/><path d="M4 15l4-3 3 2 2-2 3 3" fill="none" stroke="currentColor" stroke-width="1.4"/></svg><span>2 fotos</span></li>
+              </ul>
+              <p class="gm-sub">Reseñas</p>
+              <div id="gm-reviews-before"></div>
+            </div>
+
+            <!-- DESPUÉS -->
+            <div class="gm-panel" id="gm-after" role="tabpanel" aria-labelledby="gm-tab-after" tabindex="0" hidden>
+              <span class="gm-badge gm-badge--after">Después</span>
+              <div class="gm-cover">
+                <div style="background:linear-gradient(140deg,#d9822b,#8e3b14)">Fachada con toldo verde</div>
+                <div style="background:linear-gradient(140deg,#5d8a3a,#2e5420)">Fruta de temporada</div>
+              </div>
+              <div class="gm-name">Frutería A Horta (ejemplo)</div>
+              <div class="gm-rating"><b>3,7</b> <span class="stars" aria-label="3,7 de 5 estrellas">★★★★☆</span> <span>(3 · todas respondidas)</span></div>
+              <div class="gm-cat">Frutería · Tienda de verduras</div>
+              <ul class="gm-rows">
+                <li><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 6v4l3 2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                  <div><span class="gm-open">Abierto</span> · Cierra a las 14:00
+                    <table class="gm-hours">
+                      <caption class="visually-hidden">Horario completo</caption>
+                      <tr><td>Lunes a viernes</td><td>8:30–14:00 · 17:00–20:00</td></tr>
+                      <tr><td>Sábado</td><td>8:30–14:00</td></tr>
+                      <tr><td>Domingo</td><td>Cerrado</td></tr>
+                    </table>
+                  </div>
+                </li>
+                <li><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 5h12M4 10h12M4 15h7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                  <span><mark>Frutería de barrio</mark> en A Coruña con <mark>fruta fresca</mark> y <mark>verdura de temporada</mark> de huertas de Bergantiños. Preparamos cestas y hacemos <mark>reparto a domicilio</mark> en el barrio.</span></li>
+                <li><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2c-3.3 0-6 2.5-6 5.8C4 12 10 18 10 18s6-6 6-10.2C16 4.5 13.3 2 10 2z" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="10" cy="8" r="2" fill="currentColor"/></svg><span>Rúa Exemplo, 3, A Coruña</span></li>
+                <li><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 3h3l1.5 4-2 1.3a9 9 0 0 0 4.2 4.2L13 10.5l4 1.5v3a2 2 0 0 1-2 2A13 13 0 0 1 3 5a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg><span>600 000 000</span></li>
+              </ul>
+              <p class="gm-sub">12 fotos ordenadas</p>
+              <ul class="gm-photos" id="gm-photos" aria-label="Doce fotos de ejemplo ordenadas por tipo"></ul>
+              <p class="gm-sub">Reseñas</p>
+              <div id="gm-reviews-after"></div>
+            </div>
+
+            <!-- BÚSQUEDA -->
+            <div class="gm-panel" id="gm-search" role="tabpanel" aria-labelledby="gm-tab-search" tabindex="0" hidden>
+              <div class="gm-search" aria-label="Búsqueda simulada">
+                <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M13 13l4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                <span>fruta fresca cerca de mí</span>
+              </div>
+              <div class="gm-switch" role="group" aria-label="Comparar resultados">
+                <button type="button" data-rank="before" aria-pressed="false">Antes</button>
+                <button type="button" data-rank="after" aria-pressed="true">Después</button>
+              </div>
+              <div class="gm-mini-map">
+                <svg viewBox="0 0 300 90" role="img" aria-label="Mapa ilustrativo con varias tiendas marcadas">
+                  <rect width="300" height="90" fill="#e8eee8"/>
+                  <g stroke="#fff" stroke-width="7" fill="none"><path d="M0 30 H300"/><path d="M0 68 Q150 58 300 72"/><path d="M90 0 V90"/><path d="M210 0 L190 90"/></g>
+                  <g fill="#9aa5a3"><circle cx="40" cy="18" r="5"/><circle cx="250" cy="50" r="5"/><circle cx="150" cy="80" r="5"/><circle cx="270" cy="15" r="5"/></g>
+                  <circle cx="130" cy="45" r="8" fill="#1F4D4A" stroke="#fff" stroke-width="2.5"/>
+                </svg>
+              </div>
+              <ol class="gm-results" id="gm-results" aria-live="polite"></ol>
+              <p class="gm-disclaimer">Mejoramos tu visibilidad; no se puede garantizar una posición concreta en Google.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================
+     PACK WEB + RESERVAS + WHATSAPP
+     ========================================================= -->
+<section class="service pack" id="pack" aria-labelledby="pack-title">
+  <div class="wrap">
+    <span class="service__kicker mono">Pack · Servicios 01 + 02</span>
+    <h2 id="pack-title" class="display">Web + reservas + WhatsApp</h2>
+    <p class="service__tag serif-i">Una sola agenda: reservan en la web o por chat, y tú lo ves todo junto.</p>
+
+    <div class="pack-grid">
+      <div>
+        <span class="save">Ahorras 75 €</span>
+        <div class="price">
+          <span class="price__amount">575 €<small> + IVA</small></span>
+          <span class="price__label"><b>Precio de lanzamiento</b>en vez de 650 €</span>
+        </div>
+        <div class="meta">
+          <span class="chip">Plazo: 5 a 7 semanas</span>
+          <span class="chip">Mantenimiento opcional: 35 €/mes</span>
+        </div>
+        <div class="includes">
+          <h3 class="mono">Qué incluye</h3>
+          <ul>
+            <li>Todo el servicio 01: web, galería y reservas.</li>
+            <li>Todo el servicio 02: asistente de WhatsApp.</li>
+            <li>Ambos conectados a la misma agenda, sin dobles reservas.</li>
+          </ul>
+        </div>
+      </div>
+
+      <figure class="flow-card" style="margin:0">
+        <div class="flow-card__head">
+          <figcaption class="mono">Cómo se conecta todo en un mismo negocio</figcaption>
+          <span class="stamp stamp--sm">Esquema de ejemplo</span>
+        </div>
+        <div class="flow">
+          <div class="flow__node">
+            <svg viewBox="0 0 36 36" aria-hidden="true"><rect x="4" y="6" width="28" height="22" rx="3" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M4 12h28M13 32h10M18 28v4" stroke="currentColor" stroke-width="2.4"/></svg>
+            <h3>Web</h3>
+            <p>El cliente ve tus trabajos y elige día y hora.</p>
+          </div>
+          <div class="flow__link"><span>cada reserva va a la agenda</span></div>
+          <div class="flow__node flow__node--core">
+            <svg viewBox="0 0 36 36" aria-hidden="true"><rect x="5" y="7" width="26" height="24" rx="3" fill="none" stroke="currentColor" stroke-width="2.4"/><path d="M5 14h26M12 4v6M24 4v6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M12 22l4 4 8-8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <h3>Agenda única</h3>
+            <p>Los huecos libres son los mismos en la web y en el chat.</p>
+          </div>
+          <div class="flow__link"><span>el chat lee y reserva en la misma agenda</span></div>
+          <div class="flow__node">
+            <svg viewBox="0 0 36 36" aria-hidden="true"><path d="M18 4a14 14 0 0 0-12 21L4 32l7.2-1.9A14 14 0 1 0 18 4z" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><path d="M13 15h10M13 20h6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+            <h3>WhatsApp</h3>
+            <p>El asistente contesta y reserva, incluso de noche.</p>
+          </div>
+        </div>
+        <div class="flow__out">
+          <p class="flow__step"><b>1</b><span>Lucía (ficticia) reserva el jueves a las 17:30 desde la web.</span></p>
+          <p class="flow__step"><b>2</b><span>Ese hueco desaparece al momento del chat de WhatsApp.</span></p>
+          <p class="flow__step"><b>3</b><span>El miércoles le llega un recordatorio por WhatsApp para confirmar.</span></p>
+        </div>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- =========================================================
+     MANTENIMIENTO OPCIONAL
+     ========================================================= -->
+<section class="maint" id="mantenimiento" aria-labelledby="maint-title">
+  <div class="wrap">
+    <div class="maint-card">
+      <div>
+        <span class="service__kicker mono">Opcional · cancelable</span>
+        <h2 id="maint-title" class="display">Mantenimiento mensual</h2>
+        <p class="serif-i" style="font-size:1.15rem;color:var(--green);margin-top:.6rem">Para que todo siga funcionando sin que tengas que pensar en ello.</p>
+        <ul class="maint-prices">
+          <li><span>Web con galería y reservas</span><b>20 €/mes</b></li>
+          <li><span>Asistente de WhatsApp</span><b>25 €/mes</b></li>
+          <li><span>Tienda online pequeña</span><b>25 €/mes</b></li>
+          <li><span>Pack web + WhatsApp</span><b>35 €/mes</b></li>
+        </ul>
+        <p class="fineprint">Precios + IVA. Google Maps y SEO local no necesita mantenimiento.</p>
+      </div>
+      <div>
+        <ul class="maint-list">
+          <li>
+            <span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="2.8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 6v6c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8V6M5 12v6c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8v-6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span>
+            <div><strong>Copias de seguridad</strong><span>Automáticas y guardadas fuera del servidor.</span></div>
+          </li>
+          <li>
+            <span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            <div><strong>Actualizaciones de seguridad</strong><span>Revisión y parches cuando hacen falta.</span></div>
+          </li>
+          <li>
+            <span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M13 7l4 4" stroke="currentColor" stroke-width="2"/></svg></span>
+            <div><strong>Hasta 2 cambios pequeños al mes</strong><span>Un precio, un horario, una foto nueva…</span></div>
+          </li>
+          <li>
+            <span class="ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M8 10h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+            <div><strong>Soporte por WhatsApp o email</strong><span>Respuesta en horario laboral.</span></div>
+          </li>
+        </ul>
+        <p class="not-included"><b>No incluye:</b> páginas nuevas, rediseños, fotografía, publicidad.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- =========================================================
+     PIE · CONTACTO
+     ========================================================= -->
+<footer class="site-foot" id="contacto">
+  <div class="wrap">
+    <h2 class="display">Falamos? <em>Sin compromiso.</em></h2>
+    <div class="contact">
+      <div><span class="mono">Quién</span>Nadia Lagoa Vilela<br><small>Desarrolladora de software · A Coruña e Costa da Morte</small></div>
+      <a href="mailto:nadialavi.work@gmail.com"><span class="mono">Email</span>nadialavi.work@gmail.com</a>
+      <a href="https://dossier-nadia.vercel.app" target="_blank" rel="noopener"><span class="mono">Dossier</span>dossier-nadia.vercel.app</a>
+    </div>
+    <p class="foot-note">Precios de lanzamiento, sin IVA (21 %). Los plazos son orientativos y empiezan cuando tengo los textos y las fotos. Todos los negocios, personas, teléfonos y reseñas de las demos son ficticios.</p>
+  </div>
+</footer>
+
+<script>
+/* =============================================================
+   JavaScript puro, sin dependencias. Cada demo vive en su propia
+   función autoejecutable para no compartir variables entre sí.
+   ============================================================= */
+'use strict';
+
+/** Atajos de selección */
+const $ = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+/** Formato de moneda en euros a la española: 2,80 € */
+const eur = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' });
+
+/** Crea un elemento con atributos y texto en una línea */
+function el(tag, attrs = {}, text) {
+  const node = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === 'class') node.className = v;
+    else node.setAttribute(k, v);
+  }
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
+/** Hace scroll dentro de un contenedor (no de toda la página) hasta un hijo */
+function scrollInside(container, child, offset = 40) {
+  const top = child.getBoundingClientRect().top - container.getBoundingClientRect().top + container.scrollTop - offset;
+  container.scrollTo({ top, behavior: 'smooth' });
+}
+
+/* -------------------------------------------------------------
+   DEMO 1 · Estudio Tinta Norte: galería + reservas
+   ------------------------------------------------------------- */
+(function tintaNorte() {
+  const app = $('#tn-app');
+
+  // Galería: 6 trabajos ficticios con color y un motivo SVG sencillo
+  const motifs = {
+    flor: '<circle cx="50" cy="38" r="12"/><circle cx="36" cy="52" r="12"/><circle cx="64" cy="52" r="12"/><circle cx="50" cy="62" r="12"/><path d="M50 74 V96"/>',
+    faro: '<path d="M42 92 L46 36 H54 L58 92Z"/><path d="M40 36 H60 L50 22Z"/><path d="M14 50 l8 -4 8 4 M70 40 l8 -4 8 4"/><path d="M8 94 Q30 86 50 94 T92 94"/>',
+    ola: '<path d="M8 70 Q22 40 40 56 Q50 30 70 42 Q86 52 92 70"/><path d="M8 84 Q30 74 50 84 T92 84"/>',
+    brujula: '<circle cx="50" cy="52" r="34"/><path d="M50 22 L58 52 L50 82 L42 52Z"/><path d="M20 52 H80"/>',
+    golondrina: '<path d="M12 48 Q40 40 50 56 Q62 36 90 30 Q70 50 58 62 L70 84 L50 68 L30 84 L42 62 Q28 56 12 48Z"/>',
+    ancla: '<circle cx="50" cy="24" r="7"/><path d="M50 31 V88 M34 44 H66 M22 66 Q26 88 50 88 Q74 88 78 66"/>'
+  };
+  const works = [
+    ['Línea fina floral', 'flor', '#e9d9cc', '#b9573a'],
+    ['Faro y gaviotas', 'faro', '#d6e2e0', '#1f4d4a'],
+    ['Ola minimalista', 'ola', '#dfe6ec', '#2c4a63'],
+    ['Rosa de los vientos', 'brujula', '#efe2c8', '#6b4a1e'],
+    ['Golondrina tradicional', 'golondrina', '#f1d7cf', '#7d2e22'],
+    ['Ancla en puntillismo', 'ancla', '#e3e0d6', '#1d1a1a']
+  ];
+  const gallery = $('#tn-gallery');
+  works.forEach(([title, motif, bg, ink]) => {
+    const li = el('li');
+    li.innerHTML =
+      `<div class="art" style="background:${bg}">
+         <svg viewBox="0 0 100 100" role="img" aria-label="Ilustración del tatuaje: ${title}">
+           <g fill="none" stroke="${ink}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">${motifs[motif]}</g>
+         </svg>
+       </div>`;
+    li.append(el('span', {}, title));
+    gallery.append(li);
+  });
+
+  // Datos de la agenda ficticia
+  const services = [
+    { id: 'peq', name: 'Tatuaje pequeño', price: 60 },
+    { id: 'med', name: 'Tatuaje mediano', price: 120 },
+    { id: 'ret', name: 'Retoque', price: 30 }
+  ];
+  const days = [
+    { id: 'lun', short: 'Lun', long: 'lunes 12', n: 12 },
+    { id: 'mar', short: 'Mar', long: 'martes 13', n: 13 },
+    { id: 'mie', short: 'Mié', long: 'miércoles 14', n: 14 },
+    { id: 'jue', short: 'Jue', long: 'jueves 15', n: 15 },
+    { id: 'vie', short: 'Vie', long: 'viernes 16', n: 16 },
+    { id: 'sab', short: 'Sáb', long: 'sábado 17', n: 17 }
+  ];
+  const slotsWeek = ['11:00', '12:30', '16:00', '17:30', '19:00'];
+  const slotsSat = ['10:00', '11:30', '13:00'];
+  // Horas ya ocupadas por otros clientes (inventados)
+  const busy = {
+    lun: ['11:00', '16:00'], mar: ['12:30', '17:30', '19:00'], mie: ['11:00'],
+    jue: ['16:00', '19:00'], vie: ['11:00', '12:30', '17:30'], sab: ['10:00', '13:00']
+  };
+
+  const state = { service: services[0], day: days[2], slot: null };
+
+  // Pinta los servicios como radios
+  const servicesBox = $('#bk-services');
+  services.forEach((s, i) => {
+    const label = el('label', { class: 'bk-service' });
+    const input = el('input', { type: 'radio', name: 'bk-service', value: s.id });
+    if (i === 0) input.checked = true;
+    input.addEventListener('change', () => { state.service = s; updateSummary(); });
+    const name = el('span');
+    name.append(input, document.createTextNode(s.name));
+    label.append(name, el('b', {}, eur.format(s.price)));
+    servicesBox.append(label);
+  });
+
+  // Pinta los días
+  const daysBox = $('#bk-days');
+  days.forEach(d => {
+    const b = el('button', { type: 'button', class: 'bk-day', 'aria-pressed': String(d === state.day), 'aria-label': d.long });
+    b.innerHTML = `${d.short}<strong>${d.n}</strong>`;
+    b.addEventListener('click', () => {
+      state.day = d;
+      state.slot = null;
+      $$('.bk-day', daysBox).forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+      renderSlots();
+      hideResult();
+    });
+    daysBox.append(b);
+  });
+
+  // Pinta las horas del día elegido
+  const slotsBox = $('#bk-slots');
+  function renderSlots() {
+    slotsBox.replaceChildren();
+    const list = state.day.id === 'sab' ? slotsSat : slotsWeek;
+    list.forEach(time => {
+      const isBusy = busy[state.day.id].includes(time);
+      const b = el('button', { type: 'button', class: 'bk-slot', 'aria-pressed': 'false' }, time);
+      if (isBusy) { b.disabled = true; b.setAttribute('aria-label', `${time}, ocupado`); }
+      b.addEventListener('click', () => {
+        state.slot = time;
+        $$('.bk-slot', slotsBox).forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+        showResult();
+      });
+      slotsBox.append(b);
+    });
+  }
+
+  // Confirmación + tarjeta de recordatorio automático
+  const result = $('#bk-result');
+  const status = $('#bk-status');
+  function updateSummary() {
+    if (!state.slot) return;
+    $('#bk-ok').innerHTML =
+      `<strong>¡Cita reservada!</strong><br>${state.service.name} · ${state.day.long} de octubre · ${state.slot}<br>` +
+      `Precio orientativo: ${eur.format(state.service.price)}. Te llegará un recordatorio el día antes.`;
+    $('#bk-reminder-text').textContent = `Mañana a las ${state.slot} en Estudio Tinta Norte. ¿Confirmas?`;
+  }
+  function showResult() {
+    updateSummary();
+    status.hidden = true;
+    $('#bk-confirm').disabled = false;
+    result.hidden = false;
+    scrollInside(app, result, 60);
+  }
+  function hideResult() { result.hidden = true; }
+
+  $('#bk-confirm').addEventListener('click', e => {
+    status.textContent = '✓ Confirmada. ¡Te esperamos!';
+    status.hidden = false;
+    e.currentTarget.disabled = true;
+  });
+  $('#bk-change').addEventListener('click', () => {
+    state.slot = null;
+    $$('.bk-slot', slotsBox).forEach(x => x.setAttribute('aria-pressed', 'false'));
+    hideResult();
+    scrollInside(app, $('#bk-days'), 60);
+    $('.bk-day[aria-pressed="true"]', daysBox).focus({ preventScroll: true });
+  });
+
+  // Botón "Reservar cita" de la portada: baja hasta el widget
+  $$('[data-scroll-to]', app).forEach(b => b.addEventListener('click', () => {
+    scrollInside(app, document.getElementById(b.dataset.scrollTo), 0);
+  }));
+  // Enlaces del menú interno: scroll dentro del móvil, no de la página
+  $$('.tn-nav a', app).forEach(a => a.addEventListener('click', e => {
+    e.preventDefault();
+    scrollInside(app, $(a.getAttribute('href')), 44);
+  }));
+
+  // Botón de WhatsApp: en la demo solo explica qué pasaría
+  $('#tn-wa').addEventListener('click', () => {
+    $('#tn-wa-note').textContent = 'En la web real se abriría WhatsApp con un mensaje para el 600 000 000 (número ficticio).';
+  });
+
+  renderSlots();
+})();
+
+/* -------------------------------------------------------------
+   DEMO 2 · Peluquería Mar de Fondo: asistente de WhatsApp
+   ------------------------------------------------------------- */
+(function marDeFondo() {
+  const log = $('#wa-log');
+  const quick = $('#wa-quick');
+  const form = $('#wa-form');
+  const input = $('#wa-input');
+  const clockEl = $('#wa-clock');
+
+  // Todos los textos en castellano (es) y gallego (gl)
+  const TXT = {
+    es: {
+      sub: 'Asistente automático · responde 24 h',
+      closed: 'Local cerrado · te responde el asistente automático',
+      placeholder: 'Escribe un mensaje',
+      bot: 'Asistente',
+      quick: { horario: '¿Horario?', precios: '¿Precios?', cita: 'Quiero cita' },
+      script: [
+        ['out', 'Hola! ¿Tenéis hueco el sábado para cortar y peinar?'],
+        ['in', 'Hola 👋 Ahora estamos cerrados, pero te ayudo yo. El sábado tengo libre a estas horas:', ['10:30', '12:00']],
+        ['out', 'A las 12:00'],
+        ['in', 'Listo ✅ Cita el sábado a las 12:00 para corte y peinado. El viernes por la tarde te enviaré un recordatorio para confirmar.'],
+        ['out', '¿Puedo ir con mi perro? Es pequeñito'],
+        ['in', 'Esa no la sé con seguridad. Te paso con una persona del equipo: mañana desde las 9:30 te responden por aquí. 🙂', null, true]
+      ],
+      replies: {
+        horario: 'Abrimos de martes a viernes de 9:30 a 19:30 y los sábados de 9:00 a 14:00. Domingo y lunes, cerrado.',
+        precios: 'Corte mujer 22 €, corte hombre 14 €, peinado 15 €, color desde 35 €. ¿Te reservo un hueco?',
+        cita: '¡Genial! Esta semana tengo libre: jueves a las 17:00, viernes a las 11:30 o sábado a las 10:30. Elige una:',
+        citaOpts: ['Jueves 17:00', 'Viernes 11:30', 'Sábado 10:30'],
+        confirm: h => `Reservado ✅ ${h}. Te enviaré un recordatorio el día antes. Si no puedes venir, responde «cambiar».`,
+        hola: '¡Hola! Puedo decirte el horario, los precios o buscarte una cita. ¿Qué necesitas?',
+        gracias: '¡A ti! Que tengas buena noche 🌙',
+        cambiar: 'Sin problema. Te paso con una persona para cambiar la cita: mañana desde las 9:30 te escriben.',
+        handoff: 'Eso no lo sé responder bien. Te paso con una persona del equipo: mañana desde las 9:30 te contestan por aquí.'
+      },
+      keys: { horario: ['horario', 'hora abr', 'abris', 'abrís', 'cerrais', 'cuando abr'], precios: ['precio', 'cuanto', 'cuánto', 'cuesta', 'tarifa', 'vale'], cita: ['cita', 'reserv', 'hueco', 'turno'], hola: ['hola', 'buenas'], gracias: ['gracias'], cambiar: ['cambiar', 'anular', 'cancelar'] }
+    },
+    gl: {
+      sub: 'Asistente automático · responde 24 h',
+      closed: 'Local pechado · respóndeche o asistente automático',
+      placeholder: 'Escribe unha mensaxe',
+      bot: 'Asistente',
+      quick: { horario: 'Horario?', precios: 'Prezos?', cita: 'Quero cita' },
+      script: [
+        ['out', 'Ola! Tedes oco o sábado para cortar e peitear?'],
+        ['in', 'Ola 👋 Agora estamos pechados, pero axúdoche eu. O sábado teño libre a estas horas:', ['10:30', '12:00']],
+        ['out', 'Ás 12:00'],
+        ['in', 'Feito ✅ Cita o sábado ás 12:00 para corte e peiteado. O venres pola tarde envíoche un recordatorio para confirmar.'],
+        ['out', 'Podo ir co meu can? É pequeniño'],
+        ['in', 'Iso non o sei con seguridade. Pásote cunha persoa do equipo: mañá desde as 9:30 respóndenche por aquí. 🙂', null, true]
+      ],
+      replies: {
+        horario: 'Abrimos de martes a venres de 9:30 a 19:30 e os sábados de 9:00 a 14:00. Domingo e luns, pechado.',
+        precios: 'Corte muller 22 €, corte home 14 €, peiteado 15 €, cor desde 35 €. Resérvoche un oco?',
+        cita: 'Xenial! Esta semana teño libre: xoves ás 17:00, venres ás 11:30 ou sábado ás 10:30. Escolle unha:',
+        citaOpts: ['Xoves 17:00', 'Venres 11:30', 'Sábado 10:30'],
+        confirm: h => `Reservado ✅ ${h}. Envíoche un recordatorio o día antes. Se non podes vir, responde «cambiar».`,
+        hola: 'Ola! Podo dicirche o horario, os prezos ou buscarche unha cita. Que precisas?',
+        gracias: 'Grazas a ti! Boa noite 🌙',
+        cambiar: 'Sen problema. Pásote cunha persoa para cambiar a cita: mañá desde as 9:30 escríbenche.',
+        handoff: 'Iso non o sei responder ben. Pásote cunha persoa do equipo: mañá desde as 9:30 respóndenche por aquí.'
+      },
+      keys: { horario: ['horario', 'abrides', 'pechades', 'cando abr'], precios: ['prezo', 'canto', 'custa', 'tarifa', 'vale'], cita: ['cita', 'reserv', 'oco', 'quenda'], hola: ['ola', 'boas', 'bo dia'], gracias: ['grazas'], cambiar: ['cambiar', 'anular', 'cancelar'] }
+    }
+  };
+
+  let lang = 'es';
+  let minutes = 22 * 60 + 47;   // la conversación empieza a las 22:47
+  let busy = false;             // evita solapar respuestas
+
+  const clock = () => `${String(Math.floor(minutes / 60) % 24).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
+
+  /** Añade una burbuja al chat */
+  function addMsg(dir, text, opts = {}) {
+    const m = el('div', { class: `msg msg--${dir}${opts.handoff ? ' msg--handoff' : ''}` });
+    if (dir === 'in') m.append(el('span', { class: 'msg__bot' }, TXT[lang].bot));
+    m.append(document.createTextNode(text));
+    if (opts.options) {
+      const box = el('div', { class: 'msg__opts' });
+      opts.options.forEach(o => {
+        const b = el('button', { type: 'button' }, o);
+        if (opts.used) b.disabled = true;
+        b.addEventListener('click', () => {
+          if (busy) return;
+          $$('button', box).forEach(x => (x.disabled = true));
+          userSays(o, () => TXT[lang].replies.confirm(o));
+        });
+        box.append(b);
+      });
+      m.append(box);
+    }
+    m.append(el('span', { class: 'msg__time' }, clock() + (dir === 'out' ? ' ✓✓' : '')));
+    log.append(m);
+    log.scrollTop = log.scrollHeight;
+    return m;
+  }
+
+  /** Mensaje del cliente + respuesta del asistente tras "escribiendo…" */
+  function userSays(text, replyFn) {
+    busy = true;
+    minutes++;
+    clockEl.textContent = clock();
+    addMsg('out', text);
+    const typing = el('div', { class: 'typing', 'aria-label': 'Escribiendo…' });
+    typing.innerHTML = '<i></i><i></i><i></i>';
+    log.append(typing);
+    log.scrollTop = log.scrollHeight;
+    setTimeout(() => {
+      typing.remove();
+      const r = replyFn();
+      if (typeof r === 'string') addMsg('in', r, { handoff: r === TXT[lang].replies.handoff || r === TXT[lang].replies.cambiar });
+      else addMsg('in', r.text, { options: r.options });
+      busy = false;
+    }, 850);
+  }
+
+  /** Elige la respuesta predefinida según palabras clave */
+  function answerFor(text) {
+    const t = text.toLowerCase();
+    const { keys, replies } = TXT[lang];
+    const hit = Object.keys(keys).find(k => keys[k].some(w => t.includes(w)));
+    if (hit === 'cita') return { text: replies.cita, options: replies.citaOpts };
+    return hit ? replies[hit] : replies.handoff;
+  }
+
+  /** Reinicia el chat con el guion del idioma elegido */
+  function render() {
+    const T = TXT[lang];
+    minutes = 22 * 60 + 47;
+    clockEl.textContent = clock();
+    $('#wa-sub').textContent = T.sub;
+    input.placeholder = T.placeholder;
+    $('label[for="wa-input"]').textContent = T.placeholder;
+    log.replaceChildren(el('div', { class: 'wa-sys' }, T.closed));
+    T.script.forEach(([dir, text, options, handoff], i) => {
+      if (i === 2 || i === 4) minutes++;
+      addMsg(dir, text, { options, used: true, handoff });
+    });
+    log.scrollTop = 0; // se lee la conversación desde el principio
+
+    quick.replaceChildren();
+    Object.entries(T.quick).forEach(([key, label]) => {
+      const b = el('button', { type: 'button' }, label);
+      b.addEventListener('click', () => {
+        if (busy) return;
+        const r = T.replies;
+        userSays(label, () => (key === 'cita' ? { text: r.cita, options: r.citaOpts } : r[key]));
+      });
+      quick.append(b);
+    });
+  }
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const text = input.value.trim();
+    if (!text || busy) return;
+    input.value = '';
+    userSays(text, () => answerFor(text));
+  });
+
+  $$('.wa-lang button').forEach(b => b.addEventListener('click', () => {
+    if (busy) return;
+    lang = b.dataset.lang;
+    $$('.wa-lang button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    render();
+  }));
+
+  render();
+})();
+
+/* -------------------------------------------------------------
+   DEMO 3 · Forno do Cantón: tienda con carrito
+   ------------------------------------------------------------- */
+(function fornoDoCanton() {
+  const SHIPPING = 3.5;
+  // Ilustraciones simples para cada producto (sin imágenes externas)
+  const pics = {
+    pan: '<ellipse cx="50" cy="56" rx="38" ry="22" fill="#8a5a33"/><path d="M28 48 l8 10 M44 42 l8 12 M60 42 l8 12" stroke="#5e3a1e" stroke-width="3" stroke-linecap="round"/>',
+    empanada: '<rect x="12" y="34" width="76" height="40" rx="8" fill="#d39a4a"/><path d="M12 40 Q20 34 28 40 T44 40 T60 40 T76 40 T88 40" stroke="#a96f2a" stroke-width="3" fill="none"/><path d="M30 54 h40" stroke="#a96f2a" stroke-width="3"/>',
+    bica: '<rect x="14" y="38" width="72" height="32" rx="4" fill="#e3b56b"/><rect x="14" y="38" width="72" height="9" rx="4" fill="#f4e4c3"/>',
+    millo: '<ellipse cx="50" cy="56" rx="34" ry="26" fill="#d9a63c"/><path d="M30 46 q20 -14 40 0" stroke="#a87a1d" stroke-width="3" fill="none"/>',
+    tarta: '<circle cx="50" cy="56" r="34" fill="#e7c27c"/><path d="M50 36 v40 M36 46 l28 20 M64 46 l-28 20" stroke="#fff6e5" stroke-width="5" stroke-linecap="round"/>',
+    rosquillas: '<circle cx="34" cy="48" r="14" fill="none" stroke="#e0b06a" stroke-width="10"/><circle cx="66" cy="48" r="14" fill="none" stroke="#e0b06a" stroke-width="10"/><circle cx="50" cy="70" r="14" fill="none" stroke="#e0b06a" stroke-width="10"/>'
+  };
+  const products = [
+    { id: 'centeno', name: 'Pan de centeno', price: 2.8, pic: 'pan', bg: '#efe2cf' },
+    { id: 'empanada', name: 'Empanada de zamburiñas', price: 14, pic: 'empanada', bg: '#f3dfc2' },
+    { id: 'bica', name: 'Bica gallega', price: 6.5, pic: 'bica', bg: '#f6ead3' },
+    { id: 'millo', name: 'Pan de millo', price: 3.2, pic: 'millo', bg: '#f4e6c0' },
+    { id: 'santiago', name: 'Tarta de Santiago', price: 12, pic: 'tarta', bg: '#efe0cb' },
+    { id: 'rosquillas', name: 'Rosquillas de anís (6 u.)', price: 4.5, pic: 'rosquillas', bg: '#f1e4d2' }
+  ];
+  const cart = new Map(); // id -> cantidad
+  let orderNumber = 141;
+
+  const grid = $('#fc-grid');
+  const drawer = $('#fc-drawer');
+  const scrim = $('#fc-scrim');
+  const openBtn = $('#fc-open');
+  const count = $('#fc-count');
+  const toast = $('#fc-toast');
+  const payBtn = $('#fc-pay');
+  const body = $('#fc-body');
+  const foot = $('#fc-foot');
+  const bodyTemplate = body.innerHTML; // para restaurar tras un pedido
+  let toastTimer;
+
+  // Catálogo
+  products.forEach(p => {
+    const li = el('li', { class: 'fc-item' });
+    li.innerHTML =
+      `<div class="pic" style="background:${p.bg}"><svg viewBox="0 0 100 100" role="img" aria-label="Ilustración: ${p.name}">${pics[p.pic]}</svg></div>`;
+    const b = el('div', { class: 'fc-item__body' });
+    b.append(el('h4', {}, p.name));
+    const row = el('div', { class: 'fc-item__row' });
+    const add = el('button', { type: 'button', class: 'fc-add', 'aria-label': `Añadir ${p.name} al carrito` }, 'Añadir');
+    add.addEventListener('click', () => {
+      cart.set(p.id, (cart.get(p.id) || 0) + 1);
+      update();
+      showToast(`${p.name} añadido`);
+      count.classList.remove('bump'); void count.offsetWidth; count.classList.add('bump');
+    });
+    row.append(el('span', { class: 'fc-item__price' }, eur.format(p.price)), add);
+    b.append(row);
+    li.append(b);
+    grid.append(li);
+  });
+
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('show'), 1400);
+  }
+
+  const items = () => [...cart.entries()].map(([id, qty]) => ({ ...products.find(p => p.id === id), qty }));
+  const units = () => [...cart.values()].reduce((a, b) => a + b, 0);
+  const delivery = () => ($('input[name="fc-delivery"]:checked', body) || {}).value || 'pickup';
+  const totals = () => {
+    const sub = items().reduce((s, i) => s + i.price * i.qty, 0);
+    const ship = delivery() === 'ship' && sub > 0 ? SHIPPING : 0;
+    return { sub, ship, total: sub + ship };
+  };
+
+  /** Redibuja líneas del carrito, contador y totales */
+  function update() {
+    const n = units();
+    count.textContent = n;
+    count.setAttribute('aria-label', `${n} productos`);
+    const lines = $('#fc-lines', body);
+    if (!lines) return; // el carrito muestra la pantalla de "pedido hecho"
+    lines.replaceChildren();
+    if (!n) lines.append(el('li', { class: 'fc-empty' }, 'Tu carrito está vacío. Añade algo rico.'));
+    items().forEach(i => {
+      const li = el('li', { class: 'fc-line' });
+      li.append(el('span', { class: 'fc-line__name' }, i.name), el('span', { class: 'fc-line__sum' }, eur.format(i.price * i.qty)));
+      const q = el('div', { class: 'fc-qty' });
+      const minus = el('button', { type: 'button', 'aria-label': `Quitar una unidad de ${i.name}` }, '−');
+      const plus = el('button', { type: 'button', 'aria-label': `Añadir una unidad de ${i.name}` }, '+');
+      minus.addEventListener('click', () => { i.qty > 1 ? cart.set(i.id, i.qty - 1) : cart.delete(i.id); update(); });
+      plus.addEventListener('click', () => { cart.set(i.id, i.qty + 1); update(); });
+      q.append(minus, el('span', {}, String(i.qty)), plus);
+      li.append(q);
+      lines.append(li);
+    });
+    const t = totals();
+    $('#fc-sub', body).textContent = eur.format(t.sub);
+    $('#fc-ship', body).textContent = eur.format(t.ship);
+    $('#fc-total', body).textContent = eur.format(t.total);
+    payBtn.disabled = n === 0;
+    payBtn.textContent = n ? `Pagar ${eur.format(t.total)}` : 'Pagar';
+  }
+
+  // Abrir / cerrar el carrito, con foco gestionado y tecla Escape
+  function openCart() {
+    drawer.classList.add('open'); scrim.classList.add('open');
+    openBtn.setAttribute('aria-expanded', 'true');
+    setTimeout(() => $('#fc-close').focus(), 50);
+  }
+  function closeCart() {
+    drawer.classList.remove('open'); scrim.classList.remove('open');
+    openBtn.setAttribute('aria-expanded', 'false');
+    openBtn.focus();
+  }
+  openBtn.addEventListener('click', openCart);
+  $('#fc-close').addEventListener('click', closeCart);
+  scrim.addEventListener('click', closeCart);
+  drawer.addEventListener('keydown', e => { if (e.key === 'Escape') closeCart(); });
+  body.addEventListener('change', e => { if (e.target.name === 'fc-delivery') update(); });
+
+  // Pago simulado → pantalla de éxito + aviso en el panel del negocio
+  payBtn.addEventListener('click', () => {
+    if (!units()) return;
+    const t = totals();
+    const method = $('input[name="fc-pay"]:checked', body).value;
+    const deliveryText = delivery() === 'ship' ? 'Envío a domicilio' : 'Recoger en tienda';
+    const list = items();
+    orderNumber++;
+
+    body.innerHTML =
+      `<div class="fc-done" role="status">
+         <svg viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="26" fill="#1F4D4A"/><path d="M17 29l7 7 15-16" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+         <h5>¡Pedido recibido!</h5>
+         <p>Pedido nº 0${orderNumber} · ${eur.format(t.total)} con ${method}.</p>
+         <p>${deliveryText}. Te avisamos cuando esté listo.</p>
+         <p class="fc-sim">Pago simulado: no se ha cobrado nada.</p>
+       </div>`;
+    foot.hidden = true;
+
+    const biz = $('#biz-body');
+    biz.innerHTML =
+      `<div class="order-alert">
+         <span class="order-alert__icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 3a5 5 0 0 0-5 5v4l-2 3h14l-2-3V8a5 5 0 0 0-5-5zM10 18a2 2 0 0 0 4 0" fill="#fff"/></svg></span>
+         <div>
+           <p><strong>Nuevo pedido recibido · nº 0${orderNumber}</strong></p>
+           <p>${eur.format(t.total)} · ${method} · ${deliveryText}</p>
+           <ul></ul>
+         </div>
+       </div>`;
+    const ul = $('ul', biz);
+    list.forEach(i => ul.append(el('li', {}, `${i.qty} × ${i.name}`)));
+
+    cart.clear();
+    count.textContent = '0';
+    count.setAttribute('aria-label', '0 productos');
+
+    // Pasados unos segundos, el carrito vuelve a estar listo para otra prueba
+    setTimeout(() => {
+      body.innerHTML = bodyTemplate;
+      foot.hidden = false;
+      update();
+    }, 4500);
+  });
+
+  update();
+})();
+
+/* -------------------------------------------------------------
+   DEMO 4 · Frutería A Horta: antes / después en Google
+   ------------------------------------------------------------- */
+(function aHorta() {
+  // Pestañas accesibles (flechas izquierda/derecha, Inicio, Fin)
+  $$('[role="tablist"]').forEach(list => {
+    const tabs = $$('[role="tab"]', list);
+    function select(tab) {
+      tabs.forEach(t => {
+        const on = t === tab;
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+        document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+      });
+      const app = list.parentElement.querySelector('.phone__app');
+      if (app) app.scrollTop = 0;
+    }
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => select(t));
+      t.addEventListener('keydown', e => {
+        let next = null;
+        if (e.key === 'ArrowRight') next = tabs[(i + 1) % tabs.length];
+        if (e.key === 'ArrowLeft') next = tabs[(i - 1 + tabs.length) % tabs.length];
+        if (e.key === 'Home') next = tabs[0];
+        if (e.key === 'End') next = tabs[tabs.length - 1];
+        if (next) { e.preventDefault(); select(next); next.focus(); }
+      });
+    });
+  });
+
+  // Reseñas inventadas, marcadas como EJEMPLO
+  const reviews = [
+    { who: 'Antía R.', color: '#7b5ea7', stars: 5, text: 'La fruta siempre en su punto y te aconsejan muy bien.', reply: 'Moitas grazas, Antía. ¡Nos alegra que te guste! Te esperamos esta semana con las primeras castañas.' },
+    { who: 'Manuel P.', color: '#2f7d6d', stars: 4, text: 'Buenos tomates de la zona. A veces hay cola los sábados.', reply: 'Gracias, Manuel. Tomamos nota: ahora puedes encargar por teléfono y recogerlo sin esperar.' },
+    { who: 'Sabela C.', color: '#b4562f', stars: 2, text: 'Fui un lunes por la tarde y estaba cerrado. No ponía el horario en ningún sitio.', reply: 'Perdona, Sabela, tienes toda la razón. Ya hemos publicado el horario completo. ¡Esperamos verte pronto!' }
+  ];
+  function renderReviews(container, withReply) {
+    reviews.forEach(r => {
+      const d = el('div', { class: 'review' });
+      d.innerHTML =
+        `<div class="review__head">
+           <span class="review__av" style="background:${r.color}" aria-hidden="true">${r.who[0]}</span>
+           <b>${r.who}</b>
+           <span class="stars" aria-label="${r.stars} de 5 estrellas">${'★'.repeat(r.stars)}${'☆'.repeat(5 - r.stars)}</span>
+           <span class="stamp stamp--sm">Ejemplo</span>
+         </div>`;
+      d.append(el('p', {}, r.text));
+      if (withReply) {
+        const rep = el('div', { class: 'review__reply' });
+        rep.append(el('b', {}, 'Respuesta del propietario'), document.createTextNode(r.reply));
+        d.append(rep);
+      } else {
+        d.append(el('p', { class: 'review__none' }, 'Sin responder'));
+      }
+      container.append(d);
+    });
+  }
+  renderReviews($('#gm-reviews-before'), false);
+  renderReviews($('#gm-reviews-after'), true);
+
+  // 12 fotos ordenadas por tipo
+  const photos = [
+    ['Fachada', '#c96f2c'], ['Escaparate', '#d08a3a'], ['Interior', '#8b6b4a'], ['Mostrador', '#6f5a43'],
+    ['Fruta de temporada', '#d0492f'], ['Cítricos', '#e3a12b'], ['Verdura', '#4f8a3a'], ['Setas', '#8a6d4f'],
+    ['Cestas', '#a0612c'], ['Reparto', '#2f6b6a'], ['Equipo', '#5e5a7a'], ['Logo', '#1F4D4A']
+  ];
+  const ph = $('#gm-photos');
+  photos.forEach(([label, color]) => ph.append(el('li', { style: `background:linear-gradient(160deg, ${color}, #1b2624)` }, label)));
+
+  // Búsqueda simulada: mismos resultados, distinta posición de la frutería
+  const others = [
+    ['Supermercado O Porto (ejemplo)', 'Supermercado · 4,1 ★ · 800 m'],
+    ['Froitas Marola (ejemplo)', 'Frutería · 4,4 ★ · 1,2 km'],
+    ['Mercado de Barrio Alto (ejemplo)', 'Mercado · 4,3 ★ · 1,5 km'],
+    ['Ultramarinos Pedra (ejemplo)', 'Tienda de comestibles · 4,0 ★ · 900 m'],
+    ['Hortas do Val (ejemplo)', 'Frutería · 4,5 ★ · 2,3 km'],
+    ['Tenda Rosalía (ejemplo)', 'Tienda · 3,9 ★ · 1,1 km']
+  ];
+  const us = {
+    before: ['Frutería A Horta (ejemplo)', 'Tienda · 3,7 ★ · 300 m · horario desconocido'],
+    after: ['Frutería A Horta (ejemplo)', 'Frutería · 3,7 ★ · 300 m · Abierto hasta las 14:00']
+  };
+  const results = $('#gm-results');
+  function renderRanking(mode) {
+    const list = others.slice();
+    list.splice(mode === 'after' ? 1 : 6, 0, us[mode]); // 2.º puesto después, 7.º antes
+    results.replaceChildren();
+    list.forEach(([name, info]) => {
+      const li = el('li');
+      if (name === us[mode][0]) li.className = 'is-us';
+      const d = el('div');
+      d.append(el('b', {}, name), el('small', {}, info));
+      li.append(d);
+      results.append(li);
+    });
+  }
+  $$('.gm-switch button').forEach(b => b.addEventListener('click', () => {
+    $$('.gm-switch button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    renderRanking(b.dataset.rank);
+  }));
+  renderRanking('after');
+})();
+</script>
+</body>
+</html>
