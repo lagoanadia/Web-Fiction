@@ -2,16 +2,16 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Nadia Lagoa Vilela · Webs, reservas y WhatsApp para negocios en A Coruña</title>
-<meta name="description" content="Desarrolladora de software en A Coruña. Webs con reservas, asistente de WhatsApp, tiendas online y Google Maps para negocios en crecimiento. Tarifas fijas con IVA incluido.">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lagoa · Estudio digital en A Coruña · Webs, reservas y WhatsApp</title>
+<meta name="description" content="Lagoa, estudio digital de Nadia Lagoa Vilela en A Coruña. Webs con reservas, asistente de WhatsApp, tiendas online y Google Maps para negocios en crecimiento. Tarifas fijas con IVA incluido.">
 <link rel="canonical" href="https://nadialavi.vercel.app/">
-<meta name="theme-color" content="#1F4D4A">
+<meta name="theme-color" content="#05080c">
 
-<!-- Open Graph: cómo se ve el enlace al compartirlo en WhatsApp, LinkedIn… -->
+<!-- Open Graph: cómo se ve el enlace al compartirlo -->
 <meta property="og:type" content="website">
 <meta property="og:locale" content="es_ES">
-<meta property="og:title" content="Nadia Lagoa Vilela · Servicios digitales para tu negocio">
+<meta property="og:title" content="Lagoa · Tu negocio sigue vendiendo cuando tú cierras">
 <meta property="og:description" content="Webs con reservas, asistente de WhatsApp, tienda online y Google Maps para negocios en crecimiento de A Coruña.">
 <meta property="og:url" content="https://nadialavi.vercel.app/">
 
@@ -20,7 +20,7 @@
 {
   "@context": "https://schema.org",
   "@type": "ProfessionalService",
-  "name": "Nadia Lagoa Vilela · Servicios digitales",
+  "name": "Lagoa · Estudio digital",
   "description": "Webs con reservas, asistente de WhatsApp, tiendas online y optimización de Google Maps para negocios en crecimiento.",
   "url": "https://nadialavi.vercel.app/",
   "email": "nadialavi.work@gmail.com",
@@ -42,193 +42,642 @@
 }
 </script>
 
+<!-- Marca JS antes de pintar: activa la animación de scroll sin saltos -->
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
 <style>
 /* =============================================================
-   ESTILO BASE NEUTRO (provisional)
-   La estética definitiva se decidirá más adelante. Todo el diseño
-   depende de estas variables: cambiándolas se re-tematiza la web
-   sin tocar el HTML ni el JavaScript.
+   1. TOKENS
+   Estética inspirada en las páginas de producto de Apple:
+   mucho aire, titulares grandes y compactos, tarjetas redondeadas
+   y una historia que avanza con el scroll.
    ============================================================= */
 :root {
-  --bg: #ffffff;
-  --surface: #f5f5f4;
-  --text: #1c1c1c;
-  --muted: #555555;
-  --border: #d4d4d4;
-  --accent: #1F4D4A;       /* color de botones y enlaces */
-  --accent-text: #ffffff;
+  --bg: #fbfbfd;
+  --bg-2: #f5f5f7;
+  --card: #ffffff;
+  --ink: #1d1d1f;
+  --ink-2: #6e6e73;
+  --line: #d2d2d7;
+  --accent: #0b6e69;        /* verde laguna: botones y enlaces */
+  --accent-2: #08524e;
+  --accent-soft: #e3f1ef;
+  --amber: #ffb547;         /* la luz de la tienda */
+  --night: #05080c;
+  --night-2: #10161d;
+  --wa: #1b7a46;
   --ok: #1d6b3a;
-  --error: #a3261a;
-  --wa: #1b7a46;           /* botón de WhatsApp */
-  --radius: 8px;
-  --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --max: 1080px;
-  --gutter: 16px;
+  --error: #b3261e;
+  --sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+  --r-xl: 30px;
+  --r-l: 22px;
+  --r: 14px;
+  --max: 1120px;
+  --gutter: 20px;
+  --ease: cubic-bezier(.22, .8, .2, 1);
 }
+@media (min-width: 740px) { :root { --gutter: 32px; } }
 
+/* =============================================================
+   2. BASE
+   ============================================================= */
 *, *::before, *::after { box-sizing: border-box; }
-html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
-body { margin: 0; font-family: var(--font); color: var(--text); background: var(--bg); line-height: 1.55; overflow-x: hidden; }
-img, svg { max-width: 100%; display: block; }
-a { color: var(--accent); }
-h1, h2, h3 { line-height: 1.2; overflow-wrap: break-word; }
-h2 { font-size: clamp(1.5rem, 5vw, 2rem); margin: 0 0 .5rem; }
-h3 { font-size: 1.1rem; margin: 0 0 .4rem; }
-button, input, select, textarea { font: inherit; color: inherit; }
-:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
-[hidden] { display: none !important; } /* que ninguna clase muestre algo oculto */
-.visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.skip { position: absolute; left: 8px; top: -60px; background: var(--accent); color: var(--accent-text); padding: .5rem 1rem; z-index: 100; }
-.skip:focus { top: 8px; }
-
-.wrap { max-width: var(--max); margin-inline: auto; padding-inline: var(--gutter); }
-section { padding-block: 3rem; scroll-margin-top: 64px; }
-section + section { border-top: 1px solid var(--border); }
-.lead { font-size: 1.1rem; color: var(--muted); max-width: 60ch; }
-.muted { color: var(--muted); }
-.small { font-size: .875rem; }
-
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; padding: .7rem 1.1rem; border-radius: var(--radius); border: 2px solid var(--accent); background: var(--accent); color: var(--accent-text); text-decoration: none; font-weight: 600; cursor: pointer; }
-.btn--outline { background: transparent; color: var(--accent); }
-.btn--wa { background: var(--wa); border-color: var(--wa); color: #fff; }
-.btn[disabled] { opacity: .5; cursor: not-allowed; }
-.actions { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1rem; }
-
-.grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); }
-.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.1rem; display: flex; flex-direction: column; gap: .5rem; min-width: 0; }
-.card ul { margin: .2rem 0; padding-left: 1.1rem; }
-.price { font-size: 1.6rem; font-weight: 700; }
-.price small { font-size: .9rem; font-weight: 400; color: var(--muted); }
-.tags { display: flex; flex-wrap: wrap; gap: .35rem; list-style: none; padding: 0; margin: 0; }
-.tags li { border: 1px solid var(--border); border-radius: 999px; padding: .1rem .6rem; font-size: .8rem; background: var(--bg); }
-.note { border-left: 4px solid var(--accent); background: var(--surface); padding: .7rem .9rem; border-radius: 4px; }
-
-/* Cabecera */
-.site-header { position: sticky; top: 0; z-index: 20; background: var(--bg); border-bottom: 1px solid var(--border); }
-.site-header .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem 1rem; padding-block: .6rem; }
-.brand { font-weight: 700; text-decoration: none; color: var(--text); }
-.site-nav ul { display: flex; flex-wrap: wrap; gap: .25rem 1rem; list-style: none; margin: 0; padding: 0; font-size: .95rem; }
-
-/* Hero */
-.hero { padding-block: 3.5rem 3rem; }
-.hero h1 { font-size: clamp(2rem, 7vw, 3.2rem); margin: 0 0 1rem; max-width: 20ch; }
-
-/* Formularios */
-form { display: grid; gap: .9rem; }
-.field { display: grid; gap: .3rem; }
-.field label, fieldset legend { font-weight: 600; font-size: .95rem; }
-input[type=text], input[type=email], input[type=tel], select, textarea { width: 100%; padding: .6rem .7rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); }
-textarea { min-height: 110px; resize: vertical; }
-fieldset { border: 1px solid var(--border); border-radius: var(--radius); padding: .8rem; margin: 0; min-width: 0; }
-.row-2 { display: grid; gap: .9rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); }
-.check { display: flex; gap: .5rem; align-items: flex-start; font-size: .9rem; }
-.check input { margin-top: .25rem; }
-.hp { display: none; } /* campo trampa anti-spam */
-.status { padding: .7rem .9rem; border-radius: var(--radius); border: 1px solid var(--border); }
-.status[data-type="ok"] { border-color: var(--ok); color: var(--ok); }
-.status[data-type="error"] { border-color: var(--error); color: var(--error); }
-
-/* Pestañas reserva / mensaje */
-.tabs { display: flex; gap: .4rem; border-bottom: 1px solid var(--border); margin-bottom: 1rem; flex-wrap: wrap; }
-.tabs [role=tab] { border: 0; background: none; padding: .6rem .9rem; border-bottom: 3px solid transparent; cursor: pointer; font-weight: 600; color: var(--muted); }
-.tabs [role=tab][aria-selected=true] { color: var(--accent); border-bottom-color: var(--accent); }
-
-/* Selector de días y horas de la reserva */
-.choice-grid { display: grid; gap: .4rem; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); }
-.choice { padding: .5rem .3rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); cursor: pointer; text-align: center; line-height: 1.2; }
-.choice[aria-pressed=true] { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
-.choice small { display: block; font-size: .75rem; }
-
-/* Calculadora de presupuesto */
-.calc { display: grid; gap: 1.2rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); align-items: start; }
-.calc-option { display: flex; gap: .6rem; align-items: flex-start; padding: .7rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); cursor: pointer; }
-.calc-option input { margin-top: .3rem; }
-.calc-option span { flex: 1; }
-.calc-option b { white-space: nowrap; }
-.totals { width: 100%; border-collapse: collapse; }
-.totals td { padding: .35rem 0; border-bottom: 1px solid var(--border); }
-.totals td:first-child { overflow-wrap: anywhere; padding-right: .5rem; }
-.totals td:last-child { text-align: right; white-space: nowrap; }
-.totals tr.total td { font-weight: 700; font-size: 1.1rem; border-bottom: 0; }
-
-/* Preguntas frecuentes */
-details { border: 1px solid var(--border); border-radius: var(--radius); padding: .7rem .9rem; background: var(--surface); }
-details + details { margin-top: .5rem; }
-summary { cursor: pointer; font-weight: 600; }
-
-/* Pie */
-.site-footer { background: var(--surface); border-top: 1px solid var(--border); padding-block: 2rem 6rem; font-size: .9rem; }
-
-/* Diálogo de privacidad */
-dialog { max-width: min(640px, calc(100% - 2rem)); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.2rem; }
-dialog::backdrop { background: rgba(0,0,0,.4); }
-
-/* ---------- Chatbot (estilo WhatsApp) ---------- */
-.chat-launcher { position: fixed; right: 16px; bottom: 16px; z-index: 40; border-radius: 999px; padding: .8rem 1.1rem; box-shadow: 0 6px 20px rgba(0,0,0,.25); }
-.chat {
-  position: fixed; right: 16px; bottom: 16px; z-index: 50;
-  width: min(380px, calc(100vw - 32px)); height: min(600px, calc(100dvh - 32px));
-  display: flex; flex-direction: column; overflow: hidden;
-  background: #efeae2; border-radius: 14px; box-shadow: 0 12px 40px rgba(0,0,0,.35);
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: 64px; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--sans); font-size: 17px; line-height: 1.5;
+  -webkit-font-smoothing: antialiased; overflow-x: hidden;
 }
-.chat[hidden] { display: none; }
-.chat__head { display: flex; align-items: center; gap: .6rem; padding: .7rem .8rem; background: #075e54; color: #fff; }
+img, svg { display: block; max-width: 100%; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+h1, h2, h3, p { margin: 0; overflow-wrap: break-word; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+[hidden] { display: none !important; }
+.visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.skip { position: absolute; left: 12px; top: -80px; z-index: 200; background: var(--ink); color: #fff; padding: .6rem 1rem; border-radius: 999px; }
+.skip:focus { top: 60px; }
+
+.wrap { width: 100%; max-width: var(--max); margin-inline: auto; padding-inline: var(--gutter); }
+.section { padding-block: clamp(4.5rem, 10vw, 8rem); }
+.section--alt { background: var(--bg-2); }
+
+/* Titulares al estilo Apple: término en negrita + continuación en gris */
+.headline { font-size: clamp(2.2rem, 6.2vw, 4rem); font-weight: 700; letter-spacing: -0.035em; line-height: 1.05; }
+.headline .soft { color: var(--ink-2); }
+.eyebrow { font-size: .8rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: .9rem; display: block; }
+.lead { font-size: clamp(1.1rem, 2.2vw, 1.35rem); color: var(--ink-2); line-height: 1.45; max-width: 46ch; margin-top: 1.1rem; letter-spacing: -0.01em; }
+.small { font-size: .875rem; }
+.muted { color: var(--ink-2); }
+.center { text-align: center; margin-inline: auto; }
+
+/* Botones */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .45rem;
+  min-height: 46px; padding: .7rem 1.4rem; border-radius: 999px; border: 0;
+  background: var(--accent); color: #fff; font-weight: 600; font-size: 1rem; letter-spacing: -0.01em;
+  cursor: pointer; text-decoration: none; transition: background .2s, transform .2s var(--ease);
+}
+.btn:hover { background: var(--accent-2); text-decoration: none; }
+.btn:active { transform: scale(.97); }
+.btn--ghost { background: transparent; color: var(--accent); box-shadow: inset 0 0 0 1.5px currentColor; }
+.btn--ghost:hover { background: var(--accent-soft); }
+.btn--outline { background: transparent; color: var(--accent); box-shadow: inset 0 0 0 1.5px currentColor; }
+.btn--wa { background: var(--wa); }
+.btn--wa:hover { background: #155f37; }
+.btn--light { background: #fff; color: var(--ink); }
+.btn--light:hover { background: #e8e8ed; }
+.btn[disabled], .btn[aria-disabled="true"] { opacity: .45; cursor: not-allowed; }
+.link-arrow { font-weight: 600; }
+.link-arrow::after { content: " ›"; }
+.actions { display: flex; flex-wrap: wrap; gap: .7rem; margin-top: 1.8rem; align-items: center; }
+.center .actions, .actions.center { justify-content: center; }
+
+.pills { display: flex; flex-wrap: wrap; gap: .5rem; list-style: none; padding: 0; margin: 0; }
+.pills li { font-size: .85rem; padding: .35rem .8rem; border-radius: 999px; background: var(--bg-2); color: var(--ink); }
+
+/* Aparición suave al hacer scroll (solo con JS y sin "reducir movimiento") */
+@media (prefers-reduced-motion: no-preference) {
+  .js [data-reveal] { opacity: 0; transform: translateY(28px); transition: opacity .9s var(--ease), transform .9s var(--ease); }
+  .js [data-reveal].is-in { opacity: 1; transform: none; }
+}
+
+/* =============================================================
+   3. NAVEGACIÓN (barra translúcida)
+   ============================================================= */
+.nav {
+  position: fixed; inset: 0 0 auto; z-index: 100; height: 52px;
+  background: rgba(16, 18, 20, .72); color: #f5f5f7;
+  -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.nav .wrap { height: 100%; display: flex; align-items: center; gap: 1rem; }
+.nav__brand { color: #fff; font-weight: 700; letter-spacing: .18em; font-size: .95rem; text-decoration: none; }
+.nav__brand:hover { text-decoration: none; }
+.nav__links { display: none; list-style: none; margin: 0 0 0 auto; padding: 0; gap: 1.6rem; font-size: .82rem; }
+.nav__links a { color: #e8e8ed; opacity: .85; }
+.nav__links a:hover { opacity: 1; text-decoration: none; }
+.nav__cta { margin-left: auto; min-height: 32px; padding: .3rem .9rem; font-size: .82rem; }
+.nav__menu { background: none; border: 0; color: #fff; width: 40px; height: 40px; display: grid; place-items: center; cursor: pointer; margin-right: -8px; }
+.nav__menu span, .nav__menu span::before, .nav__menu span::after { display: block; width: 18px; height: 1.5px; background: currentColor; position: relative; transition: transform .3s var(--ease); }
+.nav__menu span::before, .nav__menu span::after { content: ""; position: absolute; left: 0; }
+.nav__menu span::before { top: -6px; } .nav__menu span::after { top: 6px; }
+.nav[data-open="true"] .nav__menu span { background: transparent; }
+.nav[data-open="true"] .nav__menu span::before { transform: translateY(6px) rotate(45deg); }
+.nav[data-open="true"] .nav__menu span::after { transform: translateY(-6px) rotate(-45deg); }
+.nav__sheet { position: fixed; inset: 52px 0 auto; background: rgba(16,18,20,.94); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); padding: 1rem var(--gutter) 1.6rem; }
+.nav__sheet ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .2rem; }
+.nav__sheet a { display: block; color: #f5f5f7; font-size: 1.5rem; font-weight: 600; padding: .45rem 0; letter-spacing: -0.02em; }
+@media (min-width: 820px) {
+  .nav__links { display: flex; }
+  .nav__cta { margin-left: 1.4rem; }
+  .nav__menu, .nav__sheet { display: none !important; }
+}
+
+/* =============================================================
+   4. HISTORIA DE LA PORTADA: la tienda cierra y la web sigue
+   --p = progreso del scroll (0→1), --n = noche, --s = persiana.
+   Sin JS o con "reducir movimiento" se muestra el estado final.
+   ============================================================= */
+.story { --p: 1; --n: 1; --s: 1; position: relative; background: var(--night); color: #fff; }
+@media (prefers-reduced-motion: no-preference) { .js .story { height: 360vh; } }
+.story__stage { position: relative; height: 100vh; height: 100svh; min-height: 560px; overflow: hidden; }
+@media (prefers-reduced-motion: no-preference) { .js .story__stage { position: sticky; top: 0; } }
+
+/* Cielo: atardecer → noche */
+.sky, .sky__night, .stars { position: absolute; inset: 0; }
+.sky { background: linear-gradient(180deg, #23365a 0%, #6b5a86 38%, #e08a63 72%, #f6b37a 100%); }
+.sky__night { background: linear-gradient(180deg, #020409 0%, #07101c 55%, #0e1a2a 100%); opacity: var(--n); }
+.stars {
+  opacity: var(--n);
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 18%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 28% 8%, #fff 50%, transparent 51%),
+    radial-gradient(1.2px 1.2px at 47% 22%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 63% 12%, #fff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 78% 26%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 88% 6%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 6% 34%, #fff 50%, transparent 51%),
+    radial-gradient(1.2px 1.2px at 36% 31%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 55% 4%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 94% 36%, #fff 50%, transparent 51%);
+}
+.moon {
+  position: absolute; left: 12%; bottom: calc(56svh + 7svh); width: clamp(34px, 5vw, 64px); aspect-ratio: 1; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fffdf3, #e8e1c8 70%);
+  box-shadow: 0 0 40px 10px rgba(255, 246, 214, .25);
+  opacity: var(--n); transform: translateY(calc((1 - var(--n)) * 30vh));
+}
+
+/* Textos que cambian durante la historia */
+.story__copy { position: absolute; z-index: 4; inset: 76px var(--gutter) auto; text-align: center; }
+.story__kicker { font-size: .8rem; letter-spacing: .14em; text-transform: uppercase; color: rgba(255,255,255,.75); font-weight: 600; }
+.captions { position: relative; display: grid; margin-top: .7rem; }
+.caption {
+  grid-area: 1 / 1; font-size: clamp(1.7rem, 5.2vw, 3.6rem); font-weight: 700; letter-spacing: -0.035em; line-height: 1.05;
+  text-shadow: 0 2px 30px rgba(0,0,0,.35); opacity: 0; transform: translateY(14px);
+  transition: opacity .6s var(--ease), transform .6s var(--ease);
+}
+.caption.is-active { opacity: 1; transform: none; }
+.caption em { font-style: normal; color: var(--amber); }
+
+/* Fachada de la tienda */
+.facade {
+  position: absolute; z-index: 2; left: max(var(--gutter), calc(50% - 600px)); bottom: 0;
+  width: min(900px, 72vw); height: 56svh; min-height: 300px;
+  background: linear-gradient(180deg, #2b2f35, #1d2025);
+  border-radius: 18px 18px 0 0;
+  box-shadow: 0 -30px 80px rgba(0,0,0,.35);
+}
+.facade::after { /* oscurece la fachada al caer la noche */
+  content: ""; position: absolute; inset: 0; border-radius: inherit; background: #000; opacity: calc(var(--n) * .35); pointer-events: none;
+}
+.sign {
+  position: absolute; top: 0; left: 0; right: 0; height: 26%; display: grid; place-items: center;
+  font-weight: 800; letter-spacing: .32em; padding-left: .32em; /* compensa el espaciado final */
+  font-size: clamp(2.1rem, 8.5vw, 6.2rem); line-height: 1;
+  color: #f6e3bd;
+  text-shadow: 0 0 calc(var(--n) * 28px) rgba(255, 181, 71, calc(var(--n) * .9)), 0 0 calc(var(--n) * 70px) rgba(255, 140, 40, calc(var(--n) * .45));
+  z-index: 2;
+}
+.front {
+  position: absolute; left: 5%; right: 5%; top: 30%; bottom: 13%;
+  border-radius: 8px; overflow: hidden; background: #111;
+  box-shadow: inset 0 0 0 6px #3a3f46;
+}
+.interior { /* el interior iluminado del local */
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.55), transparent 55%),
+    linear-gradient(180deg, #ffd99c 0%, #f3ad57 70%, #c97a2e 100%);
+}
+.interior::before { /* baldas */
+  content: ""; position: absolute; left: 8%; right: 38%; top: 16%; bottom: 30%;
+  background: repeating-linear-gradient(180deg, transparent 0 22%, rgba(110,60,20,.55) 22% 24%);
+}
+.interior::after { /* mostrador */
+  content: ""; position: absolute; left: 6%; right: 34%; bottom: 0; height: 22%;
+  background: linear-gradient(180deg, #8a4f22, #6b3a17); border-radius: 6px 6px 0 0;
+}
+.door { position: absolute; right: 6%; top: 8%; bottom: 0; width: 22%; border-radius: 6px 6px 0 0; background: rgba(255,255,255,.18); box-shadow: inset 0 0 0 4px #3a3f46; }
+.open-sign { position: absolute; right: 9%; top: 20%; background: #fff; color: #1b5e20; font-weight: 700; font-size: clamp(.55rem, 1.2vw, .8rem); letter-spacing: .1em; padding: .25rem .55rem; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,.25); }
+.shutter {
+  position: absolute; inset: 0; z-index: 1;
+  transform: translateY(calc((1 - var(--s)) * -101%));
+  background: repeating-linear-gradient(180deg, #cfd4d8 0 10px, #9ea6ad 10px 12px, #e3e6e9 12px 13px);
+  filter: brightness(calc(1 - var(--n) * .5));
+  box-shadow: 0 6px 18px rgba(0,0,0,.4);
+}
+.shutter::after { /* barra inferior con candado */
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 12px; background: #7d858c;
+}
+.pavement { position: absolute; left: 0; right: 0; bottom: 0; height: 13%; background: linear-gradient(180deg, #34383e, #26292e); }
+
+/* Móvil del dueño: sigue recibiendo avisos */
+.device {
+  position: absolute; z-index: 5; right: max(var(--gutter), calc(50% - 600px)); bottom: 3svh;
+  width: min(clamp(150px, 17vw, 240px), calc(62svh * 9 / 19.2)); aspect-ratio: 9 / 19.2;
+  border-radius: clamp(26px, 3.4vw, 46px); padding: clamp(6px, .8vw, 10px);
+  background: #0a0a0a; box-shadow: 0 0 0 1.5px #3c3c3f, 0 40px 80px rgba(0,0,0,.55);
+}
+.device__screen {
+  position: relative; height: 100%; border-radius: clamp(20px, 2.8vw, 38px); overflow: hidden;
+  background: radial-gradient(120% 70% at 50% 0%, #1f6f6a 0%, #0c2a32 55%, #060b12 100%);
+  padding: 12% 6% 6%;
+}
+.device__island { position: absolute; top: 2.4%; left: 50%; translate: -50% 0; width: 32%; height: 3.4%; background: #000; border-radius: 999px; }
+.device__date { text-align: center; font-size: clamp(.55rem, .95vw, .8rem); color: rgba(255,255,255,.85); font-weight: 600; }
+.device__clock { text-align: center; font-size: clamp(1.9rem, 3.8vw, 3.4rem); font-weight: 700; letter-spacing: -0.04em; line-height: 1; margin: .1em 0 .35em; color: #fff; font-variant-numeric: tabular-nums; }
+.notifs { display: grid; gap: 5px; }
+.notif {
+  display: grid; grid-template-columns: auto 1fr auto; gap: 2px 7px; align-items: start;
+  padding: 6% 6.5%; border-radius: clamp(10px, 1.4vw, 18px);
+  background: rgba(255,255,255,.78); color: #111;
+  -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+  font-size: clamp(.5rem, .82vw, .74rem); line-height: 1.25;
+  opacity: 0; transform: translateY(-10px) scale(.96);
+  transition: opacity .5s var(--ease), transform .5s var(--ease);
+}
+.notif.show, .story:not(.is-live) .notif { opacity: 1; transform: none; }
+.notif__icon { grid-row: span 2; width: clamp(16px, 2.2vw, 28px); aspect-ratio: 1; border-radius: 26%; display: grid; place-items: center; color: #fff; font-weight: 700; font-size: .9em; }
+.notif b { font-weight: 600; }
+.notif time { color: #555; font-size: .9em; }
+.notif span { grid-column: 2 / 4; color: #222; }
+
+.scroll-hint {
+  position: absolute; z-index: 4; left: 50%; bottom: 2.4svh; translate: -50% 0;
+  font-size: .78rem; color: rgba(255,255,255,.85); letter-spacing: .04em; white-space: nowrap; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  opacity: calc(1 - var(--p) * 8);
+}
+.scroll-hint::after { content: ""; width: 9px; height: 9px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg); animation: hint 1.6s infinite; }
+@keyframes hint { 50% { transform: translateY(4px) rotate(45deg); } }
+@media (prefers-reduced-motion: reduce) { .scroll-hint { display: none; } }
+
+@media (max-width: 739px) {
+  .facade { left: 0; width: 100%; height: 50svh; border-radius: 0; }
+  .moon { bottom: calc(50svh + 5svh); }
+  .sign { right: 44%; font-size: clamp(1.6rem, 8vw, 2.4rem); }
+  .front { left: 5%; right: 47%; }
+  .door, .open-sign { display: none; }
+  .device { right: 12px; bottom: 2svh; width: min(172px, 46vw); }
+  .notif { grid-template-columns: 1fr auto; font-size: .56rem; padding: 6% 7%; }
+  .notif__icon { display: none; }
+  .notif span { grid-column: 1 / 3; }
+  .notif:nth-child(4) { display: none; } /* en pantallas pequeñas caben tres avisos */
+  .scroll-hint { left: 50%; bottom: calc(50svh + 1.5svh); }
+}
+
+/* =============================================================
+   5. AMANECER: la propuesta de valor
+   ============================================================= */
+.dawn { background: linear-gradient(180deg, var(--night) 0%, #1a2433 16%, #c9d6dd 46%, var(--bg) 70%); padding-block: clamp(6rem, 14vw, 11rem) clamp(4rem, 9vw, 7rem); }
+.dawn .headline { font-size: clamp(2.5rem, 8vw, 5.6rem); max-width: 15ch; margin-inline: auto; }
+.gradient-text { background: linear-gradient(90deg, #0b6e69, #2a9d8f 40%, #e08a3a 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.dawn .lead { margin-inline: auto; }
+.dawn .pills { justify-content: center; margin-top: 2rem; }
+.dawn .pills li { background: rgba(255,255,255,.7); }
+
+/* =============================================================
+   6. SERVICIOS: rejilla tipo bento
+   ============================================================= */
+.bento { display: grid; gap: 18px; margin-top: 3rem; grid-template-columns: 1fr; }
+@media (min-width: 820px) { .bento { grid-template-columns: 1fr 1fr; } }
+.tile {
+  background: var(--card); border-radius: var(--r-xl); padding: clamp(1.6rem, 3.5vw, 2.6rem);
+  display: flex; flex-direction: column; gap: 1rem; min-width: 0;
+  box-shadow: 0 1px 2px rgba(0,0,0,.04);
+  transition: transform .5s var(--ease), box-shadow .5s var(--ease);
+}
+.tile:hover { transform: translateY(-4px); box-shadow: 0 24px 50px -24px rgba(0,0,0,.25); }
+.tile__num { font-size: .8rem; font-weight: 600; color: var(--ink-2); letter-spacing: .06em; }
+.tile h3 { font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; }
+.price { display: flex; align-items: baseline; gap: .5rem; flex-wrap: wrap; }
+.price strong { font-size: clamp(3rem, 7vw, 4.4rem); font-weight: 700; letter-spacing: -0.05em; line-height: .95; }
+.price small { color: var(--ink-2); font-size: .9rem; }
+.tile .pills li { background: var(--bg-2); }
+.tile ul.list { margin: 0; padding: 0; list-style: none; display: grid; gap: .55rem; }
+.tile ul.list li { position: relative; padding-left: 1.6rem; color: #333; }
+.tile ul.list li::before { content: ""; position: absolute; left: 0; top: .45em; width: 1rem; height: .55rem; border-left: 2px solid var(--accent); border-bottom: 2px solid var(--accent); transform: rotate(-45deg) scale(.8); transform-origin: left top; }
+.tile .note { font-size: .82rem; color: var(--ink-2); }
+.tile .link-arrow { margin-top: auto; }
+
+.tile--pack { background: var(--night); color: #f5f5f7; position: relative; overflow: hidden; }
+@media (min-width: 820px) { .tile--pack { grid-column: 1 / -1; display: grid; grid-template-columns: 1.1fr 1fr; gap: 2rem; align-items: center; } }
+.tile--pack::before { content: ""; position: absolute; inset: auto -20% -60% 30%; height: 120%; background: radial-gradient(closest-side, rgba(255,181,71,.35), transparent); pointer-events: none; }
+.tile--pack h3 { font-size: clamp(1.9rem, 4.4vw, 3rem); }
+.tile--pack h3 em { font-style: normal; color: var(--amber); }
+.tile--pack .price small, .tile--pack .muted { color: #a1a1a6; }
+.tile--pack .pills li { background: rgba(255,255,255,.1); color: #f5f5f7; }
+.tile--pack p { color: #d2d2d7; }
+.tile--pack > * { position: relative; }
+
+.extras { margin-top: 3.5rem; text-align: center; }
+.extras h3 { font-size: clamp(1.4rem, 3vw, 1.9rem); letter-spacing: -0.03em; }
+.extras .pills { justify-content: center; margin-top: 1.2rem; }
+.extras .pills li { background: var(--card); box-shadow: inset 0 0 0 1px var(--line); }
+
+/* =============================================================
+   7. MANTENIMIENTO
+   ============================================================= */
+.features { display: grid; gap: 18px; margin-top: 3rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); }
+.feature { background: var(--card); border-radius: var(--r-l); padding: 1.8rem 1.5rem; }
+.feature svg { width: 36px; height: 36px; color: var(--accent); margin-bottom: 1rem; }
+.feature h3 { font-size: 1.2rem; letter-spacing: -0.02em; margin-bottom: .35rem; }
+.feature p { color: var(--ink-2); font-size: .95rem; }
+.callout { margin-top: 1.4rem; padding: 1.1rem 1.4rem; border-radius: var(--r-l); background: var(--card); box-shadow: inset 0 0 0 1px var(--line); }
+
+/* =============================================================
+   8. CALCULADORA: opciones + tique de caja
+   ============================================================= */
+.calc { display: grid; gap: 28px; margin-top: 3rem; align-items: start; }
+@media (min-width: 900px) { .calc { grid-template-columns: 1.1fr .9fr; } }
+.calc fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.calc legend { font-weight: 600; margin-bottom: .8rem; padding: 0; }
+.calc-option {
+  display: flex; gap: .9rem; align-items: center; padding: 1.1rem 1.2rem; border-radius: var(--r-l);
+  background: var(--card); cursor: pointer; box-shadow: inset 0 0 0 1.5px transparent; transition: box-shadow .25s;
+}
+.calc-option + .calc-option { margin-top: 10px; }
+.calc-option:has(input:checked) { box-shadow: inset 0 0 0 2px var(--accent); }
+.calc-option input { width: 22px; height: 22px; accent-color: var(--accent); flex: none; margin: 0; }
+.calc-option span { flex: 1; min-width: 0; }
+.calc-option b { font-size: 1.15rem; letter-spacing: -0.02em; white-space: nowrap; }
+.calc-maint { display: flex; gap: .7rem; align-items: center; margin-top: 1.2rem; font-weight: 500; cursor: pointer; }
+.calc-maint input { width: 20px; height: 20px; accent-color: var(--accent); margin: 0; }
+
+.receipt {
+  position: relative; background: #fff; color: #222; font-family: var(--mono); font-size: .9rem;
+  padding: 1.8rem 1.5rem 2.6rem; border-radius: 6px 6px 0 0;
+  box-shadow: 0 30px 60px -30px rgba(0,0,0,.35);
+  -webkit-mask: radial-gradient(10px at 50% calc(100% + 4px), #0000 98%, #000) 50% / 20px 100%;
+          mask: radial-gradient(10px at 50% calc(100% + 4px), #0000 98%, #000) 50% / 20px 100%;
+}
+@media (min-width: 900px) { .receipt { position: sticky; top: 80px; } }
+.receipt__head { text-align: center; border-bottom: 1.5px dashed #bbb; padding-bottom: 1rem; margin-bottom: .8rem; }
+.receipt__head strong { display: block; font-size: 1.15rem; letter-spacing: .3em; padding-left: .3em; }
+.totals { width: 100%; border-collapse: collapse; }
+.totals td { padding: .38rem 0; vertical-align: top; }
+.totals td:first-child { overflow-wrap: anywhere; padding-right: .6rem; }
+.totals td:last-child { text-align: right; white-space: nowrap; }
+.totals--sum { border-top: 1.5px dashed #bbb; margin-top: .6rem; }
+.totals tr.total td { font-weight: 600; font-size: 1.3rem; padding-top: .8rem; }
+.receipt .actions { font-family: var(--sans); margin-top: 1.4rem; }
+.receipt #calc-time { margin-top: .9rem; color: #555; font-size: .8rem; }
+
+/* =============================================================
+   9. CÓMO TRABAJO: conversación
+   ============================================================= */
+.process { background: var(--night); color: #f5f5f7; }
+.process .headline .soft { color: #86868b; }
+.thread { max-width: 680px; margin: 3.2rem auto 0; display: flex; flex-direction: column; gap: .55rem; }
+.thread__day { align-self: center; font-size: .75rem; font-weight: 600; color: #a1a1a6; letter-spacing: .06em; text-transform: uppercase; margin: 1.4rem 0 .4rem; text-align: center; }
+.thread__day b { display: block; color: #fff; font-size: 1.05rem; text-transform: none; letter-spacing: -0.01em; margin-top: .25rem; }
+.bubble { max-width: 78%; padding: .7rem 1rem; border-radius: 20px; font-size: 1rem; line-height: 1.4; }
+.bubble--them { align-self: flex-start; background: #26262a; border-bottom-left-radius: 6px; }
+.bubble--me { align-self: flex-end; background: var(--accent); border-bottom-right-radius: 6px; }
+.thread__note { text-align: center; color: #86868b; font-size: .8rem; margin-top: 1.6rem; }
+
+/* =============================================================
+   10. TRABAJOS
+   ============================================================= */
+.works { margin-top: 3rem; border-top: 1px solid var(--line); }
+.work { display: grid; grid-template-columns: 1fr auto; gap: .4rem 1.5rem; align-items: center; padding: 1.6rem .2rem; border-bottom: 1px solid var(--line); color: var(--ink); transition: padding .4s var(--ease), background .4s; }
+.work:hover { text-decoration: none; padding-inline: 1.2rem; background: var(--card); }
+.work h3 { font-size: clamp(1.6rem, 4.5vw, 2.8rem); font-weight: 700; letter-spacing: -0.04em; line-height: 1.05; }
+.work p { grid-column: 1; color: var(--ink-2); max-width: 60ch; }
+.work__go { grid-row: 1 / 3; grid-column: 2; width: 46px; height: 46px; border-radius: 50%; background: var(--bg-2); display: grid; place-items: center; font-size: 1.2rem; transition: background .3s, color .3s, transform .4s var(--ease); }
+.work:hover .work__go { background: var(--accent); color: #fff; transform: rotate(-45deg); }
+.work__links { grid-column: 1; display: flex; gap: 1rem; flex-wrap: wrap; font-weight: 600; font-size: .95rem; }
+
+/* =============================================================
+   11. CONTACTO
+   ============================================================= */
+.contact-card { margin-top: 3rem; background: var(--card); border-radius: var(--r-xl); padding: clamp(1.4rem, 4vw, 2.8rem); box-shadow: 0 1px 2px rgba(0,0,0,.04); }
+.segmented { display: inline-grid; grid-auto-flow: column; grid-auto-columns: 1fr; background: var(--bg-2); padding: 4px; border-radius: 12px; gap: 4px; margin-bottom: 1.8rem; max-width: 100%; }
+.segmented [role=tab] { border: 0; background: transparent; border-radius: 9px; padding: .55rem 1.1rem; font-weight: 600; font-size: .92rem; color: var(--ink-2); cursor: pointer; white-space: nowrap; }
+@media (max-width: 480px) { .segmented { display: grid; width: 100%; } .segmented [role=tab] { white-space: normal; padding: .55rem .5rem; font-size: .88rem; } }
+.segmented [role=tab][aria-selected=true] { background: var(--card); color: var(--ink); box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+form { display: grid; gap: 1.1rem; }
+.field { display: grid; gap: .35rem; min-width: 0; }
+.field label, .group__label { font-size: .88rem; font-weight: 600; }
+input[type=text], input[type=email], input[type=tel], select, textarea {
+  width: 100%; padding: .85rem 1rem; border-radius: 12px; border: 1px solid var(--line); background: var(--card);
+  transition: border-color .2s, box-shadow .2s;
+}
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft); }
+textarea { min-height: 120px; resize: vertical; }
+.row-2 { display: grid; gap: 1.1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); }
+fieldset.group { border: 0; padding: 0; margin: 0; min-width: 0; }
+fieldset.group legend { padding: 0; margin-bottom: .6rem; }
+.radios { display: flex; flex-wrap: wrap; gap: .5rem; }
+.radio { display: inline-flex; gap: .45rem; align-items: center; padding: .55rem .95rem; border-radius: 999px; background: var(--bg-2); cursor: pointer; font-size: .92rem; }
+.radio:has(input:checked) { background: var(--accent-soft); box-shadow: inset 0 0 0 1.5px var(--accent); }
+.radio input { accent-color: var(--accent); margin: 0; }
+.choice-grid { display: grid; gap: .5rem; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); }
+.choice { padding: .6rem .3rem; border-radius: 12px; border: 0; background: var(--bg-2); cursor: pointer; text-align: center; line-height: 1.2; font-weight: 600; transition: background .2s; }
+.choice:hover { background: #e8e8ed; }
+.choice[aria-pressed=true] { background: var(--accent); color: #fff; }
+.choice small { display: block; font-size: .72rem; font-weight: 500; opacity: .8; text-transform: capitalize; }
+.check { display: flex; gap: .6rem; align-items: flex-start; font-size: .9rem; }
+.check input { margin-top: .2rem; width: 18px; height: 18px; accent-color: var(--accent); flex: none; }
+.hp { display: none; }
+.status { padding: .9rem 1.1rem; border-radius: 12px; background: var(--bg-2); }
+.status[data-type="ok"] { background: #e5f3ea; color: var(--ok); }
+.status[data-type="error"] { background: #fbeaea; color: var(--error); }
+.direct { margin-top: 2rem; display: flex; flex-wrap: wrap; gap: .6rem 2rem; justify-content: center; font-size: .95rem; }
+
+/* =============================================================
+   12. PREGUNTAS FRECUENTES
+   ============================================================= */
+.faq { max-width: 820px; margin: 3rem auto 0; border-top: 1px solid var(--line); }
+.faq details { border-bottom: 1px solid var(--line); }
+.faq summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; gap: 1rem; padding: 1.3rem 0; font-size: clamp(1.05rem, 2.2vw, 1.3rem); font-weight: 600; letter-spacing: -0.02em; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; font-weight: 300; font-size: 1.6rem; line-height: 1; color: var(--ink-2); transition: transform .3s var(--ease); }
+.faq details[open] summary::after { transform: rotate(45deg); }
+.faq details p { padding: 0 0 1.4rem; color: var(--ink-2); max-width: 65ch; }
+
+/* =============================================================
+   13. PIE con la marca gigante
+   ============================================================= */
+.footer { background: var(--bg-2); padding-top: clamp(3rem, 8vw, 6rem); overflow: hidden; }
+.footer__grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); font-size: .9rem; color: var(--ink-2); }
+.footer__grid strong { display: block; color: var(--ink); margin-bottom: .3rem; }
+.footer__legal { margin-top: 2.2rem; padding-top: 1rem; border-top: 1px solid var(--line); font-size: .78rem; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; }
+.wordmark {
+  font-weight: 800; letter-spacing: -0.06em; line-height: .78; text-align: center;
+  font-size: clamp(5rem, 27vw, 24rem); margin: 2rem 0 -0.08em;
+  background: linear-gradient(180deg, #d2d2d7, var(--bg-2) 92%); -webkit-background-clip: text; background-clip: text; color: transparent;
+  user-select: none;
+}
+
+/* =============================================================
+   14. DIÁLOGO DE PRIVACIDAD
+   ============================================================= */
+dialog { max-width: min(640px, calc(100% - 2rem)); border: 0; border-radius: var(--r-l); padding: 1.6rem; box-shadow: 0 30px 80px rgba(0,0,0,.35); }
+dialog::backdrop { background: rgba(0,0,0,.45); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+dialog h2 { font-size: 1.5rem; letter-spacing: -0.03em; margin-bottom: 1rem; }
+dialog p { margin-bottom: .7rem; font-size: .95rem; }
+
+/* =============================================================
+   15. CHATBOT
+   ============================================================= */
+.chat-launcher {
+  position: fixed; right: 16px; bottom: 16px; z-index: 90; border-radius: 999px; padding: .8rem 1.2rem;
+  background: rgba(20,22,24,.82); color: #fff; border: 0; font-weight: 600; cursor: pointer;
+  -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); box-shadow: 0 10px 30px rgba(0,0,0,.3);
+  display: inline-flex; gap: .5rem; align-items: center;
+}
+.chat-launcher { transition: opacity .4s var(--ease), transform .4s var(--ease); }
+.chat-launcher.is-away { opacity: 0; transform: translateY(16px); pointer-events: none; visibility: hidden; }
+.chat-launcher::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: #34c759; box-shadow: 0 0 0 3px rgba(52,199,89,.25); }
+.chat {
+  position: fixed; right: 16px; bottom: 16px; z-index: 95;
+  width: min(390px, calc(100vw - 32px)); height: min(620px, calc(100dvh - 32px));
+  display: flex; flex-direction: column; overflow: hidden;
+  background: #fff; border-radius: 26px; box-shadow: 0 30px 80px rgba(0,0,0,.35);
+}
+.chat__head { display: flex; align-items: center; gap: .7rem; padding: .9rem 1rem; background: rgba(245,245,247,.9); border-bottom: 1px solid #e5e5ea; }
+.chat__avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(140deg, #0b6e69, #2a9d8f); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: .85rem; flex: none; }
 .chat__head strong { display: block; font-size: .95rem; }
-.chat__head span { font-size: .75rem; opacity: .9; }
-.chat__lang { margin-left: auto; display: flex; gap: 2px; background: rgba(255,255,255,.18); border-radius: 999px; padding: 2px; }
-.chat__lang button, .chat__close { border: 0; background: none; color: #fff; cursor: pointer; border-radius: 999px; padding: .2rem .5rem; font-size: .75rem; font-weight: 700; }
-.chat__lang button[aria-pressed=true] { background: #fff; color: #075e54; }
-.chat__close { font-size: 1.2rem; line-height: 1; padding: .2rem .45rem; }
-.chat__log { flex: 1; overflow-y: auto; padding: .8rem .6rem; display: flex; flex-direction: column; gap: .4rem; overscroll-behavior: contain; }
-.msg { max-width: 85%; padding: .45rem .6rem .3rem; border-radius: 8px; font-size: .9rem; line-height: 1.4; box-shadow: 0 1px 1px rgba(0,0,0,.1); overflow-wrap: anywhere; white-space: pre-line; color: #111; }
-.msg--bot { align-self: flex-start; background: #fff; border-top-left-radius: 2px; }
-.msg--user { align-self: flex-end; background: #d9fdd3; border-top-right-radius: 2px; }
-.msg time { display: block; text-align: right; font-size: .68rem; color: #667; margin-top: .15rem; }
-.msg .msg__actions { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .4rem; white-space: normal; }
-.msg .msg__actions a, .msg .msg__actions button { font-size: .8rem; padding: .3rem .6rem; border-radius: 999px; border: 1px solid #075e54; color: #075e54; background: #fff; text-decoration: none; cursor: pointer; }
-.msg .msg__actions .wa { background: var(--wa); border-color: var(--wa); color: #fff; }
-.typing { align-self: flex-start; background: #fff; border-radius: 8px; padding: .5rem .7rem; font-size: .85rem; color: #667; }
-.chat__quick { display: flex; gap: .35rem; overflow-x: auto; padding: .4rem .5rem 0; scrollbar-width: none; }
-.chat__quick button { flex: none; border: 0; border-radius: 999px; background: #fff; padding: .35rem .75rem; font-size: .8rem; cursor: pointer; box-shadow: 0 1px 1px rgba(0,0,0,.12); color: #075e54; font-weight: 600; }
-.chat__form { display: flex; gap: .4rem; padding: .5rem; }
-.chat__form input { flex: 1; min-width: 0; border: 0; border-radius: 999px; padding: .6rem .9rem; background: #fff; }
-.chat__form button { flex: none; width: 42px; height: 42px; border-radius: 50%; border: 0; background: #075e54; color: #fff; cursor: pointer; }
+.chat__head span { font-size: .75rem; color: var(--ink-2); }
+.chat__lang { margin-left: auto; display: flex; gap: 2px; background: #e5e5ea; border-radius: 9px; padding: 2px; }
+.chat__lang button { border: 0; background: none; cursor: pointer; border-radius: 7px; padding: .2rem .5rem; font-size: .72rem; font-weight: 700; color: var(--ink-2); }
+.chat__lang button[aria-pressed=true] { background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+.chat__close { border: 0; background: #e5e5ea; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 1rem; line-height: 1; color: var(--ink-2); }
+.chat__log { flex: 1; overflow-y: auto; padding: 1rem .8rem; display: flex; flex-direction: column; gap: .45rem; overscroll-behavior: contain; }
+.msg { max-width: 82%; padding: .55rem .85rem .35rem; border-radius: 18px; font-size: .92rem; line-height: 1.4; overflow-wrap: anywhere; white-space: pre-line; animation: pop .25s var(--ease); }
+@keyframes pop { from { opacity: 0; transform: scale(.96) translateY(4px); } to { opacity: 1; transform: none; } }
+.msg--bot { align-self: flex-start; background: #e9e9eb; color: #111; border-bottom-left-radius: 6px; }
+.msg--user { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 6px; }
+.msg time { display: block; text-align: right; font-size: .66rem; opacity: .6; margin-top: .15rem; }
+.msg .msg__actions { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .5rem; white-space: normal; }
+.msg .msg__actions a, .msg .msg__actions button { font-size: .8rem; padding: .35rem .75rem; border-radius: 999px; border: 0; background: #fff; color: var(--accent); font-weight: 600; text-decoration: none; cursor: pointer; }
+.msg .msg__actions .wa { background: var(--wa); color: #fff; }
+.typing { align-self: flex-start; background: #e9e9eb; border-radius: 18px; padding: .55rem .9rem; color: #777; }
+.chat__quick { display: flex; gap: .4rem; overflow-x: auto; padding: .5rem .7rem 0; scrollbar-width: none; }
+.chat__quick button { flex: none; border: 0; border-radius: 999px; background: var(--accent-soft); color: var(--accent-2); padding: .4rem .85rem; font-size: .82rem; font-weight: 600; cursor: pointer; }
+.chat__form { display: flex; gap: .5rem; padding: .6rem .7rem .8rem; }
+.chat__form input { flex: 1; min-width: 0; border-radius: 999px; padding: .65rem 1rem; border: 1px solid var(--line); }
+.chat__form button { flex: none; width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--accent); color: #fff; cursor: pointer; font-size: 1rem; }
 </style>
 </head>
 
 <body>
 <a class="skip" href="#main">Saltar al contenido</a>
 
-<header class="site-header">
+<!-- =============================================================
+     NAVEGACIÓN
+     ============================================================= -->
+<header class="nav" data-open="false">
   <div class="wrap">
-    <a class="brand" href="#inicio">Nadia Lagoa Vilela</a>
-    <nav class="site-nav" aria-label="Principal">
-      <ul>
-        <li><a href="#servicios">Servicios</a></li>
-        <li><a href="#presupuesto">Presupuesto</a></li>
-        <li><a href="#trabajos">Trabajos</a></li>
-        <li><a href="#contacto">Reservar / Contacto</a></li>
-      </ul>
-    </nav>
+    <a class="nav__brand" href="#inicio" aria-label="Lagoa, inicio">LAGOA</a>
+    <ul class="nav__links">
+      <li><a href="#servicios">Servicios</a></li>
+      <li><a href="#mantenimiento">Mantenimiento</a></li>
+      <li><a href="#presupuesto">Presupuesto</a></li>
+      <li><a href="#como-trabajo">Cómo trabajo</a></li>
+      <li><a href="#trabajos">Trabajos</a></li>
+    </ul>
+    <a class="btn nav__cta" href="#contacto" data-open-tab="tab-reserva">Contacto</a>
+    <button class="nav__menu" type="button" aria-expanded="false" aria-controls="nav-sheet" aria-label="Abrir menú"><span></span></button>
   </div>
+  <nav class="nav__sheet" id="nav-sheet" aria-label="Menú" hidden>
+    <ul>
+      <li><a href="#servicios">Servicios</a></li>
+      <li><a href="#mantenimiento">Mantenimiento</a></li>
+      <li><a href="#presupuesto">Presupuesto</a></li>
+      <li><a href="#como-trabajo">Cómo trabajo</a></li>
+      <li><a href="#trabajos">Trabajos</a></li>
+      <li><a href="#faq">Preguntas frecuentes</a></li>
+      <li><a href="#contacto">Contacto</a></li>
+    </ul>
+  </nav>
 </header>
 
 <main id="main">
 
 <!-- =============================================================
-     INICIO
+     PORTADA: la tienda cierra, la web sigue abierta
      ============================================================= -->
-<section class="hero" id="inicio">
-  <div class="wrap">
-    <p class="muted">Desarrolladora de software · A Coruña</p>
-    <h1>Tu negocio sigue vendiendo cuando tú cierras.</h1>
-    <p class="lead">Hago webs con reservas, asistentes de WhatsApp, tiendas online y fichas de Google Maps para negocios en crecimiento. Tarifas fijas, plazos claros y todo queda a tu nombre.</p>
-    <div class="actions">
-      <a class="btn" href="#contacto" data-open-tab="tab-reserva">Consulta rápida sin compromiso</a>
-      <a class="btn btn--wa" data-wa="Hola, Nadia. Te escribo desde tu web para hablar sobre mi negocio." href="https://wa.me/34613597453">Contactar por WhatsApp</a>
+<section class="story" id="inicio" aria-labelledby="story-title">
+  <div class="story__stage">
+    <div class="sky" aria-hidden="true"></div>
+    <div class="sky__night" aria-hidden="true"></div>
+    <div class="stars" aria-hidden="true"></div>
+    <div class="moon" aria-hidden="true"></div>
+
+    <div class="story__copy">
+      <p class="story__kicker">Lagoa · Estudio digital en A Coruña</p>
+      <h1 class="visually-hidden" id="story-title">Lagoa: tu negocio sigue vendiendo cuando tú cierras</h1>
+      <div class="captions" aria-hidden="true">
+        <p class="caption" data-step="0">20:00. Último cliente del día.</p>
+        <p class="caption" data-step="1">Bajas la persiana.</p>
+        <p class="caption" data-step="2">Pero tu negocio <em>sigue abierto.</em></p>
+        <p class="caption is-active" data-step="3">Tu negocio sigue vendiendo <em>cuando tú cierras.</em></p>
+      </div>
     </div>
-    <ul class="tags" style="margin-top:1.2rem" aria-label="Datos rápidos">
+
+    <div class="facade" aria-hidden="true">
+      <div class="sign">LAGOA</div>
+      <div class="front">
+        <div class="interior"></div>
+        <div class="door"></div>
+        <div class="open-sign">ABIERTO</div>
+        <div class="shutter"></div>
+      </div>
+      <div class="pavement"></div>
+    </div>
+
+    <div class="device" role="img" aria-label="Móvil del negocio por la noche recibiendo una reserva, un mensaje del asistente de WhatsApp, un pedido y un recordatorio confirmado">
+      <div class="device__screen">
+        <div class="device__island"></div>
+        <p class="device__date">Esta noche</p>
+        <p class="device__clock" id="story-clock">01:30</p>
+        <div class="notifs">
+          <div class="notif" data-at="0.5">
+            <i class="notif__icon" style="background:#0b6e69">W</i><b>Web · Nueva reserva</b><time></time>
+            <span>Corte y peinado · sábado 12:00</span>
+          </div>
+          <div class="notif" data-at="0.61">
+            <i class="notif__icon" style="background:#1b7a46">✓</i><b>Asistente de WhatsApp</b><time></time>
+            <span>Ha respondido a 3 clientes</span>
+          </div>
+          <div class="notif" data-at="0.72">
+            <i class="notif__icon" style="background:#e08a3a">€</i><b>Tienda · Nuevo pedido</b><time></time>
+            <span>2 productos · pagado con Bizum</span>
+          </div>
+          <div class="notif" data-at="0.83">
+            <i class="notif__icon" style="background:#5856d6">⏰</i><b>Recordatorio enviado</b><time></time>
+            <span>Cita de mañana confirmada</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="scroll-hint" aria-hidden="true">Desliza para cerrar la tienda</p>
+  </div>
+</section>
+
+<!-- =============================================================
+     AMANECER: propuesta de valor
+     ============================================================= -->
+<section class="dawn center" aria-labelledby="dawn-title">
+  <div class="wrap" data-reveal>
+    <h2 class="headline" id="dawn-title">Por la mañana, <span class="gradient-text">todo está en tu móvil.</span></h2>
+    <p class="lead">Webs con reservas, asistentes de WhatsApp, tiendas online y fichas de Google Maps para negocios en crecimiento. Tarifas fijas, plazos claros y todo queda a tu nombre.</p>
+    <div class="actions center">
+      <a class="btn" href="#contacto" data-open-tab="tab-reserva">Consulta rápida sin compromiso</a>
+      <a class="link-arrow" data-wa="Hola, Nadia. Te escribo desde tu web para hablar sobre mi negocio." href="https://wa.me/34613597453">Contactar por WhatsApp</a>
+    </div>
+    <ul class="pills" aria-label="Datos rápidos">
       <li>Atención en galego, castellano, English, Deutsch y français</li>
       <li>Tarifas fijas, IVA incluido</li>
       <li>Mantenimiento opcional y cancelable</li>
@@ -239,139 +688,170 @@ dialog::backdrop { background: rgba(0,0,0,.4); }
 <!-- =============================================================
      SERVICIOS
      ============================================================= -->
-<section id="servicios">
+<section class="section section--alt" id="servicios" aria-labelledby="srv-title">
   <div class="wrap">
-    <h2>Servicios</h2>
-    <p class="lead">Tarifas fijas de lanzamiento, pago único. Puedes consultar los <a href="https://nadia-servicios.vercel.app" target="_blank" rel="noopener">ejemplos interactivos</a> de cada servicio.</p>
+    <div data-reveal>
+      <span class="eyebrow">Servicios</span>
+      <h2 class="headline" id="srv-title">Tarifas fijas. <span class="soft">IVA incluido, pago único.</span></h2>
+      <p class="lead">Puedes consultar los <a href="https://nadia-servicios.vercel.app" target="_blank" rel="noopener">ejemplos interactivos</a> de cada servicio.</p>
+    </div>
 
-    <div class="grid" style="margin-top:1.2rem">
-      <article class="card" id="srv-web">
+    <div class="bento">
+      <article class="tile" id="srv-web" data-reveal>
+        <span class="tile__num">01</span>
         <h3>Web con galería y reservas</h3>
-        <p class="price">290 € <small>IVA incluido</small></p>
-        <ul class="tags"><li>Plazo: 3-4 semanas</li><li>Mantenimiento opcional: 15 €/mes</li></ul>
-        <ul>
+        <p class="price"><strong>290 €</strong><small>IVA incluido</small></p>
+        <ul class="pills"><li>Plazo: 3-4 semanas</li><li>Mantenimiento opcional: 15 €/mes</li></ul>
+        <ul class="list">
           <li>Accesible desde cualquier dispositivo: móvil, tablet y ordenador.</li>
           <li>Galería de tus trabajos o productos, junto a tus reseñas.</li>
           <li>Reservas online por servicio, día y hora.</li>
           <li>Recordatorio automático el día anterior para reducir las ausencias.</li>
           <li>Mapa, horario y acceso directo a WhatsApp.</li>
         </ul>
-        <a href="https://nadia-servicios.vercel.app/#web" target="_blank" rel="noopener">Ver ejemplo</a>
+        <a class="link-arrow" href="https://nadia-servicios.vercel.app/#web" target="_blank" rel="noopener">Ver ejemplo</a>
       </article>
 
-      <article class="card" id="srv-whatsapp">
+      <article class="tile" id="srv-whatsapp" data-reveal>
+        <span class="tile__num">02</span>
         <h3>Asistente de WhatsApp</h3>
-        <p class="price">190 € <small>IVA incluido</small></p>
-        <ul class="tags"><li>Plazo: 2-3 semanas</li><li>Mantenimiento opcional: 19 €/mes</li></ul>
-        <ul>
+        <p class="price"><strong>190 €</strong><small>IVA incluido</small></p>
+        <ul class="pills"><li>Plazo: 2-3 semanas</li><li>Mantenimiento opcional: 19 €/mes</li></ul>
+        <ul class="list">
           <li>Respuesta inmediata sobre horarios, precios y citas disponibles.</li>
           <li>Gestión de citas desde el chat y envío de recordatorios.</li>
           <li>En castellano y en gallego.</li>
           <li>En caso de duda, la conversación se redirige a ti personalmente.</li>
         </ul>
-        <p class="small muted">Las posibles tarifas de mensajería de WhatsApp Business no están incluidas.</p>
-        <a href="https://nadia-servicios.vercel.app/#whatsapp" target="_blank" rel="noopener">Ver ejemplo</a>
+        <p class="note">Las posibles tarifas de mensajería de WhatsApp Business no están incluidas.</p>
+        <a class="link-arrow" href="https://nadia-servicios.vercel.app/#whatsapp" target="_blank" rel="noopener">Ver ejemplo</a>
       </article>
 
-      <article class="card" id="srv-tienda">
+      <article class="tile" id="srv-tienda" data-reveal>
+        <span class="tile__num">03</span>
         <h3>Tienda online pequeña</h3>
-        <p class="price">390 € <small>IVA incluido</small></p>
-        <ul class="tags"><li>Plazo: 4-6 semanas</li><li>Mantenimiento opcional: 19 €/mes</li></ul>
-        <ul>
+        <p class="price"><strong>390 €</strong><small>IVA incluido</small></p>
+        <ul class="pills"><li>Plazo: 4-6 semanas</li><li>Mantenimiento opcional: 19 €/mes</li></ul>
+        <ul class="list">
           <li>Catálogo con fotos y precios que gestionas tú.</li>
           <li>Recogida en tienda o envío a domicilio.</li>
           <li>Pago a través de Bizum o tarjeta.</li>
           <li>Notificación inmediata de cada nuevo pedido.</li>
           <li>Formación para que gestiones tus productos de forma autónoma.</li>
         </ul>
-        <p class="small muted">Las comisiones de la pasarela y los envíos dependen de tu banco y transportista.</p>
-        <a href="https://nadia-servicios.vercel.app/#tienda" target="_blank" rel="noopener">Ver ejemplo</a>
+        <p class="note">Las comisiones de la pasarela y los envíos dependen de tu banco y transportista.</p>
+        <a class="link-arrow" href="https://nadia-servicios.vercel.app/#tienda" target="_blank" rel="noopener">Ver ejemplo</a>
       </article>
 
-      <article class="card" id="srv-google">
+      <article class="tile" id="srv-google" data-reveal>
+        <span class="tile__num">04</span>
         <h3>Google Maps y SEO local</h3>
-        <p class="price">120 € <small>IVA incluido</small></p>
-        <ul class="tags"><li>Plazo: 1 semana</li><li>Sin cuota mensual</li></ul>
-        <ul>
+        <p class="price"><strong>120 €</strong><small>IVA incluido</small></p>
+        <ul class="pills"><li>Plazo: 1 semana</li><li>Sin cuota mensual</li></ul>
+        <ul class="list">
           <li>Revisión completa de tu ficha de empresa en Google.</li>
           <li>Categoría correcta, horario completo y descripción con las palabras que usan tus clientes.</li>
           <li>Fotos que definen tu negocio.</li>
           <li>Plantilla para responder reseñas y respuesta a las pendientes.</li>
         </ul>
-        <p class="small muted">Se mejora la visibilidad de tu negocio; no es posible garantizar una posición concreta en Google.</p>
-        <a href="https://nadia-servicios.vercel.app/#google" target="_blank" rel="noopener">Ver ejemplo</a>
+        <p class="note">Se mejora la visibilidad de tu negocio; no es posible garantizar una posición concreta en Google.</p>
+        <a class="link-arrow" href="https://nadia-servicios.vercel.app/#google" target="_blank" rel="noopener">Ver ejemplo</a>
+      </article>
+
+      <article class="tile tile--pack" id="srv-pack" data-reveal>
+        <div>
+          <span class="tile__num muted">Pack</span>
+          <h3>Pack Web + WhatsApp: <em>ahorras 50 €</em></h3>
+          <p style="margin-top:1rem">La web y el asistente de WhatsApp comparten la misma agenda: reservan por la web o por el chat, sin dobles reservas, y todo en un mismo sitio para tu fácil gestión.</p>
+        </div>
+        <div style="display:grid;gap:1rem">
+          <p class="price"><strong>430 €</strong><small>IVA incluido</small></p>
+          <p><strong>Por separado costarían 480 €.</strong> El pack incluye la web con reservas y el asistente de WhatsApp a un precio reducido.</p>
+          <ul class="pills"><li>Plazo: 5-7 semanas</li><li>Mantenimiento opcional: 29 €/mes</li></ul>
+        </div>
       </article>
     </div>
 
-    <article class="card" id="srv-pack" style="margin-top:1rem">
-      <h3>Pack Web + WhatsApp: ahorras 50 €</h3>
-      <p class="price">430 € <small>IVA incluido</small></p>
-      <p><strong>Por separado costarían 480 €.</strong> El pack incluye la web con reservas y el asistente de WhatsApp a un precio reducido.</p>
-      <ul class="tags"><li>Plazo: 5-7 semanas</li><li>Mantenimiento opcional: 29 €/mes</li></ul>
-      <p>La web y el asistente de WhatsApp comparten la misma agenda: reservan por la web o por el chat, sin dobles reservas, y todo en un mismo sitio para tu fácil gestión.</p>
-    </article>
-
-    <h3 style="margin-top:2rem">Y también, si tu negocio lo necesita</h3>
-    <p class="muted">Presupuesto a medida tras la consulta.</p>
-    <ul class="tags">
-      <li>Panel de ventas y stock</li>
-      <li>Tienda online completa</li>
-      <li>Facturación automática</li>
-      <li>Páginas para promociones</li>
-      <li>Tarjeta de fidelización en el móvil</li>
-      <li>Portal para tus clientes</li>
-      <li>Apps a medida</li>
-      <li>Y mucho más</li>
-    </ul>
+    <div class="extras" data-reveal>
+      <h3>Y también, si tu negocio lo necesita.</h3>
+      <p class="muted" style="margin-top:.4rem">Presupuesto a medida tras la consulta.</p>
+      <ul class="pills">
+        <li>Panel de ventas y stock</li>
+        <li>Tienda online completa</li>
+        <li>Facturación automática</li>
+        <li>Páginas para promociones</li>
+        <li>Tarjeta de fidelización en el móvil</li>
+        <li>Portal para tus clientes</li>
+        <li>Apps a medida</li>
+        <li>Y mucho más</li>
+      </ul>
+    </div>
   </div>
 </section>
 
 <!-- =============================================================
      MANTENIMIENTO
      ============================================================= -->
-<section id="mantenimiento">
+<section class="section" id="mantenimiento" aria-labelledby="maint-title">
   <div class="wrap">
-    <h2>Mantenimiento mensual (opcional)</h2>
-    <p class="lead">Garantiza el correcto funcionamiento de tu web sin que tengas que ocuparte de ello. Puede cancelarse en cualquier momento.</p>
-    <div class="grid" style="margin-top:1rem">
-      <div class="card"><h3>Copias de seguridad</h3><p>Automáticas y guardadas fuera del servidor.</p></div>
-      <div class="card"><h3>Actualizaciones de seguridad</h3><p>Revisión y parches en caso de error.</p></div>
-      <div class="card"><h3>Cambios pequeños ilimitados</h3><p>Actualización de precios, horarios o fotografías siempre que lo necesites.</p></div>
-      <div class="card"><h3>Soporte por WhatsApp o email</h3><p>Respuesta en horario laboral.</p></div>
+    <div data-reveal>
+      <span class="eyebrow">Mantenimiento mensual · opcional</span>
+      <h2 class="headline" id="maint-title">Tú atiendes tu negocio. <span class="soft">Yo, tu web.</span></h2>
+      <p class="lead">Garantiza el correcto funcionamiento de tu web sin que tengas que ocuparte de ello. Puede cancelarse en cualquier momento.</p>
     </div>
-    <p class="note" style="margin-top:1rem"><strong>No incluye:</strong> páginas nuevas, rediseños, fotografía, publicidad.</p>
-    <p class="small muted">Web 15 €/mes · WhatsApp 19 €/mes · Tienda 19 €/mes · Pack 29 €/mes. IVA incluido.</p>
+    <div class="features">
+      <div class="feature" data-reveal>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="2.8"/><path d="M5 6v6c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8V6M5 12v6c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8v-6"/></svg>
+        <h3>Copias de seguridad</h3><p>Automáticas y guardadas fuera del servidor.</p>
+      </div>
+      <div class="feature" data-reveal>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z"/><path d="M9 12l2 2 4-4" stroke-linecap="round"/></svg>
+        <h3>Actualizaciones de seguridad</h3><p>Revisión y parches en caso de error.</p>
+      </div>
+      <div class="feature" data-reveal>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/></svg>
+        <h3>Cambios pequeños ilimitados</h3><p>Actualización de precios, horarios o fotografías siempre que lo necesites.</p>
+      </div>
+      <div class="feature" data-reveal>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h8" stroke-linecap="round"/></svg>
+        <h3>Soporte por WhatsApp o email</h3><p>Respuesta en horario laboral.</p>
+      </div>
+    </div>
+    <p class="callout" data-reveal><strong>No incluye:</strong> páginas nuevas, rediseños, fotografía, publicidad.</p>
+    <p class="small muted" style="margin-top:1rem">Web 15 €/mes · WhatsApp 19 €/mes · Tienda 19 €/mes · Pack 29 €/mes. IVA incluido.</p>
   </div>
 </section>
 
 <!-- =============================================================
      CALCULADORA DE PRESUPUESTO
      ============================================================= -->
-<section id="presupuesto">
+<section class="section section--alt" id="presupuesto" aria-labelledby="calc-title">
   <div class="wrap">
-    <h2>Calcula tu presupuesto</h2>
-    <p class="lead">Selecciona los servicios que te interesan. Si eliges la web y el asistente de WhatsApp, se aplica automáticamente el precio del pack.</p>
+    <div data-reveal>
+      <span class="eyebrow">Presupuesto</span>
+      <h2 class="headline" id="calc-title">Calcula tu presupuesto. <span class="soft">Sin sorpresas.</span></h2>
+      <p class="lead">Selecciona los servicios que te interesan. Si eliges la web y el asistente de WhatsApp, se aplica automáticamente el precio del pack.</p>
+    </div>
 
-    <div class="calc" style="margin-top:1rem">
-      <fieldset>
+    <div class="calc">
+      <fieldset data-reveal>
         <legend>Servicios</legend>
-        <div style="display:grid;gap:.5rem" id="calc-options"><!-- generado por JS --></div>
-        <label class="check" style="margin-top:.8rem">
-          <input type="checkbox" id="calc-maint"> Incluir mantenimiento mensual
-        </label>
+        <div id="calc-options"><!-- generado por JS --></div>
+        <label class="calc-maint"><input type="checkbox" id="calc-maint"> Incluir mantenimiento mensual</label>
       </fieldset>
 
-      <div class="card" aria-live="polite">
-        <h3>Resumen</h3>
-        <table class="totals">
-          <tbody id="calc-lines"></tbody>
-        </table>
-        <table class="totals">
-          <tr class="total"><td>Total pago único (IVA incluido)</td><td id="calc-total">0,00 €</td></tr>
-          <tr><td class="small muted">De los cuales IVA (21 %)</td><td class="small muted" id="calc-iva">0,00 €</td></tr>
+      <div class="receipt" aria-live="polite" data-reveal>
+        <div class="receipt__head">
+          <strong>LAGOA</strong>
+          <span class="small">Presupuesto · A Coruña</span>
+        </div>
+        <table class="totals"><tbody id="calc-lines"></tbody></table>
+        <table class="totals totals--sum">
+          <tr class="total"><td>Total pago único (IVA incluido)</td><td id="calc-total">0 €</td></tr>
+          <tr><td class="small">De los cuales IVA (21 %)</td><td class="small" id="calc-iva">0 €</td></tr>
           <tr id="calc-monthly-row" hidden><td>Mantenimiento (IVA incluido)</td><td id="calc-monthly"></td></tr>
         </table>
-        <p class="small muted" id="calc-time"></p>
+        <p id="calc-time"></p>
         <div class="actions">
           <button type="button" class="btn" id="calc-send" disabled>Solicitar este presupuesto</button>
           <a class="btn btn--wa" id="calc-wa" href="https://wa.me/34613597453" aria-disabled="true">Enviar por WhatsApp</a>
@@ -382,179 +862,210 @@ dialog::backdrop { background: rgba(0,0,0,.4); }
 </section>
 
 <!-- =============================================================
-     CÓMO TRABAJO
+     CÓMO TRABAJO: contado como una conversación
      ============================================================= -->
-<section id="como-trabajo">
+<section class="section process" id="como-trabajo" aria-labelledby="process-title">
   <div class="wrap">
-    <h2>Cómo trabajo</h2>
-    <ol class="grid" style="padding-left:1.2rem">
-      <li class="card"><h3>Consulta inicial sin compromiso</h3><p>Analizamos tu negocio y las tareas que más tiempo te requieren.</p></li>
-      <li class="card"><h3>Desarrollo</h3><p>Recibirás avances periódicos y podrás dar tu opinión en cada fase.</p></li>
-      <li class="card"><h3>Entrega y formación</h3><p>Te explico su funcionamiento y todo queda a tu nombre.</p></li>
-    </ol>
+    <div class="center" data-reveal>
+      <span class="eyebrow" style="color:#5fd3c8">Cómo trabajo</span>
+      <h2 class="headline" id="process-title">Un proyecto, una conversación. <span class="soft">Sin formularios interminables.</span></h2>
+    </div>
+
+    <div class="thread">
+      <p class="thread__day" data-reveal>Día 1<b>Consulta inicial sin compromiso</b></p>
+      <p class="bubble bubble--them" data-reveal>Hola, Nadia. Tengo una peluquería y pierdo muchas citas por no poder contestar a tiempo.</p>
+      <p class="bubble bubble--me" data-reveal>Gracias por escribir. Analizamos tu negocio y las tareas que más tiempo te requieren. ¿Te viene bien mañana a las 17:00?</p>
+
+      <p class="thread__day" data-reveal>Día 3<b>Propuesta</b></p>
+      <p class="bubble bubble--me" data-reveal>Te envío la propuesta con la tarifa fija y el plazo de entrega.</p>
+      <p class="bubble bubble--them" data-reveal>Perfecto, adelante.</p>
+
+      <p class="thread__day" data-reveal>Semana 2<b>Desarrollo</b></p>
+      <p class="bubble bubble--me" data-reveal>Primer avance disponible. Puedes revisarlo y darme tu opinión en cada fase.</p>
+
+      <p class="thread__day" data-reveal>Semana 3<b>Entrega y formación</b></p>
+      <p class="bubble bubble--me" data-reveal>Tu web ya está publicada. Te explico su funcionamiento y todo queda a tu nombre.</p>
+      <p class="bubble bubble--them" data-reveal>Esta noche ya han reservado dos clientes.</p>
+      <p class="thread__note" data-reveal>Conversación de ejemplo para ilustrar el proceso.</p>
+    </div>
   </div>
 </section>
 
 <!-- =============================================================
      TRABAJOS (proyectos reales publicados)
      ============================================================= -->
-<section id="trabajos">
+<section class="section" id="trabajos" aria-labelledby="works-title">
   <div class="wrap">
-    <h2>Trabajos</h2>
-    <p class="lead">Selección de proyectos propios publicados, disponibles para su consulta.</p>
-    <div class="grid" style="margin-top:1rem">
-      <article class="card">
+    <div data-reveal>
+      <span class="eyebrow">Trabajos</span>
+      <h2 class="headline" id="works-title">Hecho por Lagoa. <span class="soft">Abre cualquiera y pruébalo.</span></h2>
+      <p class="lead">Selección de proyectos propios publicados, disponibles para su consulta.</p>
+    </div>
+    <div class="works">
+      <a class="work" href="https://nadia-servicios.vercel.app" target="_blank" rel="noopener" data-reveal>
         <h3>Muestrario de servicios</h3>
+        <span class="work__go" aria-hidden="true">→</span>
         <p>Demos interactivas de cada servicio con negocios ficticios: reservar cita, chatear con un asistente, hacer un pedido y comparar una ficha de Google.</p>
-        <ul class="tags"><li>HTML</li><li>CSS</li><li>JavaScript</li></ul>
-        <a href="https://nadia-servicios.vercel.app" target="_blank" rel="noopener">nadia-servicios.vercel.app</a>
-      </article>
-      <article class="card">
+      </a>
+      <a class="work" href="https://synaptic-ruby.vercel.app" target="_blank" rel="noopener" data-reveal>
         <h3>Synaptic</h3>
+        <span class="work__go" aria-hidden="true">→</span>
         <p>App para estudiantes: captura apuntes en texto, imagen o voz, los organiza con IA, genera tarjetas de estudio y responde preguntas sobre tu propio material.</p>
-        <ul class="tags"><li>Web app</li><li>IA</li></ul>
-        <a href="https://synaptic-ruby.vercel.app" target="_blank" rel="noopener">synaptic-ruby.vercel.app</a>
-      </article>
-      <article class="card">
+      </a>
+      <a class="work" href="https://cadence-amber-iota.vercel.app" target="_blank" rel="noopener" data-reveal>
         <h3>Cadence</h3>
+        <span class="work__go" aria-hidden="true">→</span>
         <p>Un único lugar tranquilo para planes, hábitos, casa y dinero. Con acceso mediante Google, GitHub o email.</p>
-        <ul class="tags"><li>Web app</li><li>Autenticación</li></ul>
-        <a href="https://cadence-amber-iota.vercel.app" target="_blank" rel="noopener">cadence-amber-iota.vercel.app</a>
-      </article>
-      <article class="card">
+      </a>
+      <div class="work" data-reveal>
         <h3>Larder</h3>
+        <span class="work__go" aria-hidden="true">→</span>
         <p>App que genera la lista de la compra a partir de lo que hay en la nevera. Antes de programarla: encuesta propia, estudio de mercado y especificación técnica.</p>
-        <ul class="tags"><li>Investigación</li><li>Producto</li><li>Especificación</li></ul>
-        <span><a href="https://larder-estado-del-arte.vercel.app" target="_blank" rel="noopener">Estudio de mercado</a> · <a href="https://larder-especificacion-tecnica.vercel.app" target="_blank" rel="noopener">Especificación técnica</a></span>
-      </article>
-      <article class="card">
+        <span class="work__links"><a href="https://larder-estado-del-arte.vercel.app" target="_blank" rel="noopener">Estudio de mercado</a><a href="https://larder-especificacion-tecnica.vercel.app" target="_blank" rel="noopener">Especificación técnica</a></span>
+      </div>
+      <a class="work" href="https://dossier-nadia.vercel.app" target="_blank" rel="noopener" data-reveal>
         <h3>Dossier de servicios</h3>
-        <p>Presentación visual de lo que ofrezco a comercios, con ejemplos de tiendas cotidianas.</p>
-        <ul class="tags"><li>Diseño</li><li>Contenido</li></ul>
-        <a href="https://dossier-nadia.vercel.app" target="_blank" rel="noopener">dossier-nadia.vercel.app</a>
-      </article>
+        <span class="work__go" aria-hidden="true">→</span>
+        <p>Presentación visual de los servicios para comercios, con ejemplos de tiendas cotidianas.</p>
+      </a>
     </div>
   </div>
 </section>
 
 <!-- =============================================================
-     RESERVA / CONTACTO
+     CONTACTO: reserva de consulta y mensaje
      ============================================================= -->
-<section id="contacto">
+<section class="section section--alt" id="contacto" aria-labelledby="contact-title">
   <div class="wrap">
-    <h2>Contacto</h2>
-    <p class="lead">Puedes reservar una consulta rápida sin compromiso o enviar un mensaje. Recibirás respuesta en un plazo máximo de 24 horas laborables.</p>
-
-    <div class="tabs" role="tablist" aria-label="Forma de contacto">
-      <button type="button" role="tab" id="tab-reserva" aria-controls="panel-reserva" aria-selected="true">Reservar consulta</button>
-      <button type="button" role="tab" id="tab-mensaje" aria-controls="panel-mensaje" aria-selected="false" tabindex="-1">Enviar mensaje</button>
+    <div class="center" data-reveal>
+      <span class="eyebrow">Contacto</span>
+      <h2 class="headline" id="contact-title">Empecemos por una consulta.</h2>
+      <p class="lead center">Puedes reservar una consulta rápida sin compromiso o enviar un mensaje. Recibirás respuesta en un plazo máximo de 24 horas laborables.</p>
     </div>
 
-    <!-- Reserva -->
-    <div role="tabpanel" id="panel-reserva" aria-labelledby="tab-reserva">
-      <form id="form-reserva" novalidate>
-        <fieldset>
-          <legend>Modalidad</legend>
+    <div class="contact-card" data-reveal>
+      <div class="segmented tabs" role="tablist" aria-label="Forma de contacto">
+        <button type="button" role="tab" id="tab-reserva" aria-controls="panel-reserva" aria-selected="true">Reservar consulta</button>
+        <button type="button" role="tab" id="tab-mensaje" aria-controls="panel-mensaje" aria-selected="false" tabindex="-1">Enviar mensaje</button>
+      </div>
+
+      <!-- Reserva -->
+      <div role="tabpanel" id="panel-reserva" aria-labelledby="tab-reserva">
+        <form id="form-reserva" novalidate>
+          <fieldset class="group">
+            <legend class="group__label">Modalidad</legend>
+            <div class="radios">
+              <label class="radio"><input type="radio" name="modalidad" value="Videollamada" checked> Videollamada</label>
+              <label class="radio"><input type="radio" name="modalidad" value="Llamada de teléfono"> Llamada de teléfono</label>
+              <label class="radio"><input type="radio" name="modalidad" value="En persona (solo A Coruña ciudad)"> En persona (solo A Coruña ciudad)</label>
+            </div>
+          </fieldset>
+
+          <fieldset class="group">
+            <legend class="group__label" id="lbl-dias">Día</legend>
+            <div class="choice-grid" id="res-days" role="group" aria-labelledby="lbl-dias"></div>
+          </fieldset>
+
+          <fieldset class="group">
+            <legend class="group__label" id="lbl-horas">Hora</legend>
+            <div class="choice-grid" id="res-slots" role="group" aria-labelledby="lbl-horas"><p class="muted small">Selecciona primero un día.</p></div>
+          </fieldset>
+
           <div class="row-2">
-            <label class="check"><input type="radio" name="modalidad" value="Videollamada" checked> Videollamada</label>
-            <label class="check"><input type="radio" name="modalidad" value="Llamada de teléfono"> Llamada de teléfono</label>
-            <label class="check"><input type="radio" name="modalidad" value="En persona (solo A Coruña ciudad)"> En persona (solo A Coruña ciudad)</label>
+            <div class="field"><label for="r-nombre">Nombre *</label><input id="r-nombre" name="nombre" type="text" autocomplete="name" required></div>
+            <div class="field"><label for="r-negocio">Negocio</label><input id="r-negocio" name="negocio" type="text" autocomplete="organization" placeholder="Ej.: peluquería en Monte Alto"></div>
+            <div class="field"><label for="r-tel">Teléfono / WhatsApp *</label><input id="r-tel" name="telefono" type="tel" autocomplete="tel" required></div>
+            <div class="field"><label for="r-email">Email</label><input id="r-email" name="email" type="email" autocomplete="email"></div>
           </div>
-        </fieldset>
+          <div class="field"><label for="r-nota">Motivo de la consulta (opcional)</label><textarea id="r-nota" name="nota"></textarea></div>
+          <input class="hp" type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <label class="check"><input type="checkbox" name="privacidad" required> <span>He leído y acepto la <a href="#" data-open-privacy>política de privacidad</a>. *</span></label>
+          <div class="status" id="res-status" role="status" hidden></div>
+          <div class="actions" style="margin-top:.4rem">
+            <button type="submit" class="btn">Solicitar cita</button>
+            <a class="btn btn--outline" id="google-booking" href="#" target="_blank" rel="noopener" hidden>Reservar en mi agenda de Google</a>
+          </div>
+          <p class="small muted">La cita quedará confirmada una vez recibas respuesta por WhatsApp o email.</p>
+        </form>
+      </div>
 
-        <fieldset>
-          <legend id="lbl-dias">Día</legend>
-          <div class="choice-grid" id="res-days" role="group" aria-labelledby="lbl-dias"></div>
-        </fieldset>
-
-        <fieldset>
-          <legend id="lbl-horas">Hora</legend>
-          <div class="choice-grid" id="res-slots" role="group" aria-labelledby="lbl-horas"><p class="muted small">Selecciona primero un día.</p></div>
-        </fieldset>
-
-        <div class="row-2">
-          <div class="field"><label for="r-nombre">Nombre *</label><input id="r-nombre" name="nombre" type="text" autocomplete="name" required></div>
-          <div class="field"><label for="r-negocio">Negocio</label><input id="r-negocio" name="negocio" type="text" autocomplete="organization" placeholder="Ej.: peluquería en Cee"></div>
-          <div class="field"><label for="r-tel">Teléfono / WhatsApp *</label><input id="r-tel" name="telefono" type="tel" autocomplete="tel" required></div>
-          <div class="field"><label for="r-email">Email</label><input id="r-email" name="email" type="email" autocomplete="email"></div>
-        </div>
-        <div class="field"><label for="r-nota">Motivo de la consulta (opcional)</label><textarea id="r-nota" name="nota"></textarea></div>
-        <input class="hp" type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true">
-        <label class="check"><input type="checkbox" name="privacidad" required> <span>He leído y acepto la <a href="#" data-open-privacy>política de privacidad</a>. *</span></label>
-        <div class="status" id="res-status" role="status" hidden></div>
-        <div class="actions">
-          <button type="submit" class="btn">Solicitar cita</button>
-          <a class="btn btn--outline" id="google-booking" href="#" target="_blank" rel="noopener" hidden>Reservar en mi agenda de Google</a>
-        </div>
-        <p class="small muted">La cita quedará confirmada una vez recibas respuesta por WhatsApp o email.</p>
-      </form>
+      <!-- Mensaje -->
+      <div role="tabpanel" id="panel-mensaje" aria-labelledby="tab-mensaje" hidden>
+        <form id="form-mensaje" novalidate>
+          <div class="row-2">
+            <div class="field"><label for="m-nombre">Nombre *</label><input id="m-nombre" name="nombre" type="text" autocomplete="name" required></div>
+            <div class="field"><label for="m-negocio">Negocio</label><input id="m-negocio" name="negocio" type="text" autocomplete="organization"></div>
+            <div class="field"><label for="m-email">Email *</label><input id="m-email" name="email" type="email" autocomplete="email" required></div>
+            <div class="field"><label for="m-tel">Teléfono / WhatsApp</label><input id="m-tel" name="telefono" type="tel" autocomplete="tel"></div>
+          </div>
+          <div class="field">
+            <label for="m-servicio">Me interesa</label>
+            <select id="m-servicio" name="servicio">
+              <option>Sin decidir</option>
+              <option>Web con galería y reservas</option>
+              <option>Asistente de WhatsApp</option>
+              <option>Tienda online pequeña</option>
+              <option>Google Maps y SEO local</option>
+              <option>Pack Web + WhatsApp</option>
+              <option>Algo a medida</option>
+            </select>
+          </div>
+          <div class="field"><label for="m-mensaje">Mensaje *</label><textarea id="m-mensaje" name="mensaje" required></textarea></div>
+          <input class="hp" type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <label class="check"><input type="checkbox" name="privacidad" required> <span>He leído y acepto la <a href="#" data-open-privacy>política de privacidad</a>. *</span></label>
+          <div class="status" id="msg-status" role="status" hidden></div>
+          <div class="actions" style="margin-top:.4rem"><button type="submit" class="btn">Enviar mensaje</button></div>
+        </form>
+      </div>
     </div>
 
-    <!-- Mensaje -->
-    <div role="tabpanel" id="panel-mensaje" aria-labelledby="tab-mensaje" hidden>
-      <form id="form-mensaje" novalidate>
-        <div class="row-2">
-          <div class="field"><label for="m-nombre">Nombre *</label><input id="m-nombre" name="nombre" type="text" autocomplete="name" required></div>
-          <div class="field"><label for="m-negocio">Negocio</label><input id="m-negocio" name="negocio" type="text" autocomplete="organization"></div>
-          <div class="field"><label for="m-email">Email *</label><input id="m-email" name="email" type="email" autocomplete="email" required></div>
-          <div class="field"><label for="m-tel">Teléfono / WhatsApp</label><input id="m-tel" name="telefono" type="tel" autocomplete="tel"></div>
-        </div>
-        <div class="field">
-          <label for="m-servicio">Me interesa</label>
-          <select id="m-servicio" name="servicio">
-            <option>Sin decidir</option>
-            <option>Web con galería y reservas</option>
-            <option>Asistente de WhatsApp</option>
-            <option>Tienda online pequeña</option>
-            <option>Google Maps y SEO local</option>
-            <option>Pack Web + WhatsApp</option>
-            <option>Algo a medida</option>
-          </select>
-        </div>
-        <div class="field"><label for="m-mensaje">Mensaje *</label><textarea id="m-mensaje" name="mensaje" required></textarea></div>
-        <input class="hp" type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true">
-        <label class="check"><input type="checkbox" name="privacidad" required> <span>He leído y acepto la <a href="#" data-open-privacy>política de privacidad</a>. *</span></label>
-        <div class="status" id="msg-status" role="status" hidden></div>
-        <div class="actions"><button type="submit" class="btn">Enviar mensaje</button></div>
-      </form>
-    </div>
-
-    <h3 style="margin-top:2rem">Contacto directo</h3>
-    <ul>
-      <li>WhatsApp: <a data-wa="Hola, Nadia. Te escribo desde tu web." href="https://wa.me/34613597453">+34 613 59 74 53</a></li>
-      <li>Email: <a href="mailto:nadialavi.work@gmail.com">nadialavi.work@gmail.com</a></li>
-    </ul>
+    <p class="direct">
+      <span>WhatsApp: <a data-wa="Hola, Nadia. Te escribo desde tu web." href="https://wa.me/34613597453">+34 613 59 74 53</a></span>
+      <span>Email: <a href="mailto:nadialavi.work@gmail.com">nadialavi.work@gmail.com</a></span>
+    </p>
   </div>
 </section>
 
 <!-- =============================================================
      PREGUNTAS FRECUENTES
      ============================================================= -->
-<section id="faq">
+<section class="section" id="faq" aria-labelledby="faq-title">
   <div class="wrap">
-    <h2>Preguntas frecuentes</h2>
-    <details><summary>¿Cuándo empieza a contar el plazo?</summary><p>Cuando haya recopilado la información necesaria para comenzar el desarrollo de tu web. Los plazos son orientativos y se confirman antes de iniciar el proyecto.</p></details>
-    <details><summary>¿Hay costes aparte?</summary><p>Únicamente los correspondientes a servicios de terceros: dominio y alojamiento (si son necesarios), comisiones de la pasarela de pago y tarifas de WhatsApp Business. Antes de iniciar el proyecto te indicaré cuáles aplican en tu caso.</p></details>
-    <details><summary>¿A nombre de quién queda el proyecto?</summary><p>A tu nombre. Al finalizar, recibirás la formación necesaria para gestionarlo.</p></details>
-    <details><summary>¿Es obligatorio contratar el mantenimiento?</summary><p>No. Es opcional y puede cancelarse en cualquier momento.</p></details>
-    <details><summary>¿Trabajas con negocios fuera de A Coruña?</summary><p>Mi actividad se centra en A Coruña. Si tu negocio se encuentra en otra zona, puedes contactarme y valoraremos tu caso.</p></details>
+    <h2 class="headline center" id="faq-title" style="text-align:center" data-reveal>Preguntas frecuentes.</h2>
+    <div class="faq" data-reveal>
+      <details><summary>¿Cuándo empieza a contar el plazo?</summary><p>Cuando haya recopilado la información necesaria para comenzar el desarrollo de tu web. Los plazos son orientativos y se confirman antes de iniciar el proyecto.</p></details>
+      <details><summary>¿Hay costes aparte?</summary><p>Únicamente los correspondientes a servicios de terceros: dominio y alojamiento (si son necesarios), comisiones de la pasarela de pago y tarifas de WhatsApp Business. Antes de iniciar el proyecto te indicaré cuáles aplican en tu caso.</p></details>
+      <details><summary>¿A nombre de quién queda el proyecto?</summary><p>A tu nombre. Al finalizar, recibirás la formación necesaria para gestionarlo.</p></details>
+      <details><summary>¿Es obligatorio contratar el mantenimiento?</summary><p>No. Es opcional y puede cancelarse en cualquier momento.</p></details>
+      <details><summary>¿Trabajas con negocios fuera de A Coruña?</summary><p>Mi actividad se centra en A Coruña. Si tu negocio se encuentra en otra zona, puedes contactarme y valoraremos tu caso.</p></details>
+    </div>
   </div>
 </section>
 
 </main>
 
-<footer class="site-footer">
+<!-- =============================================================
+     PIE
+     ============================================================= -->
+<footer class="footer">
   <div class="wrap">
-    <p><strong>Nadia Lagoa Vilela</strong> · Desarrolladora de software · A Coruña</p>
-    <p><a href="mailto:nadialavi.work@gmail.com">nadialavi.work@gmail.com</a> · <a data-wa="Hola, Nadia. Te escribo desde tu web." href="https://wa.me/34613597453">+34 613 59 74 53</a> · <a href="https://dossier-nadia.vercel.app" target="_blank" rel="noopener">Dossier</a></p>
-    <p class="small"><a href="#" data-open-privacy>Política de privacidad</a> · © <span id="year">2026</span></p>
+    <div class="footer__grid">
+      <div><strong>Lagoa · Estudio digital</strong>Estudio de Nadia Lagoa Vilela, desarrolladora de software en A Coruña.</div>
+      <div><strong>Contacto</strong><a href="mailto:nadialavi.work@gmail.com">nadialavi.work@gmail.com</a><br><a data-wa="Hola, Nadia. Te escribo desde tu web." href="https://wa.me/34613597453">+34 613 59 74 53</a></div>
+      <div><strong>Más</strong><a href="https://dossier-nadia.vercel.app" target="_blank" rel="noopener">Dossier</a><br><a href="https://nadia-servicios.vercel.app" target="_blank" rel="noopener">Ejemplos interactivos</a></div>
+    </div>
+    <div class="footer__legal">
+      <span>© <span id="year">2026</span> Lagoa · Nadia Lagoa Vilela</span>
+      <a href="#" data-open-privacy>Política de privacidad</a>
+    </div>
   </div>
+  <p class="wordmark" aria-hidden="true">LAGOA</p>
 </footer>
 
 <!-- Política de privacidad (RGPD) -->
 <dialog id="privacy" aria-labelledby="privacy-title">
   <h2 id="privacy-title">Política de privacidad</h2>
-  <p><strong>Responsable:</strong> Nadia Lagoa Vilela · nadialavi.work@gmail.com</p>
+  <p><strong>Responsable:</strong> Nadia Lagoa Vilela (Lagoa) · nadialavi.work@gmail.com</p>
   <p><strong>Qué datos recojo:</strong> los que escribes en los formularios (nombre, negocio, teléfono, email y mensaje) y, si reservas, el día y la hora elegidos.</p>
   <p><strong>Para qué:</strong> solo para responderte, organizar la cita y, si lo pides, prepararte un presupuesto. No envío publicidad ni cedo tus datos a nadie.</p>
   <p><strong>Base legal:</strong> tu consentimiento al marcar la casilla del formulario.</p>
@@ -566,11 +1077,12 @@ dialog::backdrop { background: rgba(0,0,0,.4); }
 </dialog>
 
 <!-- Chatbot -->
-<button type="button" class="btn btn--wa chat-launcher" id="chat-open" aria-controls="chat" aria-expanded="false">Asistente virtual</button>
+<button type="button" class="chat-launcher" id="chat-open" aria-controls="chat" aria-expanded="false">Asistente virtual</button>
 <div class="chat" id="chat" role="dialog" aria-labelledby="chat-title" hidden>
   <div class="chat__head">
+    <span class="chat__avatar" aria-hidden="true">L</span>
     <div>
-      <strong id="chat-title">Nadia · asistente</strong>
+      <strong id="chat-title">Lagoa · asistente virtual</strong>
       <span id="chat-sub">Respuesta inmediata</span>
     </div>
     <div class="chat__lang" role="group" aria-label="Idioma">
@@ -584,7 +1096,7 @@ dialog::backdrop { background: rgba(0,0,0,.4); }
   <form class="chat__form" id="chat-form" autocomplete="off">
     <label for="chat-input" class="visually-hidden">Escribe tu pregunta</label>
     <input id="chat-input" type="text" maxlength="300" placeholder="Escribe tu pregunta">
-    <button type="submit" aria-label="Enviar">➤</button>
+    <button type="submit" aria-label="Enviar">↑</button>
   </form>
 </div>
 
@@ -942,7 +1454,7 @@ $$('[data-open-tab]').forEach(a => a.addEventListener('click', () => selectTab(d
     es: {
       sub: 'Respuesta inmediata',
       placeholder: 'Escribe tu pregunta',
-      hello: 'Hola, soy el asistente virtual de Nadia. Puedo informarte sobre servicios, tarifas, plazos o la reserva de una consulta rápida sin compromiso.\nSi prefieres hablar directamente con ella, puedo redirigirte a su WhatsApp.',
+      hello: 'Hola, soy el asistente virtual de Lagoa. Puedo informarte sobre servicios, tarifas, plazos o la reserva de una consulta rápida sin compromiso.\nSi prefieres hablar directamente con ella, puedo redirigirte a su WhatsApp.',
       quick: [['servicios', 'Servicios'], ['precios', 'Tarifas'], ['plazos', 'Plazos'], ['cafe', 'Reservar consulta'], ['humano', 'Hablar con Nadia']],
       toNadia: 'Hablar con Nadia por WhatsApp',
       bookBtn: 'Ir a reservar',
@@ -990,7 +1502,7 @@ $$('[data-open-tab]').forEach(a => a.addEventListener('click', () => selectTab(d
     gl: {
       sub: 'Resposta inmediata',
       placeholder: 'Escribe a túa pregunta',
-      hello: 'Ola, son o asistente virtual de Nadia. Podo informarte sobre servizos, tarifas, prazos ou a reserva dunha consulta rápida sen compromiso.\nSe prefires falar directamente con ela, podo redirixirte ao seu WhatsApp.',
+      hello: 'Ola, son o asistente virtual de Lagoa. Podo informarte sobre servizos, tarifas, prazos ou a reserva dunha consulta rápida sen compromiso.\nSe prefires falar directamente con ela, podo redirixirte ao seu WhatsApp.',
       quick: [['servicios', 'Servizos'], ['precios', 'Tarifas'], ['plazos', 'Prazos'], ['cafe', 'Reservar consulta'], ['humano', 'Falar con Nadia']],
       toNadia: 'Falar con Nadia por WhatsApp',
       bookBtn: 'Ir reservar',
@@ -1135,6 +1647,82 @@ $$('[data-open-tab]').forEach(a => a.addEventListener('click', () => selectTab(d
     $$('.chat__lang button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
     render();
   }));
+})();
+
+/* =============================================================
+   PORTADA: la persiana baja con el scroll
+   ============================================================= */
+(function story() {
+  const section = $('#inicio');
+  const clock = $('#story-clock');
+  const captions = $$('.caption', section);
+  const notifs = $$('.notif', section);
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+  const START = 20 * 60, SPAN = 330; // de 20:00 a 01:30
+  const timeAt = p => { const m = Math.round(START + p * SPAN) % 1440; return `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`; };
+
+  // Hora fija de cada aviso, coherente con el reloj
+  notifs.forEach(n => { $('time', n).textContent = timeAt(Number(n.dataset.at)); });
+
+  // El botón del asistente aparece al terminar la portada, para no tapar el móvil
+  const launcher = $('#chat-open');
+  const toggleLauncher = () => launcher.classList.toggle('is-away', section.getBoundingClientRect().bottom > innerHeight * 0.4);
+  addEventListener('scroll', toggleLauncher, { passive: true });
+  toggleLauncher();
+
+  if (reduce) return; // se queda el estado final, sin animación
+
+  section.classList.add('is-live');
+  let ticking = false;
+  function update() {
+    ticking = false;
+    const total = section.offsetHeight - innerHeight;
+    const p = total > 0 ? clamp(-section.getBoundingClientRect().top / total) : 1;
+    const n = clamp((p - 0.04) / 0.5);   // anochece
+    const s = clamp((p - 0.14) / 0.32);  // baja la persiana
+    section.style.setProperty('--p', p.toFixed(4));
+    section.style.setProperty('--n', n.toFixed(4));
+    section.style.setProperty('--s', s.toFixed(4));
+    clock.textContent = timeAt(p);
+    const step = p < 0.14 ? 0 : p < 0.4 ? 1 : p < 0.88 ? 2 : 3;
+    captions.forEach(c => c.classList.toggle('is-active', Number(c.dataset.step) === step));
+    notifs.forEach(nf => nf.classList.toggle('show', p >= Number(nf.dataset.at)));
+  }
+  const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
+  addEventListener('scroll', onScroll, { passive: true });
+  addEventListener('resize', onScroll);
+  update();
+})();
+
+/* =============================================================
+   Aparición suave de bloques al entrar en pantalla
+   ============================================================= */
+(function reveal() {
+  const items = $$('[data-reveal]');
+  if (!('IntersectionObserver' in window)) { items.forEach(i => i.classList.add('is-in')); return; }
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-in'); io.unobserve(e.target); } });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
+  items.forEach(i => io.observe(i));
+})();
+
+/* =============================================================
+   Menú en móvil
+   ============================================================= */
+(function mobileMenu() {
+  const nav = $('.nav');
+  const btn = $('.nav__menu');
+  const sheet = $('#nav-sheet');
+  const set = open => {
+    nav.dataset.open = String(open);
+    btn.setAttribute('aria-expanded', String(open));
+    btn.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+    sheet.hidden = !open;
+  };
+  btn.addEventListener('click', () => set(sheet.hidden));
+  $$('a', sheet).forEach(a => a.addEventListener('click', () => set(false)));
+  addEventListener('keydown', e => { if (e.key === 'Escape' && !sheet.hidden) { set(false); btn.focus(); } });
 })();
 </script>
 </body>
