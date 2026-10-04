@@ -458,7 +458,7 @@ dialog::backdrop { background: rgba(0,0,0,.4); }
           <div class="row-2">
             <label class="check"><input type="radio" name="modalidad" value="Videollamada" checked> Videollamada</label>
             <label class="check"><input type="radio" name="modalidad" value="Llamada de teléfono"> Llamada de teléfono</label>
-            <label class="check"><input type="radio" name="modalidad" value="En persona (A Coruña)"> En persona</label>
+            <label class="check"><input type="radio" name="modalidad" value="En persona (solo A Coruña ciudad)"> En persona (solo A Coruña ciudad)</label>
           </div>
         </fieldset>
 
@@ -954,7 +954,7 @@ $$('[data-open-tab]').forEach(a => a.addEventListener('click', () => selectTab(d
         google: () => `Google Maps y SEO local (${eur.format(gross(175))} IVA incluido, plazo: 1 semana): categoría, horario, descripción con palabras clave, fotos que definen tu negocio y respuesta a reseñas. Mejora tu visibilidad, aunque nadie puede garantizar una posición concreta.`,
         mantenimiento: () => `El mantenimiento es opcional y cancelable (${maintList('es')}, IVA incluido): copias de seguridad, revisión y parches en caso de error, cambios pequeños ilimitados y soporte por WhatsApp o email. No incluye páginas nuevas, rediseños, fotografía ni publicidad.`,
         iva: () => 'Todos los precios que ves ya incluyen el IVA (21 %).',
-        cafe: () => 'La consulta rápida, sin compromiso, sirve para ver tu negocio y lo que más tiempo te quita (videollamada, teléfono o en persona). Elige día y hora en el formulario de reserva.',
+        cafe: () => 'La consulta rápida, sin compromiso, sirve para ver tu negocio y lo que más tiempo te quita (videollamada, teléfono o, solo en A Coruña ciudad, en persona). Elige día y hora en el formulario de reserva.',
         zona: () => 'Me centro en A Coruña. Si estás en otra zona, escríbeme y lo vemos.',
         idiomas: () => 'Nadia te atiende en galego, castellano, English, Deutsch y français.',
         propiedad: () => 'Todo queda a tu nombre y Nadia te enseña a usarlo.',
@@ -1002,7 +1002,7 @@ $$('[data-open-tab]').forEach(a => a.addEventListener('click', () => selectTab(d
         google: () => `Google Maps e SEO local (${eur.format(gross(175))} IVE incluído, prazo: 1 semana): categoría, horario, descrición con palabras clave, fotos que definen o teu negocio e resposta a recensións. Mellora a túa visibilidade, aínda que ninguén pode garantir unha posición concreta.`,
         mantenimiento: () => `O mantemento é opcional e cancelable (${maintList('gl')}, IVE incluído): copias de seguridade, revisión e parches en caso de erro, cambios pequenos ilimitados e soporte por WhatsApp ou email. Non inclúe páxinas novas, redeseños, fotografía nin publicidade.`,
         iva: () => 'Todos os prezos que ves xa inclúen o IVE (21 %).',
-        cafe: () => 'A consulta rápida, sen compromiso, serve para ver o teu negocio e o que máis tempo che quita (videochamada, teléfono ou en persoa). Escolle día e hora no formulario de reserva.',
+        cafe: () => 'A consulta rápida, sen compromiso, serve para ver o teu negocio e o que máis tempo che quita (videochamada, teléfono ou, só na cidade da Coruña, en persoa). Escolle día e hora no formulario de reserva.',
         zona: () => 'Céntrome na Coruña. Se estás noutra zona, escríbeme e vémolo.',
         idiomas: () => 'Nadia atendeche en galego, castelán, English, Deutsch e français.',
         propiedad: () => 'Todo queda ao teu nome e Nadia ensínache a usalo.',
