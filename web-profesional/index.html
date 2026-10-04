@@ -1,0 +1,1147 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nadia Lagoa Vilela · Webs, reservas y WhatsApp para negocios en A Coruña y Costa da Morte</title>
+<meta name="description" content="Desarrolladora de software en A Coruña y la Costa da Morte. Webs con reservas, asistente de WhatsApp, tiendas online pequeñas y Google Maps para negocios pequeños. Café de 15 minutos gratis.">
+<link rel="canonical" href="https://nadialavi.vercel.app/">
+<meta name="theme-color" content="#1F4D4A">
+
+<!-- Open Graph: cómo se ve el enlace al compartirlo en WhatsApp, LinkedIn… -->
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_ES">
+<meta property="og:title" content="Nadia Lagoa Vilela · Servicios digitales para tu negocio">
+<meta property="og:description" content="Webs con reservas, asistente de WhatsApp, tienda online y Google Maps para negocios de A Coruña y la Costa da Morte.">
+<meta property="og:url" content="https://nadialavi.vercel.app/">
+
+<!-- Datos estructurados para Google (SEO local) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  "name": "Nadia Lagoa Vilela · Servicios digitales",
+  "description": "Webs con reservas, asistente de WhatsApp, tiendas online pequeñas y optimización de Google Maps para negocios pequeños.",
+  "url": "https://nadialavi.vercel.app/",
+  "email": "nadialavi.work@gmail.com",
+  "telephone": "+34613597453",
+  "areaServed": [
+    { "@type": "City", "name": "A Coruña" },
+    { "@type": "AdministrativeArea", "name": "Costa da Morte" }
+  ],
+  "address": { "@type": "PostalAddress", "addressRegion": "A Coruña", "addressCountry": "ES" },
+  "founder": { "@type": "Person", "name": "Nadia Lagoa Vilela", "jobTitle": "Desarrolladora de software" },
+  "knowsLanguage": ["gl", "es", "en", "de", "fr"],
+  "priceRange": "175 € – 575 €",
+  "makesOffer": [
+    { "@type": "Offer", "name": "Web con galería y reservas", "price": "375", "priceCurrency": "EUR" },
+    { "@type": "Offer", "name": "Asistente de WhatsApp", "price": "275", "priceCurrency": "EUR" },
+    { "@type": "Offer", "name": "Tienda online pequeña", "price": "575", "priceCurrency": "EUR" },
+    { "@type": "Offer", "name": "Google Maps y SEO local", "price": "175", "priceCurrency": "EUR" },
+    { "@type": "Offer", "name": "Pack web + reservas + WhatsApp", "price": "575", "priceCurrency": "EUR" }
+  ]
+}
+</script>
+
+<style>
+/* =============================================================
+   ESTILO BASE NEUTRO (provisional)
+   La estética definitiva se decidirá más adelante. Todo el diseño
+   depende de estas variables: cambiándolas se re-tematiza la web
+   sin tocar el HTML ni el JavaScript.
+   ============================================================= */
+:root {
+  --bg: #ffffff;
+  --surface: #f5f5f4;
+  --text: #1c1c1c;
+  --muted: #555555;
+  --border: #d4d4d4;
+  --accent: #1F4D4A;       /* color de botones y enlaces */
+  --accent-text: #ffffff;
+  --ok: #1d6b3a;
+  --error: #a3261a;
+  --wa: #1b7a46;           /* botón de WhatsApp */
+  --radius: 8px;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --max: 1080px;
+  --gutter: 16px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body { margin: 0; font-family: var(--font); color: var(--text); background: var(--bg); line-height: 1.55; overflow-x: hidden; }
+img, svg { max-width: 100%; display: block; }
+a { color: var(--accent); }
+h1, h2, h3 { line-height: 1.2; overflow-wrap: break-word; }
+h2 { font-size: clamp(1.5rem, 5vw, 2rem); margin: 0 0 .5rem; }
+h3 { font-size: 1.1rem; margin: 0 0 .4rem; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+[hidden] { display: none !important; } /* que ninguna clase muestre algo oculto */
+.visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.skip { position: absolute; left: 8px; top: -60px; background: var(--accent); color: var(--accent-text); padding: .5rem 1rem; z-index: 100; }
+.skip:focus { top: 8px; }
+
+.wrap { max-width: var(--max); margin-inline: auto; padding-inline: var(--gutter); }
+section { padding-block: 3rem; scroll-margin-top: 64px; }
+section + section { border-top: 1px solid var(--border); }
+.lead { font-size: 1.1rem; color: var(--muted); max-width: 60ch; }
+.muted { color: var(--muted); }
+.small { font-size: .875rem; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; padding: .7rem 1.1rem; border-radius: var(--radius); border: 2px solid var(--accent); background: var(--accent); color: var(--accent-text); text-decoration: none; font-weight: 600; cursor: pointer; }
+.btn--outline { background: transparent; color: var(--accent); }
+.btn--wa { background: var(--wa); border-color: var(--wa); color: #fff; }
+.btn[disabled] { opacity: .5; cursor: not-allowed; }
+.actions { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1rem; }
+
+.grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.1rem; display: flex; flex-direction: column; gap: .5rem; min-width: 0; }
+.card ul { margin: .2rem 0; padding-left: 1.1rem; }
+.price { font-size: 1.6rem; font-weight: 700; }
+.price small { font-size: .9rem; font-weight: 400; color: var(--muted); }
+.tags { display: flex; flex-wrap: wrap; gap: .35rem; list-style: none; padding: 0; margin: 0; }
+.tags li { border: 1px solid var(--border); border-radius: 999px; padding: .1rem .6rem; font-size: .8rem; background: var(--bg); }
+.note { border-left: 4px solid var(--accent); background: var(--surface); padding: .7rem .9rem; border-radius: 4px; }
+
+/* Cabecera */
+.site-header { position: sticky; top: 0; z-index: 20; background: var(--bg); border-bottom: 1px solid var(--border); }
+.site-header .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem 1rem; padding-block: .6rem; }
+.brand { font-weight: 700; text-decoration: none; color: var(--text); }
+.site-nav ul { display: flex; flex-wrap: wrap; gap: .25rem 1rem; list-style: none; margin: 0; padding: 0; font-size: .95rem; }
+
+/* Hero */
+.hero { padding-block: 3.5rem 3rem; }
+.hero h1 { font-size: clamp(2rem, 7vw, 3.2rem); margin: 0 0 1rem; max-width: 20ch; }
+
+/* Formularios */
+form { display: grid; gap: .9rem; }
+.field { display: grid; gap: .3rem; }
+.field label, fieldset legend { font-weight: 600; font-size: .95rem; }
+input[type=text], input[type=email], input[type=tel], select, textarea { width: 100%; padding: .6rem .7rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); }
+textarea { min-height: 110px; resize: vertical; }
+fieldset { border: 1px solid var(--border); border-radius: var(--radius); padding: .8rem; margin: 0; min-width: 0; }
+.row-2 { display: grid; gap: .9rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); }
+.check { display: flex; gap: .5rem; align-items: flex-start; font-size: .9rem; }
+.check input { margin-top: .25rem; }
+.hp { display: none; } /* campo trampa anti-spam */
+.status { padding: .7rem .9rem; border-radius: var(--radius); border: 1px solid var(--border); }
+.status[data-type="ok"] { border-color: var(--ok); color: var(--ok); }
+.status[data-type="error"] { border-color: var(--error); color: var(--error); }
+
+/* Pestañas reserva / mensaje */
+.tabs { display: flex; gap: .4rem; border-bottom: 1px solid var(--border); margin-bottom: 1rem; flex-wrap: wrap; }
+.tabs [role=tab] { border: 0; background: none; padding: .6rem .9rem; border-bottom: 3px solid transparent; cursor: pointer; font-weight: 600; color: var(--muted); }
+.tabs [role=tab][aria-selected=true] { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* Selector de días y horas de la reserva */
+.choice-grid { display: grid; gap: .4rem; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); }
+.choice { padding: .5rem .3rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); cursor: pointer; text-align: center; line-height: 1.2; }
+.choice[aria-pressed=true] { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+.choice small { display: block; font-size: .75rem; }
+
+/* Calculadora de presupuesto */
+.calc { display: grid; gap: 1.2rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); align-items: start; }
+.calc-option { display: flex; gap: .6rem; align-items: flex-start; padding: .7rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); cursor: pointer; }
+.calc-option input { margin-top: .3rem; }
+.calc-option span { flex: 1; }
+.calc-option b { white-space: nowrap; }
+.totals { width: 100%; border-collapse: collapse; }
+.totals td { padding: .35rem 0; border-bottom: 1px solid var(--border); }
+.totals td:last-child { text-align: right; white-space: nowrap; }
+.totals tr.total td { font-weight: 700; font-size: 1.1rem; border-bottom: 0; }
+
+/* Preguntas frecuentes */
+details { border: 1px solid var(--border); border-radius: var(--radius); padding: .7rem .9rem; background: var(--surface); }
+details + details { margin-top: .5rem; }
+summary { cursor: pointer; font-weight: 600; }
+
+/* Pie */
+.site-footer { background: var(--surface); border-top: 1px solid var(--border); padding-block: 2rem 6rem; font-size: .9rem; }
+
+/* Diálogo de privacidad */
+dialog { max-width: min(640px, calc(100% - 2rem)); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.2rem; }
+dialog::backdrop { background: rgba(0,0,0,.4); }
+
+/* ---------- Chatbot (estilo WhatsApp) ---------- */
+.chat-launcher { position: fixed; right: 16px; bottom: 16px; z-index: 40; border-radius: 999px; padding: .8rem 1.1rem; box-shadow: 0 6px 20px rgba(0,0,0,.25); }
+.chat {
+  position: fixed; right: 16px; bottom: 16px; z-index: 50;
+  width: min(380px, calc(100vw - 32px)); height: min(600px, calc(100dvh - 32px));
+  display: flex; flex-direction: column; overflow: hidden;
+  background: #efeae2; border-radius: 14px; box-shadow: 0 12px 40px rgba(0,0,0,.35);
+}
+.chat[hidden] { display: none; }
+.chat__head { display: flex; align-items: center; gap: .6rem; padding: .7rem .8rem; background: #075e54; color: #fff; }
+.chat__head strong { display: block; font-size: .95rem; }
+.chat__head span { font-size: .75rem; opacity: .9; }
+.chat__lang { margin-left: auto; display: flex; gap: 2px; background: rgba(255,255,255,.18); border-radius: 999px; padding: 2px; }
+.chat__lang button, .chat__close { border: 0; background: none; color: #fff; cursor: pointer; border-radius: 999px; padding: .2rem .5rem; font-size: .75rem; font-weight: 700; }
+.chat__lang button[aria-pressed=true] { background: #fff; color: #075e54; }
+.chat__close { font-size: 1.2rem; line-height: 1; padding: .2rem .45rem; }
+.chat__log { flex: 1; overflow-y: auto; padding: .8rem .6rem; display: flex; flex-direction: column; gap: .4rem; overscroll-behavior: contain; }
+.msg { max-width: 85%; padding: .45rem .6rem .3rem; border-radius: 8px; font-size: .9rem; line-height: 1.4; box-shadow: 0 1px 1px rgba(0,0,0,.1); overflow-wrap: anywhere; white-space: pre-line; color: #111; }
+.msg--bot { align-self: flex-start; background: #fff; border-top-left-radius: 2px; }
+.msg--user { align-self: flex-end; background: #d9fdd3; border-top-right-radius: 2px; }
+.msg time { display: block; text-align: right; font-size: .68rem; color: #667; margin-top: .15rem; }
+.msg .msg__actions { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .4rem; white-space: normal; }
+.msg .msg__actions a, .msg .msg__actions button { font-size: .8rem; padding: .3rem .6rem; border-radius: 999px; border: 1px solid #075e54; color: #075e54; background: #fff; text-decoration: none; cursor: pointer; }
+.msg .msg__actions .wa { background: var(--wa); border-color: var(--wa); color: #fff; }
+.typing { align-self: flex-start; background: #fff; border-radius: 8px; padding: .5rem .7rem; font-size: .85rem; color: #667; }
+.chat__quick { display: flex; gap: .35rem; overflow-x: auto; padding: .4rem .5rem 0; scrollbar-width: none; }
+.chat__quick button { flex: none; border: 0; border-radius: 999px; background: #fff; padding: .35rem .75rem; font-size: .8rem; cursor: pointer; box-shadow: 0 1px 1px rgba(0,0,0,.12); color: #075e54; font-weight: 600; }
+.chat__form { display: flex; gap: .4rem; padding: .5rem; }
+.chat__form input { flex: 1; min-width: 0; border: 0; border-radius: 999px; padding: .6rem .9rem; background: #fff; }
+.chat__form button { flex: none; width: 42px; height: 42px; border-radius: 50%; border: 0; background: #075e54; color: #fff; cursor: pointer; }
+</style>
+</head>
+
+<body>
+<a class="skip" href="#main">Saltar al contenido</a>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="#inicio">Nadia Lagoa Vilela</a>
+    <nav class="site-nav" aria-label="Principal">
+      <ul>
+        <li><a href="#servicios">Servicios</a></li>
+        <li><a href="#presupuesto">Presupuesto</a></li>
+        <li><a href="#trabajos">Trabajos</a></li>
+        <li><a href="#sobre-mi">Sobre mí</a></li>
+        <li><a href="#contacto">Reservar / Contacto</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- =============================================================
+     INICIO
+     ============================================================= -->
+<section class="hero" id="inicio">
+  <div class="wrap">
+    <p class="muted">Desarrolladora de software · A Coruña e Costa da Morte</p>
+    <h1>Tu negocio sigue vendiendo cuando tú cierras.</h1>
+    <p class="lead">Hago webs con reservas, asistentes de WhatsApp, tiendas online pequeñas y fichas de Google Maps para negocios pequeños. Precios cerrados, plazos claros y todo queda a tu nombre.</p>
+    <div class="actions">
+      <a class="btn" href="#contacto" data-open-tab="tab-reserva">Reserva un café de 15 min (gratis)</a>
+      <a class="btn btn--wa" data-wa="Hola Nadia, vengo de tu web y me gustaría hablar sobre mi negocio." href="https://wa.me/34613597453">Escríbeme por WhatsApp</a>
+    </div>
+    <ul class="tags" style="margin-top:1.2rem" aria-label="Datos rápidos">
+      <li>Te atiendo en galego, castellano, English, Deutsch y français</li>
+      <li>Precios de lanzamiento</li>
+      <li>Mantenimiento opcional y cancelable</li>
+    </ul>
+  </div>
+</section>
+
+<!-- =============================================================
+     SERVICIOS
+     ============================================================= -->
+<section id="servicios">
+  <div class="wrap">
+    <h2>Servicios</h2>
+    <p class="lead">Precios de lanzamiento, pago único, sin IVA (21 %). ¿Quieres verlos funcionando? <a href="https://nadia-servicios.vercel.app" target="_blank" rel="noopener">Prueba los ejemplos interactivos</a>.</p>
+
+    <div class="grid" style="margin-top:1.2rem">
+      <article class="card" id="srv-web">
+        <h3>Web con galería y reservas</h3>
+        <p class="price">375 € <small>+ IVA</small></p>
+        <ul class="tags"><li>3 a 4 semanas</li><li>Mantenimiento opcional: 20 €/mes</li></ul>
+        <ul>
+          <li>Web pensada primero para el móvil.</li>
+          <li>Galería de tus trabajos o productos, junto a tus reseñas.</li>
+          <li>Reservas online por servicio, día y hora.</li>
+          <li>Recordatorio automático el día antes: menos citas perdidas.</li>
+          <li>Mapa, horario y botón directo a WhatsApp.</li>
+        </ul>
+        <a href="https://nadia-servicios.vercel.app/#web" target="_blank" rel="noopener">Ver ejemplo</a>
+      </article>
+
+      <article class="card" id="srv-whatsapp">
+        <h3>Asistente de WhatsApp</h3>
+        <p class="price">275 € <small>+ IVA</small></p>
+        <ul class="tags"><li>2 a 3 semanas</li><li>Mantenimiento opcional: 25 €/mes</li></ul>
+        <ul>
+          <li>Responde al momento horarios, precios y huecos libres, también de noche.</li>
+          <li>Apunta citas desde el chat y envía recordatorios.</li>
+          <li>En castellano y en gallego.</li>
+          <li>Si no sabe algo, te pasa la conversación a ti.</li>
+        </ul>
+        <p class="small muted">Las posibles tarifas de mensajería de WhatsApp Business van aparte.</p>
+        <a href="https://nadia-servicios.vercel.app/#whatsapp" target="_blank" rel="noopener">Ver ejemplo</a>
+      </article>
+
+      <article class="card" id="srv-tienda">
+        <h3>Tienda online pequeña</h3>
+        <p class="price">575 € <small>+ IVA</small></p>
+        <ul class="tags"><li>4 a 6 semanas</li><li>Mantenimiento opcional: 25 €/mes</li></ul>
+        <ul>
+          <li>Catálogo con fotos y precios que gestionas tú.</li>
+          <li>Recogida en tienda o envío a domicilio.</li>
+          <li>Pago con Bizum o tarjeta mediante la pasarela de tu banco.</li>
+          <li>Aviso al momento de cada pedido nuevo.</li>
+          <li>Formación para que subas productos sin ayuda.</li>
+        </ul>
+        <p class="small muted">Las comisiones de la pasarela y los envíos dependen de tu banco y transportista.</p>
+        <a href="https://nadia-servicios.vercel.app/#tienda" target="_blank" rel="noopener">Ver ejemplo</a>
+      </article>
+
+      <article class="card" id="srv-google">
+        <h3>Google Maps y SEO local</h3>
+        <p class="price">175 € <small>+ IVA</small></p>
+        <ul class="tags"><li>1 semana</li><li>Sin cuota mensual</li></ul>
+        <ul>
+          <li>Revisión completa de tu ficha de empresa en Google.</li>
+          <li>Categoría correcta, horario completo y descripción con las palabras que usan tus clientes.</li>
+          <li>Fotos ordenadas (las que tú aportes).</li>
+          <li>Plantilla para responder reseñas y respuesta a las pendientes.</li>
+        </ul>
+        <p class="small muted">Mejoro tu visibilidad; nadie puede garantizar una posición concreta en Google.</p>
+        <a href="https://nadia-servicios.vercel.app/#google" target="_blank" rel="noopener">Ver ejemplo</a>
+      </article>
+    </div>
+
+    <article class="card" id="srv-pack" style="margin-top:1rem">
+      <h3>Pack web + reservas + WhatsApp</h3>
+      <p class="price">575 € <small>+ IVA · en vez de 650 € (ahorras 75 €)</small></p>
+      <ul class="tags"><li>5 a 7 semanas</li><li>Mantenimiento opcional: 35 €/mes</li></ul>
+      <p>La web y el asistente de WhatsApp comparten la misma agenda: reservan por la web o por el chat, sin dobles reservas, y tú lo ves todo junto.</p>
+    </article>
+
+    <h3 style="margin-top:2rem">Y también, si tu negocio lo necesita</h3>
+    <p class="muted">Presupuesto a medida tras el café de 15 minutos.</p>
+    <ul class="tags">
+      <li>Panel de ventas y stock</li>
+      <li>Tienda online completa</li>
+      <li>Facturas que se hacen solas</li>
+      <li>Páginas para promociones</li>
+      <li>Tarjeta de fidelización en el móvil</li>
+      <li>Portal para tus clientes</li>
+      <li>Apps a medida</li>
+    </ul>
+  </div>
+</section>
+
+<!-- =============================================================
+     MANTENIMIENTO
+     ============================================================= -->
+<section id="mantenimiento">
+  <div class="wrap">
+    <h2>Mantenimiento mensual (opcional)</h2>
+    <p class="lead">Para que todo siga funcionando sin que tengas que pensar en ello. Lo puedes cancelar cuando quieras.</p>
+    <div class="grid" style="margin-top:1rem">
+      <div class="card"><h3>Copias de seguridad</h3><p>Automáticas y guardadas fuera del servidor.</p></div>
+      <div class="card"><h3>Actualizaciones de seguridad</h3><p>Revisión y parches cuando hacen falta.</p></div>
+      <div class="card"><h3>Cambios pequeños ilimitados</h3><p>Un precio, un horario, una foto nueva… cuando lo necesites.</p></div>
+      <div class="card"><h3>Soporte por WhatsApp o email</h3><p>Respuesta en horario laboral.</p></div>
+    </div>
+    <p class="note" style="margin-top:1rem"><strong>No incluye:</strong> páginas nuevas, rediseños, fotografía, publicidad.</p>
+    <p class="small muted">Web 20 €/mes · WhatsApp 25 €/mes · Tienda 25 €/mes · Pack 35 €/mes. Precios + IVA.</p>
+  </div>
+</section>
+
+<!-- =============================================================
+     CALCULADORA DE PRESUPUESTO
+     ============================================================= -->
+<section id="presupuesto">
+  <div class="wrap">
+    <h2>Calcula tu presupuesto</h2>
+    <p class="lead">Marca lo que te interesa. Si eliges web y WhatsApp, se aplica el pack automáticamente.</p>
+
+    <div class="calc" style="margin-top:1rem">
+      <fieldset>
+        <legend>Servicios</legend>
+        <div style="display:grid;gap:.5rem" id="calc-options"><!-- generado por JS --></div>
+        <label class="check" style="margin-top:.8rem">
+          <input type="checkbox" id="calc-maint"> Quiero mantenimiento mensual
+        </label>
+      </fieldset>
+
+      <div class="card" aria-live="polite">
+        <h3>Resumen</h3>
+        <table class="totals">
+          <tbody id="calc-lines"></tbody>
+        </table>
+        <table class="totals">
+          <tr><td>Base imponible</td><td id="calc-base">0,00 €</td></tr>
+          <tr><td>IVA (21 %)</td><td id="calc-iva">0,00 €</td></tr>
+          <tr class="total"><td>Total pago único</td><td id="calc-total">0,00 €</td></tr>
+          <tr id="calc-monthly-row" hidden><td>Mantenimiento</td><td id="calc-monthly"></td></tr>
+        </table>
+        <p class="small muted" id="calc-time"></p>
+        <div class="actions">
+          <button type="button" class="btn" id="calc-send" disabled>Pedir este presupuesto</button>
+          <a class="btn btn--wa" id="calc-wa" href="https://wa.me/34613597453" aria-disabled="true">Enviar por WhatsApp</a>
+        </div>
+        <p class="small muted">Presupuesto orientativo. Te confirmo el precio final tras el café de 15 minutos.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================================
+     CÓMO TRABAJO
+     ============================================================= -->
+<section id="como-trabajo">
+  <div class="wrap">
+    <h2>Tres pasos, sin papeleo y sin sorpresas</h2>
+    <ol class="grid" style="padding-left:1.2rem">
+      <li class="card"><h3>Un café de 15 minutos</h3><p>Vemos tu negocio y lo que más tiempo te quita. Gratis, trabajes conmigo o no.</p></li>
+      <li class="card"><h3>Lo monto en semanas</h3><p>Vas viendo avances y opinas en cada paso.</p></li>
+      <li class="card"><h3>Te enseño y es tuyo</h3><p>Te enseño a usarlo y todo queda a tu nombre.</p></li>
+    </ol>
+  </div>
+</section>
+
+<!-- =============================================================
+     TRABAJOS (proyectos reales publicados)
+     ============================================================= -->
+<section id="trabajos">
+  <div class="wrap">
+    <h2>Trabajos</h2>
+    <p class="lead">Proyectos propios publicados. Puedes abrirlos y probarlos.</p>
+    <div class="grid" style="margin-top:1rem">
+      <article class="card">
+        <h3>Muestrario de servicios</h3>
+        <p>Demos interactivas de cada servicio con negocios ficticios: reservar cita, chatear con un asistente, hacer un pedido y comparar una ficha de Google.</p>
+        <ul class="tags"><li>HTML</li><li>CSS</li><li>JavaScript</li></ul>
+        <a href="https://nadia-servicios.vercel.app" target="_blank" rel="noopener">nadia-servicios.vercel.app</a>
+      </article>
+      <article class="card">
+        <h3>Synaptic</h3>
+        <p>App para estudiantes: captura apuntes en texto, imagen o voz, los organiza con IA, genera tarjetas de estudio y responde preguntas sobre tu propio material.</p>
+        <ul class="tags"><li>Web app</li><li>IA</li></ul>
+        <a href="https://synaptic-ruby.vercel.app" target="_blank" rel="noopener">synaptic-ruby.vercel.app</a>
+      </article>
+      <article class="card">
+        <h3>Cadence</h3>
+        <p>Un único lugar tranquilo para planes, hábitos, casa y dinero. Con acceso mediante Google, GitHub o email.</p>
+        <ul class="tags"><li>Web app</li><li>Autenticación</li></ul>
+        <a href="https://cadence-amber-iota.vercel.app" target="_blank" rel="noopener">cadence-amber-iota.vercel.app</a>
+      </article>
+      <article class="card">
+        <h3>Larder</h3>
+        <p>App que genera la lista de la compra a partir de lo que hay en la nevera. Antes de programarla: encuesta propia, estudio de mercado y especificación técnica.</p>
+        <ul class="tags"><li>Investigación</li><li>Producto</li><li>Especificación</li></ul>
+        <span><a href="https://larder-estado-del-arte.vercel.app" target="_blank" rel="noopener">Estudio de mercado</a> · <a href="https://larder-especificacion-tecnica.vercel.app" target="_blank" rel="noopener">Especificación técnica</a></span>
+      </article>
+      <article class="card">
+        <h3>Dossier de servicios</h3>
+        <p>Presentación visual de lo que ofrezco a comercios, con ejemplos de tiendas cotidianas.</p>
+        <ul class="tags"><li>Diseño</li><li>Contenido</li></ul>
+        <a href="https://dossier-nadia.vercel.app" target="_blank" rel="noopener">dossier-nadia.vercel.app</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================================
+     SOBRE MÍ
+     ============================================================= -->
+<section id="sobre-mi">
+  <div class="wrap">
+    <h2>Sobre mí</h2>
+    <p class="lead">Soy Nadia Lagoa Vilela, desarrolladora de software y estudiante de Desarrollo de Aplicaciones Multiplataforma (DAM).</p>
+    <p style="max-width:65ch">Viví 12 años en Suiza, donde aprendí a valorar la precisión y el trabajo bien hecho. También trabajé en hostelería, atendiendo en varios idiomas bajo presión: sé lo que es tener un negocio abierto al público y no tener tiempo para nada más. Por eso hago herramientas sencillas que te quitan trabajo, no que te dan más.</p>
+    <p><strong>Idiomas:</strong> galego, castellano, English, Deutsch, français.</p>
+  </div>
+</section>
+
+<!-- =============================================================
+     RESERVA / CONTACTO
+     ============================================================= -->
+<section id="contacto">
+  <div class="wrap">
+    <h2>Hablemos</h2>
+    <p class="lead">Reserva el café gratuito de 15 minutos o mándame un mensaje. Te respondo en menos de 24 h laborables.</p>
+
+    <div class="tabs" role="tablist" aria-label="Forma de contacto">
+      <button type="button" role="tab" id="tab-reserva" aria-controls="panel-reserva" aria-selected="true">Reservar café (15 min)</button>
+      <button type="button" role="tab" id="tab-mensaje" aria-controls="panel-mensaje" aria-selected="false" tabindex="-1">Enviar mensaje</button>
+    </div>
+
+    <!-- Reserva -->
+    <div role="tabpanel" id="panel-reserva" aria-labelledby="tab-reserva">
+      <form id="form-reserva" novalidate>
+        <fieldset>
+          <legend>Modalidad</legend>
+          <div class="row-2">
+            <label class="check"><input type="radio" name="modalidad" value="Videollamada" checked> Videollamada</label>
+            <label class="check"><input type="radio" name="modalidad" value="Llamada de teléfono"> Llamada de teléfono</label>
+            <label class="check"><input type="radio" name="modalidad" value="En persona (A Coruña / Costa da Morte)"> En persona</label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend id="lbl-dias">Día</legend>
+          <div class="choice-grid" id="res-days" role="group" aria-labelledby="lbl-dias"></div>
+        </fieldset>
+
+        <fieldset>
+          <legend id="lbl-horas">Hora</legend>
+          <div class="choice-grid" id="res-slots" role="group" aria-labelledby="lbl-horas"><p class="muted small">Elige primero un día.</p></div>
+        </fieldset>
+
+        <div class="row-2">
+          <div class="field"><label for="r-nombre">Nombre *</label><input id="r-nombre" name="nombre" type="text" autocomplete="name" required></div>
+          <div class="field"><label for="r-negocio">Negocio</label><input id="r-negocio" name="negocio" type="text" autocomplete="organization" placeholder="Ej.: peluquería en Cee"></div>
+          <div class="field"><label for="r-tel">Teléfono / WhatsApp *</label><input id="r-tel" name="telefono" type="tel" autocomplete="tel" required></div>
+          <div class="field"><label for="r-email">Email</label><input id="r-email" name="email" type="email" autocomplete="email"></div>
+        </div>
+        <div class="field"><label for="r-nota">¿Qué te gustaría mejorar? (opcional)</label><textarea id="r-nota" name="nota"></textarea></div>
+        <input class="hp" type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <label class="check"><input type="checkbox" name="privacidad" required> <span>He leído y acepto la <a href="#" data-open-privacy>política de privacidad</a>. *</span></label>
+        <div class="status" id="res-status" role="status" hidden></div>
+        <div class="actions">
+          <button type="submit" class="btn">Solicitar cita</button>
+          <a class="btn btn--outline" id="google-booking" href="#" target="_blank" rel="noopener" hidden>Reservar en mi agenda de Google</a>
+        </div>
+        <p class="small muted">La cita queda confirmada cuando te respondo por WhatsApp o email.</p>
+      </form>
+    </div>
+
+    <!-- Mensaje -->
+    <div role="tabpanel" id="panel-mensaje" aria-labelledby="tab-mensaje" hidden>
+      <form id="form-mensaje" novalidate>
+        <div class="row-2">
+          <div class="field"><label for="m-nombre">Nombre *</label><input id="m-nombre" name="nombre" type="text" autocomplete="name" required></div>
+          <div class="field"><label for="m-negocio">Negocio</label><input id="m-negocio" name="negocio" type="text" autocomplete="organization"></div>
+          <div class="field"><label for="m-email">Email *</label><input id="m-email" name="email" type="email" autocomplete="email" required></div>
+          <div class="field"><label for="m-tel">Teléfono / WhatsApp</label><input id="m-tel" name="telefono" type="tel" autocomplete="tel"></div>
+        </div>
+        <div class="field">
+          <label for="m-servicio">Me interesa</label>
+          <select id="m-servicio" name="servicio">
+            <option>Aún no lo sé</option>
+            <option>Web con galería y reservas</option>
+            <option>Asistente de WhatsApp</option>
+            <option>Tienda online pequeña</option>
+            <option>Google Maps y SEO local</option>
+            <option>Pack web + reservas + WhatsApp</option>
+            <option>Algo a medida</option>
+          </select>
+        </div>
+        <div class="field"><label for="m-mensaje">Mensaje *</label><textarea id="m-mensaje" name="mensaje" required></textarea></div>
+        <input class="hp" type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <label class="check"><input type="checkbox" name="privacidad" required> <span>He leído y acepto la <a href="#" data-open-privacy>política de privacidad</a>. *</span></label>
+        <div class="status" id="msg-status" role="status" hidden></div>
+        <div class="actions"><button type="submit" class="btn">Enviar mensaje</button></div>
+      </form>
+    </div>
+
+    <h3 style="margin-top:2rem">O directamente</h3>
+    <ul>
+      <li>WhatsApp: <a data-wa="Hola Nadia, vengo de tu web." href="https://wa.me/34613597453">+34 613 59 74 53</a></li>
+      <li>Email: <a href="mailto:nadialavi.work@gmail.com">nadialavi.work@gmail.com</a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- =============================================================
+     PREGUNTAS FRECUENTES
+     ============================================================= -->
+<section id="faq">
+  <div class="wrap">
+    <h2>Preguntas frecuentes</h2>
+    <details><summary>¿Los precios llevan IVA?</summary><p>No. Todos los precios son sin IVA; se suma el 21 %. La calculadora te lo muestra ya sumado.</p></details>
+    <details><summary>¿Cuándo empieza a contar el plazo?</summary><p>Cuando tengo los textos y las fotos de tu negocio. Los plazos son orientativos y te los confirmo antes de empezar.</p></details>
+    <details><summary>¿Hay costes aparte?</summary><p>Lo que cobran terceros: dominio y alojamiento si los necesitas, comisiones de la pasarela de pago y tarifas de WhatsApp Business. Te digo cuáles aplican a tu caso antes de empezar.</p></details>
+    <details><summary>¿Es mío lo que me haces?</summary><p>Sí. Todo queda a tu nombre y te enseño a usarlo.</p></details>
+    <details><summary>¿Estoy obligado a pagar mantenimiento?</summary><p>No. Es opcional y lo puedes cancelar cuando quieras.</p></details>
+    <details><summary>¿Trabajas fuera de A Coruña y la Costa da Morte?</summary><p>Me centro en esta zona, pero escríbeme igualmente y lo vemos.</p></details>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p><strong>Nadia Lagoa Vilela</strong> · Desarrolladora de software · A Coruña e Costa da Morte</p>
+    <p><a href="mailto:nadialavi.work@gmail.com">nadialavi.work@gmail.com</a> · <a data-wa="Hola Nadia, vengo de tu web." href="https://wa.me/34613597453">+34 613 59 74 53</a> · <a href="https://dossier-nadia.vercel.app" target="_blank" rel="noopener">Dossier</a></p>
+    <p class="small"><a href="#" data-open-privacy>Política de privacidad</a> · © <span id="year">2026</span></p>
+  </div>
+</footer>
+
+<!-- Política de privacidad (RGPD) -->
+<dialog id="privacy" aria-labelledby="privacy-title">
+  <h2 id="privacy-title">Política de privacidad</h2>
+  <p><strong>Responsable:</strong> Nadia Lagoa Vilela · nadialavi.work@gmail.com</p>
+  <p><strong>Qué datos recojo:</strong> los que escribes en los formularios (nombre, negocio, teléfono, email y mensaje) y, si reservas, el día y la hora elegidos.</p>
+  <p><strong>Para qué:</strong> solo para responderte, organizar la cita y, si lo pides, prepararte un presupuesto. No envío publicidad ni cedo tus datos a nadie.</p>
+  <p><strong>Base legal:</strong> tu consentimiento al marcar la casilla del formulario.</p>
+  <p><strong>Proveedores:</strong> los formularios se envían a mi correo mediante FormSubmit (formsubmit.co). Si escribes por WhatsApp, se aplica la política de WhatsApp (Meta).</p>
+  <p><strong>Cuánto tiempo:</strong> mientras dure la conversación o la relación comercial y, después, el tiempo que exija la ley.</p>
+  <p><strong>Tus derechos:</strong> puedes pedir acceso, rectificación o eliminación de tus datos escribiendo a nadialavi.work@gmail.com. También puedes reclamar ante la Agencia Española de Protección de Datos (aepd.es).</p>
+  <p><strong>Cookies:</strong> esta web no usa cookies.</p>
+  <form method="dialog"><button class="btn">Cerrar</button></form>
+</dialog>
+
+<!-- Chatbot -->
+<button type="button" class="btn btn--wa chat-launcher" id="chat-open" aria-controls="chat" aria-expanded="false">💬 ¿Dudas? Pregúntame</button>
+<div class="chat" id="chat" role="dialog" aria-labelledby="chat-title" hidden>
+  <div class="chat__head">
+    <div>
+      <strong id="chat-title">Nadia · asistente</strong>
+      <span id="chat-sub">Responde al momento</span>
+    </div>
+    <div class="chat__lang" role="group" aria-label="Idioma">
+      <button type="button" data-lang="es" aria-pressed="true">ES</button>
+      <button type="button" data-lang="gl" aria-pressed="false">GL</button>
+    </div>
+    <button type="button" class="chat__close" id="chat-close" aria-label="Cerrar chat">×</button>
+  </div>
+  <div class="chat__log" id="chat-log" role="log" aria-live="polite" tabindex="0"></div>
+  <div class="chat__quick" id="chat-quick" role="group" aria-label="Preguntas rápidas"></div>
+  <form class="chat__form" id="chat-form" autocomplete="off">
+    <label for="chat-input" class="visually-hidden">Escribe tu pregunta</label>
+    <input id="chat-input" type="text" maxlength="300" placeholder="Escribe tu pregunta">
+    <button type="submit" aria-label="Enviar">➤</button>
+  </form>
+</div>
+
+<script>
+'use strict';
+/* =============================================================
+   CONFIGURACIÓN — edita aquí tus datos sin tocar el resto
+   ============================================================= */
+const CONFIG = {
+  whatsapp: '34613597453',                 // número en formato internacional, sin + ni espacios
+  email: 'nadialavi.work@gmail.com',       // donde llegan reservas y mensajes
+  // Si creas una "agenda de citas" en Google Calendar, pega aquí su enlace
+  // y aparecerá el botón "Reservar en mi agenda de Google".
+  googleBookingUrl: '',
+  // Tu disponibilidad para el café de 15 min (0 = domingo … 6 = sábado)
+  availability: {
+    1: ['16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00'],
+    2: ['16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00'],
+    3: ['16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00'],
+    4: ['16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00'],
+    5: ['16:00', '16:30', '17:00', '17:30', '18:00'],
+    6: ['10:00', '10:30', '11:00', '11:30', '12:00']
+  },
+  daysAhead: 14,                            // cuántos días se muestran
+  minHoursNotice: 12                        // antelación mínima para reservar
+};
+
+/* Precios: una sola fuente de verdad para calculadora y chatbot */
+const SERVICES = [
+  { id: 'web', name: 'Web con galería y reservas', price: 375, monthly: 20, weeks: '3 a 4 semanas' },
+  { id: 'wa', name: 'Asistente de WhatsApp', price: 275, monthly: 25, weeks: '2 a 3 semanas' },
+  { id: 'shop', name: 'Tienda online pequeña', price: 575, monthly: 25, weeks: '4 a 6 semanas' },
+  { id: 'seo', name: 'Google Maps y SEO local', price: 175, monthly: 0, weeks: '1 semana' }
+];
+const PACK = { name: 'Pack web + reservas + WhatsApp', price: 575, monthly: 35, weeks: '5 a 7 semanas' };
+const VAT = 0.21;
+
+/* =============================================================
+   Utilidades
+   ============================================================= */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const eur = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' });
+const waLink = text => `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(text)}`;
+function el(tag, attrs = {}, text) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) k === 'class' ? (n.className = v) : n.setAttribute(k, v);
+  if (text !== undefined) n.textContent = text;
+  return n;
+}
+
+/** Envía un formulario a tu email mediante FormSubmit. Devuelve true si ha ido bien. */
+async function sendToEmail(subject, data) {
+  try {
+    const res = await fetch(`https://formsubmit.co/ajax/${CONFIG.email}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify({ _subject: subject, _template: 'table', _captcha: 'false', ...data })
+    });
+    const json = await res.json().catch(() => ({}));
+    return res.ok && String(json.success) === 'true';
+  } catch {
+    return false;
+  }
+}
+
+/** Muestra el resultado de un envío; si falla, ofrece WhatsApp y email con el mismo texto */
+function showStatus(box, ok, summary) {
+  box.hidden = false;
+  box.replaceChildren();
+  if (ok) {
+    box.dataset.type = 'ok';
+    box.textContent = '¡Recibido! Te respondo en menos de 24 h laborables.';
+    return;
+  }
+  box.dataset.type = 'error';
+  box.append(el('p', { style: 'margin:0 0 .5rem' }, 'No se pudo enviar desde la web. Envíamelo con un clic:'));
+  const actions = el('div', { class: 'actions', style: 'margin:0' });
+  actions.append(
+    el('a', { class: 'btn btn--wa', href: waLink(summary), target: '_blank', rel: 'noopener' }, 'Enviar por WhatsApp'),
+    el('a', { class: 'btn btn--outline', href: `mailto:${CONFIG.email}?subject=${encodeURIComponent('Contacto desde la web')}&body=${encodeURIComponent(summary)}` }, 'Enviar por email')
+  );
+  box.append(actions);
+}
+
+/** Valida campos requeridos y marca el primero que falte */
+function validate(form) {
+  for (const input of $$('[required]', form)) {
+    const empty = input.type === 'checkbox' ? !input.checked : !input.value.trim();
+    const badEmail = input.type === 'email' && input.value && !input.checkValidity();
+    if (empty || badEmail) { input.focus(); input.setAttribute('aria-invalid', 'true'); return false; }
+    input.removeAttribute('aria-invalid');
+  }
+  return true;
+}
+
+/* Enlaces de WhatsApp con mensaje ya escrito */
+$$('[data-wa]').forEach(a => { a.href = waLink(a.dataset.wa); a.target = '_blank'; a.rel = 'noopener'; });
+
+/* Año del pie */
+$('#year').textContent = new Date().getFullYear();
+
+/* Política de privacidad */
+const privacy = $('#privacy');
+$$('[data-open-privacy]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); privacy.showModal(); }));
+
+/* =============================================================
+   Pestañas Reservar / Mensaje (accesibles con flechas)
+   ============================================================= */
+const tabs = $$('.tabs [role=tab]');
+function selectTab(tab) {
+  tabs.forEach(t => {
+    const on = t === tab;
+    t.setAttribute('aria-selected', String(on));
+    t.tabIndex = on ? 0 : -1;
+    document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+  });
+}
+tabs.forEach((t, i) => {
+  t.addEventListener('click', () => selectTab(t));
+  t.addEventListener('keydown', e => {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    const next = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
+    selectTab(next); next.focus();
+  });
+});
+$$('[data-open-tab]').forEach(a => a.addEventListener('click', () => selectTab(document.getElementById(a.dataset.openTab))));
+
+/* =============================================================
+   RESERVA del café de 15 minutos
+   ============================================================= */
+(function booking() {
+  const daysBox = $('#res-days');
+  const slotsBox = $('#res-slots');
+  const fmtDay = new Intl.DateTimeFormat('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
+  const fmtLong = new Intl.DateTimeFormat('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
+  const state = { date: null, time: null };
+
+  if (CONFIG.googleBookingUrl) {
+    const g = $('#google-booking');
+    g.href = CONFIG.googleBookingUrl;
+    g.hidden = false;
+  }
+
+  /** Horas libres de un día, quitando las que no respetan la antelación mínima */
+  function slotsFor(date) {
+    const list = CONFIG.availability[date.getDay()] || [];
+    const limit = Date.now() + CONFIG.minHoursNotice * 3600e3;
+    return list.filter(t => {
+      const [h, m] = t.split(':').map(Number);
+      const d = new Date(date); d.setHours(h, m, 0, 0);
+      return d.getTime() > limit;
+    });
+  }
+
+  // Próximos días con al menos una hora disponible
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  for (let i = 0; i <= CONFIG.daysAhead; i++) {
+    const d = new Date(today); d.setDate(today.getDate() + i);
+    if (!slotsFor(d).length) continue;
+    const b = el('button', { type: 'button', class: 'choice', 'aria-pressed': 'false', 'aria-label': fmtLong.format(d) });
+    const [wd, ...rest] = fmtDay.format(d).split(' ');
+    b.append(el('small', {}, wd.replace(',', '')), document.createTextNode(rest.join(' ')));
+    b.addEventListener('click', () => {
+      state.date = d; state.time = null;
+      $$('.choice', daysBox).forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+      renderSlots();
+    });
+    daysBox.append(b);
+  }
+
+  function renderSlots() {
+    slotsBox.replaceChildren();
+    slotsFor(state.date).forEach(t => {
+      const b = el('button', { type: 'button', class: 'choice', 'aria-pressed': 'false' }, t);
+      b.addEventListener('click', () => {
+        state.time = t;
+        $$('.choice', slotsBox).forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+      });
+      slotsBox.append(b);
+    });
+  }
+
+  const form = $('#form-reserva');
+  const status = $('#res-status');
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    if (!state.date || !state.time) {
+      status.hidden = false; status.dataset.type = 'error';
+      status.textContent = 'Elige un día y una hora.';
+      (state.date ? slotsBox : daysBox).querySelector('button')?.focus();
+      return;
+    }
+    if (!validate(form)) return;
+    const f = new FormData(form);
+    if (f.get('_honey')) return; // spam
+    const when = `${fmtLong.format(state.date)} a las ${state.time}`;
+    const data = {
+      Tipo: 'Solicitud de café (15 min)',
+      Cuándo: when,
+      Modalidad: f.get('modalidad'),
+      Nombre: f.get('nombre'),
+      Negocio: f.get('negocio') || '—',
+      Teléfono: f.get('telefono'),
+      Email: f.get('email') || '—',
+      Nota: f.get('nota') || '—'
+    };
+    const summary = `Hola Nadia, quiero reservar el café de 15 min.\n${Object.entries(data).slice(1).map(([k, v]) => `${k}: ${v}`).join('\n')}`;
+    const btn = $('button[type=submit]', form);
+    btn.disabled = true; btn.textContent = 'Enviando…';
+    const ok = await sendToEmail(`Nueva reserva: ${data.Nombre} · ${when}`, data);
+    btn.disabled = false; btn.textContent = 'Solicitar cita';
+    showStatus(status, ok, summary);
+    if (ok) {
+      status.textContent = `¡Solicitud enviada! ${when} (${data.Modalidad}). Te confirmo por WhatsApp o email.`;
+      form.reset();
+      $$('.choice', form).forEach(x => x.setAttribute('aria-pressed', 'false'));
+      state.date = state.time = null;
+      slotsBox.replaceChildren(el('p', { class: 'muted small' }, 'Elige primero un día.'));
+    }
+  });
+})();
+
+/* =============================================================
+   MENSAJE de contacto
+   ============================================================= */
+(function contact() {
+  const form = $('#form-mensaje');
+  const status = $('#msg-status');
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    if (!validate(form)) return;
+    const f = new FormData(form);
+    if (f.get('_honey')) return;
+    const data = {
+      Nombre: f.get('nombre'),
+      Negocio: f.get('negocio') || '—',
+      Email: f.get('email'),
+      Teléfono: f.get('telefono') || '—',
+      Servicio: f.get('servicio'),
+      Mensaje: f.get('mensaje')
+    };
+    const summary = `Hola Nadia,\n${Object.entries(data).map(([k, v]) => `${k}: ${v}`).join('\n')}`;
+    const btn = $('button[type=submit]', form);
+    btn.disabled = true; btn.textContent = 'Enviando…';
+    const ok = await sendToEmail(`Nuevo mensaje: ${data.Nombre} · ${data.Servicio}`, { ...data, _replyto: data.Email });
+    btn.disabled = false; btn.textContent = 'Enviar mensaje';
+    showStatus(status, ok, summary);
+    if (ok) form.reset();
+  });
+})();
+
+/* =============================================================
+   CALCULADORA DE PRESUPUESTO
+   ============================================================= */
+(function calculator() {
+  const box = $('#calc-options');
+  const maint = $('#calc-maint');
+  SERVICES.forEach(s => {
+    const label = el('label', { class: 'calc-option' });
+    const input = el('input', { type: 'checkbox', value: s.id });
+    const text = el('span');
+    text.append(el('strong', {}, s.name), el('br'), el('small', { class: 'muted' }, s.weeks));
+    label.append(input, text, el('b', {}, eur.format(s.price)));
+    box.append(label);
+  });
+
+  let summaryText = '';
+
+  function compute() {
+    const chosen = $$('input:checked', box).map(i => SERVICES.find(s => s.id === i.value));
+    const ids = chosen.map(s => s.id);
+    let lines = chosen;
+    // Web + WhatsApp → se sustituyen por el pack
+    if (ids.includes('web') && ids.includes('wa')) lines = [PACK, ...chosen.filter(s => s.id !== 'web' && s.id !== 'wa')];
+
+    const base = lines.reduce((a, s) => a + s.price, 0);
+    const monthly = lines.reduce((a, s) => a + s.monthly, 0);
+    const tbody = $('#calc-lines');
+    tbody.replaceChildren();
+    if (!lines.length) {
+      const tr = el('tr'); tr.append(el('td', { class: 'muted' }, 'Marca al menos un servicio.'), el('td')); tbody.append(tr);
+    }
+    lines.forEach(s => {
+      const tr = el('tr');
+      tr.append(el('td', {}, s.name + (s === PACK ? ' (ahorras 75 €)' : '')), el('td', {}, eur.format(s.price)));
+      tbody.append(tr);
+    });
+    $('#calc-base').textContent = eur.format(base);
+    $('#calc-iva').textContent = eur.format(base * VAT);
+    $('#calc-total').textContent = eur.format(base * (1 + VAT));
+    const showMonthly = maint.checked && monthly > 0;
+    $('#calc-monthly-row').hidden = !showMonthly;
+    $('#calc-monthly').textContent = `${eur.format(monthly)}/mes + IVA`;
+    $('#calc-time').textContent = lines.length ? `Plazos orientativos: ${lines.map(s => `${s.name.split(' ')[0]} ${s.weeks}`).join(' · ')}.` : '';
+
+    summaryText = lines.length
+      ? `Hola Nadia, me interesa este presupuesto:\n${lines.map(s => `• ${s.name}: ${eur.format(s.price)}`).join('\n')}\nTotal: ${eur.format(base)} + IVA = ${eur.format(base * (1 + VAT))}` +
+        (showMonthly ? `\nCon mantenimiento: ${eur.format(monthly)}/mes + IVA` : '')
+      : '';
+    $('#calc-send').disabled = !lines.length;
+    const wa = $('#calc-wa');
+    wa.href = lines.length ? waLink(summaryText) : `https://wa.me/${CONFIG.whatsapp}`;
+    wa.target = '_blank'; wa.rel = 'noopener';
+    wa.setAttribute('aria-disabled', String(!lines.length));
+  }
+
+  box.addEventListener('change', compute);
+  maint.addEventListener('change', compute);
+
+  // "Pedir este presupuesto" rellena el formulario de mensaje
+  $('#calc-send').addEventListener('click', () => {
+    selectTab($('#tab-mensaje'));
+    $('#m-mensaje').value = summaryText;
+    const chosen = $$('input:checked', box).map(i => i.value);
+    const sel = $('#m-servicio');
+    if (chosen.includes('web') && chosen.includes('wa')) sel.value = PACK.name;
+    else if (chosen.length === 1) sel.value = SERVICES.find(s => s.id === chosen[0]).name;
+    $('#contacto').scrollIntoView();
+    $('#m-nombre').focus({ preventScroll: true });
+  });
+
+  compute();
+})();
+
+/* =============================================================
+   CHATBOT tipo WhatsApp
+   Responde preguntas frecuentes y, si no sabe o el cliente
+   quiere hablar con Nadia, abre WhatsApp con la pregunta escrita.
+   ============================================================= */
+(function chatbot() {
+  const panel = $('#chat');
+  const openBtn = $('#chat-open');
+  const log = $('#chat-log');
+  const quick = $('#chat-quick');
+  const input = $('#chat-input');
+  let lang = 'es';
+  let busy = false;
+  let started = false;
+  const history = []; // preguntas del cliente, para pasárselas a Nadia
+
+  const list = (lng) => SERVICES.map(s => `• ${lng === 'gl' ? GL_NAMES[s.id] : s.name}: ${eur.format(s.price)} + ${lng === 'gl' ? 'IVE' : 'IVA'}`).join('\n');
+  const GL_NAMES = { web: 'Web con galería e reservas', wa: 'Asistente de WhatsApp', shop: 'Tenda online pequena', seo: 'Google Maps e SEO local' };
+
+  // Textos y respuestas. "keys" son palabras que activan cada respuesta.
+  const T = {
+    es: {
+      sub: 'Responde al momento',
+      placeholder: 'Escribe tu pregunta',
+      hello: '¡Hola! 👋 Soy el asistente de Nadia. Te respondo al momento sobre servicios, precios, plazos o cómo reservar el café gratuito de 15 min.\nSi prefieres hablar con ella, te paso a su WhatsApp.',
+      quick: [['servicios', 'Servicios'], ['precios', 'Precios'], ['plazos', 'Plazos'], ['cafe', 'Reservar café'], ['humano', 'Hablar con Nadia']],
+      toNadia: 'Hablar con Nadia por WhatsApp',
+      bookBtn: 'Ir a reservar',
+      calcBtn: 'Abrir calculadora',
+      waIntro: 'Hola Nadia, vengo de tu web.',
+      answers: {
+        servicios: () => `Ofrezco:\n${list('es')}\n• Pack web + reservas + WhatsApp: ${eur.format(PACK.price)} + IVA\nTambién cosas a medida: panel de ventas y stock, facturas automáticas, tarjeta de fidelización…`,
+        precios: () => `Precios de lanzamiento, pago único (sin IVA):\n${list('es')}\n• Pack web + WhatsApp: 575 € (ahorras 75 €)\nMantenimiento opcional: web 20 €/mes, WhatsApp 25 €/mes, tienda 25 €/mes, pack 35 €/mes.`,
+        plazos: () => 'Orientativos: Google Maps 1 semana · WhatsApp 2–3 semanas · Web 3–4 semanas · Tienda 4–6 semanas · Pack 5–7 semanas. Empiezan a contar cuando tengo tus textos y fotos.',
+        web: () => 'La web con galería y reservas (375 € + IVA) incluye: diseño para móvil, galería, reservas por día y hora, recordatorio automático el día antes, mapa, horario y botón de WhatsApp.',
+        whatsapp: () => 'El asistente de WhatsApp (275 € + IVA) responde horarios, precios y huecos libres a cualquier hora, apunta citas, manda recordatorios y, si no sabe algo, te pasa la conversación. En castellano y gallego.',
+        tienda: () => 'La tienda online pequeña (575 € + IVA) incluye catálogo, carrito, recogida en tienda o envío, pago con Bizum o tarjeta (con la pasarela de tu banco) y aviso de cada pedido.',
+        google: () => 'Google Maps y SEO local (175 € + IVA, 1 semana): categoría, horario, descripción con palabras clave, fotos ordenadas y respuesta a reseñas. Mejora tu visibilidad, aunque nadie puede garantizar una posición concreta.',
+        mantenimiento: () => 'El mantenimiento es opcional y cancelable: copias de seguridad, actualizaciones de seguridad, cambios pequeños ilimitados y soporte por WhatsApp o email. No incluye páginas nuevas, rediseños, fotografía ni publicidad.',
+        iva: () => 'Los precios no llevan IVA: se suma el 21 %. Por ejemplo, la web de 375 € queda en 453,75 € con IVA.',
+        cafe: () => 'El café es una charla gratuita de 15 minutos (videollamada, teléfono o en persona) para ver tu negocio. Elige día y hora en el formulario de reserva.',
+        zona: () => 'Me centro en A Coruña y la Costa da Morte. Si estás en otra zona, escríbeme y lo vemos.',
+        idiomas: () => 'Nadia te atiende en galego, castellano, English, Deutsch y français.',
+        propiedad: () => 'Todo queda a tu nombre y Nadia te enseña a usarlo.',
+        hola: () => '¡Hola! ¿Qué te gustaría saber? Puedes usar los botones de abajo.',
+        gracias: () => '¡A ti! Si quieres, reserva el café gratuito o escribe a Nadia por WhatsApp.',
+        humano: () => 'Claro, te paso con Nadia. Pulsa el botón y se abre WhatsApp con tu conversación.',
+        fallback: () => 'Eso prefiero que te lo responda Nadia directamente. Te paso con ella: pulsa el botón y se abre WhatsApp con tu pregunta ya escrita.'
+      },
+      keys: {
+        humano: ['hablar con', 'una persona', 'humano', 'llamar', 'llamame'],
+        iva: ['iva', 'impuesto'],
+        mantenimiento: ['mantenimiento', 'cuota', 'mensual', 'al mes', 'cambios'],
+        plazos: ['que plazo', 'plazo de', 'plazos de entrega', 'cuanto tarda', 'cuantas semanas', 'cuanto tiempo', 'cuando estaria'],
+        whatsapp: ['whatsapp', 'chatbot', 'asistente'],
+        tienda: ['tienda', 'vender', 'bizum', 'pedido', 'ecommerce', 'carrito'],
+        pago: ['pagar', 'pago', 'a plazos', 'financ', 'fraccion', 'factura'],
+        google: ['google', 'maps', 'seo', 'resena', 'buscador', 'posicion'],
+        web: ['web', 'pagina', 'galeria'],
+        cafe: ['cafe', 'reserv', 'cita', 'reunion', 'quedar', 'llamada', 'diagnostico'],
+        precios: ['precio', 'cuanto cuesta', 'cuanto vale', 'cuesta', 'tarifa', 'coste', 'presupuesto', 'euros'],
+        servicios: ['servicio', 'que haces', 'que ofreces', 'ofreces'],
+        zona: ['zona', 'donde', 'coruna', 'costa da morte', 'ciudad', 'pueblo'],
+        idiomas: ['idioma', 'gallego', 'ingles', 'aleman', 'frances', 'english'],
+        propiedad: ['es mio', 'propiedad', 'a mi nombre', 'dueno'],
+        hola: ['hola', 'buenas', 'buenos dias'],
+        gracias: ['gracias']
+      }
+    },
+    gl: {
+      sub: 'Responde ao momento',
+      placeholder: 'Escribe a túa pregunta',
+      hello: 'Ola! 👋 Son o asistente de Nadia. Respóndoche ao momento sobre servizos, prezos, prazos ou como reservar o café gratuíto de 15 min.\nSe prefires falar con ela, pásote ao seu WhatsApp.',
+      quick: [['servicios', 'Servizos'], ['precios', 'Prezos'], ['plazos', 'Prazos'], ['cafe', 'Reservar café'], ['humano', 'Falar con Nadia']],
+      toNadia: 'Falar con Nadia por WhatsApp',
+      bookBtn: 'Ir reservar',
+      calcBtn: 'Abrir calculadora',
+      waIntro: 'Ola Nadia, veño da túa web.',
+      answers: {
+        servicios: () => `Ofrezo:\n${list('gl')}\n• Pack web + reservas + WhatsApp: ${eur.format(PACK.price)} + IVE\nTamén cousas a medida: panel de vendas e stock, facturas automáticas, tarxeta de fidelización…`,
+        precios: () => `Prezos de lanzamento, pagamento único (sen IVE):\n${list('gl')}\n• Pack web + WhatsApp: 575 € (aforras 75 €)\nMantemento opcional: web 20 €/mes, WhatsApp 25 €/mes, tenda 25 €/mes, pack 35 €/mes.`,
+        plazos: () => 'Orientativos: Google Maps 1 semana · WhatsApp 2–3 semanas · Web 3–4 semanas · Tenda 4–6 semanas · Pack 5–7 semanas. Comezan a contar cando teño os teus textos e fotos.',
+        web: () => 'A web con galería e reservas (375 € + IVE) inclúe: deseño para móbil, galería, reservas por día e hora, recordatorio automático o día antes, mapa, horario e botón de WhatsApp.',
+        whatsapp: () => 'O asistente de WhatsApp (275 € + IVE) responde horarios, prezos e ocos libres a calquera hora, apunta citas, manda recordatorios e, se non sabe algo, pásache a conversa. En galego e castelán.',
+        tienda: () => 'A tenda online pequena (575 € + IVE) inclúe catálogo, carriño, recollida na tenda ou envío, pagamento con Bizum ou tarxeta (coa pasarela do teu banco) e aviso de cada pedido.',
+        google: () => 'Google Maps e SEO local (175 € + IVE, 1 semana): categoría, horario, descrición con palabras clave, fotos ordenadas e resposta a recensións. Mellora a túa visibilidade, aínda que ninguén pode garantir unha posición concreta.',
+        mantenimiento: () => 'O mantemento é opcional e cancelable: copias de seguridade, actualizacións de seguridade, cambios pequenos ilimitados e soporte por WhatsApp ou email. Non inclúe páxinas novas, redeseños, fotografía nin publicidade.',
+        iva: () => 'Os prezos non levan IVE: súmase o 21 %. Por exemplo, a web de 375 € queda en 453,75 € con IVE.',
+        cafe: () => 'O café é unha charla gratuíta de 15 minutos (videochamada, teléfono ou en persoa) para ver o teu negocio. Escolle día e hora no formulario de reserva.',
+        zona: () => 'Céntrome na Coruña e na Costa da Morte. Se estás noutra zona, escríbeme e vémolo.',
+        idiomas: () => 'Nadia atendeche en galego, castelán, English, Deutsch e français.',
+        propiedad: () => 'Todo queda ao teu nome e Nadia ensínache a usalo.',
+        hola: () => 'Ola! Que che gustaría saber? Podes usar os botóns de abaixo.',
+        gracias: () => 'Grazas a ti! Se queres, reserva o café gratuíto ou escribe a Nadia por WhatsApp.',
+        humano: () => 'Claro, pásote con Nadia. Preme o botón e ábrese WhatsApp coa túa conversa.',
+        fallback: () => 'Iso prefiro que cho responda Nadia directamente. Pásote con ela: preme o botón e ábrese WhatsApp coa túa pregunta xa escrita.'
+      },
+      keys: {
+        humano: ['falar con', 'unha persoa', 'humano', 'chamar', 'chamame'],
+        iva: ['ive', 'iva', 'imposto'],
+        mantenimiento: ['mantemento', 'mantenimiento', 'cota', 'mensual', 'ao mes', 'cambios'],
+        plazos: ['que prazo', 'prazo de', 'canto tarda', 'cantas semanas', 'canto tempo'],
+        whatsapp: ['whatsapp', 'chatbot', 'asistente'],
+        tienda: ['tenda', 'vender', 'bizum', 'pedido', 'carrino'],
+        pago: ['pagar', 'pagamento', 'a prazos', 'financ', 'fraccion', 'factura'],
+        google: ['google', 'maps', 'seo', 'recension', 'buscador', 'posicion'],
+        web: ['web', 'paxina', 'galeria'],
+        cafe: ['cafe', 'reserv', 'cita', 'reunion', 'quedar', 'chamada', 'diagnostico'],
+        precios: ['prezo', 'canto custa', 'canto vale', 'custa', 'tarifa', 'custo', 'orzamento', 'euros'],
+        servicios: ['servizo', 'que fas', 'que ofreces', 'ofreces'],
+        zona: ['zona', 'onde', 'coruna', 'costa da morte', 'cidade', 'vila'],
+        idiomas: ['idioma', 'galego', 'ingles', 'aleman', 'frances', 'english'],
+        propiedad: ['e meu', 'propiedade', 'ao meu nome', 'dono'],
+        hola: ['ola', 'boas', 'bos dias'],
+        gracias: ['grazas']
+      }
+    }
+  };
+
+  const now = () => new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  const normalize = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+
+  function addMsg(who, text, extra) {
+    const m = el('div', { class: `msg msg--${who}` });
+    m.append(document.createTextNode(text));
+    if (extra) m.append(extra);
+    m.append(el('time', {}, now()));
+    log.append(m);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  /** Botones dentro de la respuesta del bot según el tema */
+  function actionsFor(topic) {
+    const t = T[lang];
+    const box = el('div', { class: 'msg__actions' });
+    if (topic === 'cafe') {
+      const b = el('button', { type: 'button' }, t.bookBtn);
+      b.addEventListener('click', () => { close(); selectTab($('#tab-reserva')); $('#contacto').scrollIntoView(); });
+      box.append(b);
+    }
+    if (topic === 'precios' || topic === 'servicios') {
+      const b = el('button', { type: 'button' }, t.calcBtn);
+      b.addEventListener('click', () => { close(); $('#presupuesto').scrollIntoView(); });
+      box.append(b);
+    }
+    if (topic === 'humano' || topic === 'fallback') {
+      const text = [t.waIntro, ...history.map(q => `— ${q}`)].join('\n');
+      box.append(el('a', { class: 'wa', href: waLink(text), target: '_blank', rel: 'noopener' }, t.toNadia));
+    }
+    return box.childElementCount ? box : null;
+  }
+
+  function topicFor(text) {
+    const q = normalize(text);
+    const keys = T[lang].keys;
+    const topic = Object.keys(keys).find(k => keys[k].some(w => q.includes(w))) || 'fallback';
+    return topic === 'pago' ? 'fallback' : topic; // las condiciones de pago las explica Nadia
+  }
+
+  function ask(text, forcedTopic) {
+    if (busy || !text.trim()) return;
+    busy = true;
+    history.push(text.trim());
+    addMsg('user', text.trim());
+    const typing = el('div', { class: 'typing' }, '…');
+    log.append(typing);
+    log.scrollTop = log.scrollHeight;
+    setTimeout(() => {
+      typing.remove();
+      const topic = forcedTopic || topicFor(text);
+      addMsg('bot', T[lang].answers[topic](), actionsFor(topic));
+      busy = false;
+    }, 600);
+  }
+
+  function render() {
+    const t = T[lang];
+    $('#chat-sub').textContent = t.sub;
+    input.placeholder = t.placeholder;
+    $('label[for="chat-input"]').textContent = t.placeholder;
+    log.replaceChildren();
+    addMsg('bot', t.hello);
+    quick.replaceChildren();
+    t.quick.forEach(([topic, label]) => {
+      const b = el('button', { type: 'button' }, label);
+      b.addEventListener('click', () => ask(label, topic));
+      quick.append(b);
+    });
+  }
+
+  function open() {
+    panel.hidden = false;
+    openBtn.hidden = true;
+    openBtn.setAttribute('aria-expanded', 'true');
+    if (!started) { render(); started = true; }
+    input.focus();
+  }
+  function close() {
+    panel.hidden = true;
+    openBtn.hidden = false;
+    openBtn.setAttribute('aria-expanded', 'false');
+    openBtn.focus();
+  }
+
+  openBtn.addEventListener('click', open);
+  $('#chat-close').addEventListener('click', close);
+  panel.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+  $('#chat-form').addEventListener('submit', e => {
+    e.preventDefault();
+    ask(input.value);
+    input.value = '';
+  });
+  $$('.chat__lang button').forEach(b => b.addEventListener('click', () => {
+    lang = b.dataset.lang;
+    $$('.chat__lang button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    render();
+  }));
+})();
+</script>
+</body>
+</html>
