@@ -187,185 +187,77 @@ button, input, select, textarea { font: inherit; color: inherit; }
 }
 
 /* =============================================================
-   4. HISTORIA DE LA PORTADA: la tienda cierra y la web sigue
-   --p = progreso del scroll (0→1), --n = noche, --s = persiana.
-   Sin JS o con "reducir movimiento" se muestra el estado final.
+   4. PORTADA: comparador antes / después
+   --pos = posición de la línea (0% = todo "Con Lagoa", 100% = todo "Sin Lagoa")
    ============================================================= */
-.story { --p: 1; --n: 1; --s: 1; position: relative; background: var(--night); color: #fff; }
-@media (prefers-reduced-motion: no-preference) { .js .story { height: 260vh; } }
-.story__stage { position: relative; height: 100vh; height: 100svh; min-height: 560px; overflow: hidden; }
-@media (prefers-reduced-motion: no-preference) { .js .story__stage { position: sticky; top: 0; } }
+.hero {
+  background: radial-gradient(ellipse 90% 70% at 50% -10%, #4c230a 0%, #2a1a1f 48%, #000 100%);
+  color: #f6f3ea; text-align: center;
+  padding: calc(52px + clamp(3rem, 8vw, 6rem)) 0 clamp(4rem, 9vw, 7rem);
+}
+.hero__kicker { font-size: .8rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--sand-light); }
+.hero h1 { font-size: clamp(2.5rem, 7.5vw, 5.4rem); font-weight: 700; letter-spacing: -0.045em; line-height: 1.02; max-width: 15ch; margin: 1rem auto 0; }
+.hero h1 em { font-style: normal; color: var(--copper); }
+.hero .lead { color: #dccdbd; margin-inline: auto; }
+.hero .link-arrow { color: var(--sand-light); }
+.hero .pills { justify-content: center; margin-top: 1.6rem; }
+.hero .pills li { background: rgba(255,255,255,.08); color: #eadfcd; }
 
-/* Cielo: atardecer → noche */
-.sky, .sky__night, .stars { position: absolute; inset: 0; }
-.sky { background: linear-gradient(180deg, #2a1a1f 0%, #764134 45%, #ad8350 80%, #afa060 100%); }
-.sky__night { background: linear-gradient(180deg, #000 0%, #0d0709 55%, #1d1215 100%); opacity: var(--n); }
-.stars {
-  opacity: var(--n);
-  background-image:
-    radial-gradient(1.5px 1.5px at 12% 18%, #fff 50%, transparent 51%),
-    radial-gradient(1px 1px at 28% 8%, #fff 50%, transparent 51%),
-    radial-gradient(1.2px 1.2px at 47% 22%, #fff 50%, transparent 51%),
-    radial-gradient(1px 1px at 63% 12%, #fff 50%, transparent 51%),
-    radial-gradient(1.5px 1.5px at 78% 26%, #fff 50%, transparent 51%),
-    radial-gradient(1px 1px at 88% 6%, #fff 50%, transparent 51%),
-    radial-gradient(1px 1px at 6% 34%, #fff 50%, transparent 51%),
-    radial-gradient(1.2px 1.2px at 36% 31%, #fff 50%, transparent 51%),
-    radial-gradient(1px 1px at 55% 4%, #fff 50%, transparent 51%),
-    radial-gradient(1px 1px at 94% 36%, #fff 50%, transparent 51%);
+.compare-wrap { margin-top: clamp(2.8rem, 6vw, 4.5rem); }
+.compare-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .6rem 1rem; }
+.compare-bar button {
+  border: 1px solid rgba(255,255,255,.22); background: rgba(255,255,255,.06); color: #f6f3ea;
+  border-radius: 999px; padding: .45rem 1rem; font-weight: 600; font-size: .88rem; cursor: pointer;
 }
-.moon {
-  position: absolute; left: 12%; bottom: calc(56svh + 7svh); width: clamp(34px, 5vw, 64px); aspect-ratio: 1; border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #fffdf3, #e8e1c8 70%);
-  box-shadow: 0 0 40px 10px rgba(255, 246, 214, .25);
-  opacity: var(--n); transform: translateY(calc((1 - var(--n)) * 30vh));
-}
+.compare-bar button:hover { background: rgba(255,255,255,.14); }
+.compare-bar button[aria-pressed="true"] { background: #f6f3ea; color: var(--ink); border-color: transparent; }
+.compare-bar p { color: #cdb8ae; font-size: .88rem; }
 
-/* Textos que cambian durante la historia */
-.story__copy { position: absolute; z-index: 4; inset: 76px var(--gutter) auto; text-align: center; }
-.story__question { font-size: clamp(1rem, 2.4vw, 1.35rem); font-weight: 600; color: var(--sand-light); letter-spacing: -0.01em; }
-/* Etiquetas que nombran cada servicio cuando ocurre */
-.checks { display: flex; flex-wrap: wrap; justify-content: center; gap: .4rem; list-style: none; padding: 0; margin: 1rem auto 0; max-width: 640px; }
-.checks li {
-  font-size: clamp(.72rem, 1.6vw, .85rem); font-weight: 600; padding: .32rem .75rem; border-radius: 999px;
-  color: rgba(255,255,255,.62); border: 1px solid rgba(255,255,255,.22); background: rgba(0,0,0,.18);
-  transition: background .4s var(--ease), color .4s var(--ease), border-color .4s;
+.compare {
+  --pos: 100%;
+  position: relative; display: grid; max-width: 1040px; margin: 1.2rem auto 0;
+  border-radius: var(--r-xl); overflow: hidden; text-align: left;
+  user-select: none; -webkit-user-select: none; touch-action: pan-y; cursor: ew-resize;
+  box-shadow: 0 40px 100px -40px rgba(0,0,0,.85);
 }
-.checks li::before { content: "○ "; }
-.checks li.on, .story:not(.is-live) .checks li { background: var(--copper); color: #1a0f12; border-color: transparent; }
-.checks li.on::before, .story:not(.is-live) .checks li::before { content: "✓ "; }
-.captions { position: relative; display: grid; margin-top: .7rem; }
-.caption {
-  grid-area: 1 / 1; font-size: clamp(1.7rem, 5.2vw, 3.6rem); font-weight: 700; letter-spacing: -0.035em; line-height: 1.05;
-  text-shadow: 0 2px 30px rgba(0,0,0,.35); opacity: 0; transform: translateY(14px);
-  transition: opacity .6s var(--ease), transform .6s var(--ease);
+.compare__layer {
+  grid-area: 1 / 1; display: grid; gap: 12px; align-content: start;
+  grid-template-columns: 1fr; padding: clamp(1rem, 3vw, 1.8rem);
 }
-.caption.is-active { opacity: 1; transform: none; }
-.caption em { font-style: normal; color: var(--copper); }
+@media (min-width: 640px) { .compare__layer { grid-template-columns: 1fr 1fr; } }
+.compare__layer--before { background: #d6d1c4; color: #4d4642; }
+.compare__layer--after { background: linear-gradient(135deg, #f6f3ea, #e6e3cc); color: var(--ink); clip-path: inset(0 0 0 var(--pos)); }
+.compare__tag {
+  grid-column: 1 / -1; justify-self: start; font-size: .78rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  padding: .35rem .8rem; border-radius: 999px; background: rgba(0,0,0,.08);
+}
+.compare__layer--after .compare__tag { justify-self: end; background: var(--accent); color: #fff; }
+.ctile { border-radius: 18px; padding: 1.1rem 1.2rem; display: grid; gap: .3rem; align-content: start; min-height: 150px; }
+.compare__layer--before .ctile { background: rgba(255,255,255,.4); }
+.compare__layer--after .ctile { background: var(--card); box-shadow: 0 1px 2px rgba(42,26,31,.06); }
+.ctile__label { font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: .7; }
+.ctile__status { font-size: clamp(1.15rem, 2.4vw, 1.45rem); font-weight: 700; letter-spacing: -0.025em; line-height: 1.15; }
+.ctile__status::before { display: inline-block; width: 1.35em; }
+.compare__layer--before .ctile__status { color: #8f3a2a; }
+.compare__layer--before .ctile__status::before { content: "✕"; }
+.compare__layer--after .ctile__status::before { content: "✓"; color: #3f6b2f; }
+.ctile p { font-size: .92rem; line-height: 1.4; }
+.ctile a { font-weight: 600; font-size: .9rem; margin-top: .3rem; }
+.ctile a::after { content: " ›"; }
+.ctile__none { font-size: .9rem; margin-top: .3rem; opacity: .7; }
 
-/* Fachada de la tienda */
-.facade {
-  position: absolute; z-index: 2; left: max(var(--gutter), calc(50% - 600px)); bottom: 0;
-  width: min(900px, 72vw); height: 56svh; min-height: 300px;
-  background: linear-gradient(180deg, #3a2529, #2a1a1f);
-  border-radius: 18px 18px 0 0;
-  box-shadow: 0 -30px 80px rgba(0,0,0,.35);
+.compare__handle { position: absolute; top: 0; bottom: 0; left: var(--pos); width: 3px; margin-left: -1.5px; background: #fff; pointer-events: none; box-shadow: 0 0 12px rgba(0,0,0,.35); }
+/* El tirador nunca se sale del borde aunque la línea esté al 0 % o al 100 % */
+.compare__knob {
+  position: absolute; top: calc(clamp(1rem, 3vw, 1.8rem) + 15px); /* a la altura de las etiquetas, sin tapar texto */
+  left: clamp(30px, var(--pos), calc(100% - 30px)); width: 52px; height: 52px; margin: -26px 0 0 -26px; border-radius: 50%; pointer-events: none;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232a1a1f' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 6l-6 6 6 6M15 6l6 6-6 6'/%3E%3C/svg%3E") center / 24px no-repeat;
+  box-shadow: 0 6px 20px rgba(0,0,0,.35);
 }
-.facade::after { /* oscurece la fachada al caer la noche */
-  content: ""; position: absolute; inset: 0; border-radius: inherit; background: #000; opacity: calc(var(--n) * .35); pointer-events: none;
-}
-.sign {
-  position: absolute; top: 0; left: 0; right: 0; height: 26%; display: grid; place-items: center;
-  font-weight: 800; letter-spacing: .32em; padding-left: .32em; /* compensa el espaciado final */
-  font-size: clamp(2.1rem, 8.5vw, 6.2rem); line-height: 1;
-  color: #f2dcae;
-  text-shadow: 0 0 calc(var(--n) * 28px) rgba(214, 168, 102, calc(var(--n) * .9)), 0 0 calc(var(--n) * 70px) rgba(173, 131, 80, calc(var(--n) * .55));
-  z-index: 2;
-}
-.front {
-  position: absolute; left: 5%; right: 5%; top: 30%; bottom: 13%;
-  border-radius: 8px; overflow: hidden; background: #111;
-  box-shadow: inset 0 0 0 6px #4c230a;
-}
-.interior { /* el interior iluminado del local */
-  position: absolute; inset: 0;
-  background:
-    radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.55), transparent 55%),
-    linear-gradient(180deg, #f3ddb0 0%, #d6a866 65%, #ad8350 100%);
-}
-.interior::before { /* baldas */
-  content: ""; position: absolute; left: 8%; right: 38%; top: 16%; bottom: 30%;
-  background: repeating-linear-gradient(180deg, transparent 0 22%, rgba(76,35,10,.55) 22% 24%);
-}
-.interior::after { /* mostrador */
-  content: ""; position: absolute; left: 6%; right: 34%; bottom: 0; height: 22%;
-  background: linear-gradient(180deg, #764134, #4c230a); border-radius: 6px 6px 0 0;
-}
-.door { position: absolute; right: 6%; top: 8%; bottom: 0; width: 22%; border-radius: 6px 6px 0 0; background: rgba(255,255,255,.18); box-shadow: inset 0 0 0 4px #4c230a; }
-.open-sign { position: absolute; right: 9%; top: 20%; background: #fff; color: #1b5e20; font-weight: 700; font-size: clamp(.55rem, 1.2vw, .8rem); letter-spacing: .1em; padding: .25rem .55rem; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,.25); }
-.shutter {
-  position: absolute; inset: 0; z-index: 1;
-  transform: translateY(calc((1 - var(--s)) * -101%));
-  background: repeating-linear-gradient(180deg, #ccc9a1 0 10px, #9d9a76 10px 12px, #dedbb8 12px 13px);
-  filter: brightness(calc(1 - var(--n) * .5));
-  box-shadow: 0 6px 18px rgba(0,0,0,.4);
-}
-.shutter::after { /* barra inferior con candado */
-  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 12px; background: #8a8664;
-}
-.pavement { position: absolute; left: 0; right: 0; bottom: 0; height: 13%; background: linear-gradient(180deg, #2a1a1f, #1a1013); }
-
-/* Móvil del dueño: sigue recibiendo avisos */
-.device {
-  position: absolute; z-index: 5; right: max(var(--gutter), calc(50% - 600px)); bottom: 3svh;
-  width: min(clamp(150px, 17vw, 240px), calc(62svh * 9 / 19.2)); aspect-ratio: 9 / 19.2;
-  border-radius: clamp(26px, 3.4vw, 46px); padding: clamp(6px, .8vw, 10px);
-  background: #0a0a0a; box-shadow: 0 0 0 1.5px #3c3c3f, 0 40px 80px rgba(0,0,0,.55);
-}
-.device__screen {
-  position: relative; height: 100%; border-radius: clamp(20px, 2.8vw, 38px); overflow: hidden;
-  background: radial-gradient(120% 70% at 50% 0%, #764134 0%, #2a1a1f 55%, #0d0709 100%);
-  padding: 12% 6% 6%;
-}
-.device__island { position: absolute; top: 2.4%; left: 50%; translate: -50% 0; width: 32%; height: 3.4%; background: #000; border-radius: 999px; }
-.device__date { text-align: center; font-size: clamp(.55rem, .95vw, .8rem); color: rgba(255,255,255,.85); font-weight: 600; }
-.device__clock { text-align: center; font-size: clamp(1.9rem, 3.8vw, 3.4rem); font-weight: 700; letter-spacing: -0.04em; line-height: 1; margin: .1em 0 .35em; color: #fff; font-variant-numeric: tabular-nums; }
-.notifs { display: grid; gap: 5px; }
-.notif {
-  display: grid; grid-template-columns: auto 1fr auto; gap: 2px 7px; align-items: start;
-  padding: 6% 6.5%; border-radius: clamp(10px, 1.4vw, 18px);
-  background: rgba(255,255,255,.78); color: #111;
-  -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
-  font-size: clamp(.5rem, .82vw, .74rem); line-height: 1.25;
-  opacity: 0; transform: translateY(-10px) scale(.96);
-  transition: opacity .5s var(--ease), transform .5s var(--ease);
-}
-.notif.show, .story:not(.is-live) .notif { opacity: 1; transform: none; }
-.notif__icon { grid-row: span 2; width: clamp(16px, 2.2vw, 28px); aspect-ratio: 1; border-radius: 26%; display: grid; place-items: center; color: #fff; font-weight: 700; font-size: .9em; }
-.notif b { font-weight: 600; }
-.notif time { color: #555; font-size: .9em; }
-.notif span { grid-column: 2 / 4; color: #222; }
-
-.scroll-hint {
-  position: absolute; z-index: 4; left: 50%; bottom: 2.4svh; translate: -50% 0;
-  font-size: .78rem; color: rgba(255,255,255,.85); letter-spacing: .04em; white-space: nowrap; display: flex; flex-direction: column; align-items: center; gap: 4px;
-  opacity: calc(1 - var(--p) * 8);
-}
-.scroll-hint::after { content: ""; width: 9px; height: 9px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg); animation: hint 1.6s infinite; }
-@keyframes hint { 50% { transform: translateY(4px) rotate(45deg); } }
-@media (prefers-reduced-motion: reduce) { .scroll-hint { display: none; } }
-
-@media (max-width: 739px) {
-  .facade { left: 0; width: 100%; height: 50svh; border-radius: 0; }
-  .moon { bottom: calc(50svh + 5svh); }
-  .sign { right: 44%; font-size: clamp(1.6rem, 8vw, 2.4rem); }
-  .front { left: 5%; right: 47%; }
-  .door, .open-sign { display: none; }
-  .device { right: 12px; bottom: 2svh; width: min(172px, 46vw); }
-  .notif { grid-template-columns: 1fr auto; font-size: .56rem; padding: 6% 7%; }
-  .notif__icon { display: none; }
-  .notif span { grid-column: 1 / 3; }
-  .notif:nth-child(4) { display: none; } /* en pantallas pequeñas caben tres avisos */
-  .scroll-hint { left: 50%; bottom: calc(50svh + 1.5svh); }
-}
-
-/* =============================================================
-   5. AMANECER: la propuesta de valor
-   ============================================================= */
-.dawn { background: linear-gradient(180deg, var(--night) 0, #2a1a1f 4rem, #b9b48c 9rem, #ddd9bd 14rem, var(--bg) 24rem); padding-block: clamp(10rem, 18vw, 13rem) clamp(4rem, 9vw, 7rem); }
-.dawn .headline { font-size: clamp(2.5rem, 8vw, 5.6rem); max-width: 15ch; margin-inline: auto; }
-.gradient-text { background: linear-gradient(90deg, #a53f2b, #764134 45%, #ad8350 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.dawn .lead { margin-inline: auto; }
-.dawn .pills { justify-content: center; margin-top: 2rem; }
-.summary { margin: 2.6rem auto 0; max-width: 980px; }
-.summary__title { font-weight: 600; color: var(--ink-2); margin-bottom: 1rem; }
-.summary__grid { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); }
-.summary__grid a { display: grid; align-content: start; gap: .2rem; height: 100%; padding: 1.2rem 1.1rem; border-radius: var(--r-l); background: var(--card); color: var(--ink); text-align: left; box-shadow: 0 1px 2px rgba(0,0,0,.05); transition: transform .4s var(--ease), box-shadow .4s var(--ease); }
-.summary__grid a:hover { text-decoration: none; transform: translateY(-3px); box-shadow: 0 18px 40px -22px rgba(42,26,31,.45); }
-.summary__grid strong { font-size: 2.6rem; font-weight: 700; letter-spacing: -0.05em; line-height: 1; color: var(--accent); }
-.summary__grid span { font-weight: 600; }
-.summary__grid small { color: var(--ink-2); font-size: .82rem; }
-.dawn .pills li { background: rgba(255,255,255,.7); }
+.compare:has(input:focus-visible) .compare__knob { outline: 3px solid var(--copper); outline-offset: 3px; }
+.compare.animate .compare__layer--after { transition: clip-path .9s var(--ease); }
+.compare.animate .compare__handle, .compare.animate .compare__knob { transition: left .9s var(--ease); }
+.compare-note { color: #a8968d; font-size: .8rem; margin-top: 1rem; }
 
 /* =============================================================
    6. SERVICIOS: rejilla tipo bento
@@ -559,7 +451,6 @@ dialog p { margin-bottom: .7rem; font-size: .95rem; }
   display: inline-flex; gap: .5rem; align-items: center;
 }
 .chat-launcher { transition: opacity .4s var(--ease), transform .4s var(--ease); }
-.chat-launcher.is-away { opacity: 0; transform: translateY(16px); pointer-events: none; visibility: hidden; }
 .chat-launcher::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: #34c759; box-shadow: 0 0 0 3px rgba(52,199,89,.25); }
 .chat {
   position: fixed; right: 16px; bottom: 16px; z-index: 95;
@@ -628,93 +519,93 @@ dialog p { margin-bottom: .7rem; font-size: .95rem; }
 <main id="main">
 
 <!-- =============================================================
-     PORTADA: la tienda cierra, la web sigue abierta
+     PORTADA: titular + comparador antes / después
      ============================================================= -->
-<section class="story" id="inicio" aria-labelledby="story-title">
-  <div class="story__stage">
-    <div class="sky" aria-hidden="true"></div>
-    <div class="sky__night" aria-hidden="true"></div>
-    <div class="stars" aria-hidden="true"></div>
-    <div class="moon" aria-hidden="true"></div>
-
-    <div class="story__copy">
-      <p class="story__question">¿Qué pasa en tu negocio cuando cierras?</p>
-      <h1 class="visually-hidden" id="story-title">Lagoa: tu negocio sigue vendiendo cuando tú cierras</h1>
-      <div class="captions" aria-hidden="true">
-        <p class="caption" data-step="0">20:00. Cierras la tienda.</p>
-        <p class="caption" data-step="1">Bajas la persiana y te vas a casa.</p>
-        <p class="caption" data-step="2">Mientras, tu web <em>sigue atendiendo.</em></p>
-        <p class="caption is-active" data-step="3">Tu negocio sigue vendiendo <em>cuando tú cierras.</em></p>
-      </div>
-      <ul class="checks" aria-label="Lo que hace tu negocio mientras está cerrado">
-        <li data-at="0.5">Reserva desde tu web</li>
-        <li data-at="0.61">Asistente de WhatsApp</li>
-        <li data-at="0.72">Pedido en tu tienda online</li>
-        <li data-at="0.83">Recordatorio automático</li>
-      </ul>
-    </div>
-
-    <div class="facade" aria-hidden="true">
-      <div class="sign">LAGOA</div>
-      <div class="front">
-        <div class="interior"></div>
-        <div class="door"></div>
-        <div class="open-sign">ABIERTO</div>
-        <div class="shutter"></div>
-      </div>
-      <div class="pavement"></div>
-    </div>
-
-    <div class="device" role="img" aria-label="Móvil del negocio por la noche recibiendo una reserva, un mensaje del asistente de WhatsApp, un pedido y un recordatorio confirmado">
-      <div class="device__screen">
-        <div class="device__island"></div>
-        <p class="device__date">Esta noche</p>
-        <p class="device__clock" id="story-clock">01:30</p>
-        <div class="notifs">
-          <div class="notif" data-at="0.5">
-            <i class="notif__icon" style="background:#a53f2b">W</i><b>Web · Nueva reserva</b><time></time>
-            <span>Corte y peinado · sábado 12:00</span>
-          </div>
-          <div class="notif" data-at="0.61">
-            <i class="notif__icon" style="background:#1b7a46">✓</i><b>Asistente de WhatsApp</b><time></time>
-            <span>Ha respondido a 3 clientes</span>
-          </div>
-          <div class="notif" data-at="0.72">
-            <i class="notif__icon" style="background:#ad8350">€</i><b>Tienda · Nuevo pedido</b><time></time>
-            <span>2 productos · pagado con Bizum</span>
-          </div>
-          <div class="notif" data-at="0.83">
-            <i class="notif__icon" style="background:#764134">⏰</i><b>Recordatorio enviado</b><time></time>
-            <span>Cita de mañana confirmada</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <p class="scroll-hint" aria-hidden="true">Desliza para cerrar la tienda</p>
-  </div>
-</section>
-
-<!-- =============================================================
-     AMANECER: propuesta de valor
-     ============================================================= -->
-<section class="dawn center" aria-labelledby="dawn-title">
-  <div class="wrap" data-reveal>
-    <h2 class="headline" id="dawn-title">Por la mañana, <span class="gradient-text">todo está en tu móvil.</span></h2>
-    <div class="summary">
-      <p class="summary__title">Mientras dormías:</p>
-      <ul class="summary__grid">
-        <li><a href="#srv-web"><strong>1</strong><span>reserva nueva</span><small>Web con galería y reservas · 290 €</small></a></li>
-        <li><a href="#srv-whatsapp"><strong>3</strong><span>clientes atendidos</span><small>Asistente de WhatsApp · 190 €</small></a></li>
-        <li><a href="#srv-tienda"><strong>1</strong><span>pedido pagado</span><small>Tienda online pequeña · 390 €</small></a></li>
-        <li><a href="#srv-pack"><strong>1</strong><span>cita confirmada</span><small>Recordatorios automáticos, incluidos en la web y el asistente</small></a></li>
-      </ul>
-    </div>
+<section class="hero" id="inicio" aria-labelledby="hero-title">
+  <div class="wrap">
+    <p class="hero__kicker">Lagoa · Estudio digital en A Coruña</p>
+    <h1 id="hero-title">Tu negocio sigue vendiendo <em>cuando tú cierras.</em></h1>
     <p class="lead">Webs con reservas, asistentes de WhatsApp, tiendas online y fichas de Google Maps para negocios en crecimiento. Tarifas fijas, plazos claros y todo queda a tu nombre.</p>
     <div class="actions center">
       <a class="btn" href="#contacto" data-open-tab="tab-reserva">Consulta rápida sin compromiso</a>
       <a class="link-arrow" data-wa="Hola, Nadia. Te escribo desde tu web para hablar sobre mi negocio." href="https://wa.me/34613597453">Contactar por WhatsApp</a>
     </div>
+
+    <div class="compare-wrap">
+      <div class="compare-bar">
+        <button type="button" data-compare="100" aria-pressed="true">Sin Lagoa</button>
+        <p>Arrastra la línea o pulsa para comparar</p>
+        <button type="button" data-compare="0" aria-pressed="false">Con Lagoa</button>
+      </div>
+
+      <div class="compare" id="compare">
+        <label class="visually-hidden" for="compare-range">Comparar tu negocio sin Lagoa y con Lagoa</label>
+        <input class="visually-hidden" id="compare-range" type="range" min="0" max="100" step="100" value="100">
+
+        <!-- SIN LAGOA -->
+        <div class="compare__layer compare__layer--before">
+          <span class="compare__tag">Sin Lagoa</span>
+          <div class="ctile">
+            <span class="ctile__label">Reservas</span>
+            <p class="ctile__status">3 llamadas perdidas</p>
+            <p>Mientras atendías a otro cliente. La agenda del sábado sigue con huecos.</p>
+            <span class="ctile__none">Solo por teléfono</span>
+          </div>
+          <div class="ctile">
+            <span class="ctile__label">WhatsApp</span>
+            <p class="ctile__status">12 mensajes sin responder</p>
+            <p>«¿Tenéis hueco hoy?» · hace 3 horas</p>
+            <span class="ctile__none">Contestas cuando puedes</span>
+          </div>
+          <div class="ctile">
+            <span class="ctile__label">Ventas</span>
+            <p class="ctile__status">0 pedidos online</p>
+            <p>Solo vendes cuando la tienda está abierta.</p>
+            <span class="ctile__none">Sin tienda online</span>
+          </div>
+          <div class="ctile">
+            <span class="ctile__label">Google Maps</span>
+            <p class="ctile__status">Ficha incompleta</p>
+            <p>Sin horario, dos fotos y reseñas sin responder.</p>
+            <span class="ctile__none">Nadie la revisa</span>
+          </div>
+        </div>
+
+        <!-- CON LAGOA -->
+        <div class="compare__layer compare__layer--after">
+          <span class="compare__tag">Con Lagoa</span>
+          <div class="ctile">
+            <span class="ctile__label">Reservas</span>
+            <p class="ctile__status">Agenda del sábado llena</p>
+            <p>Tus clientes reservan desde la web a cualquier hora y reciben un recordatorio.</p>
+            <a href="#srv-web">Web con reservas · 290 €</a>
+          </div>
+          <div class="ctile">
+            <span class="ctile__label">WhatsApp</span>
+            <p class="ctile__status">Todos respondidos al momento</p>
+            <p>«¿Tenéis hueco hoy?» → «Sí, a las 17:30. ¿Te lo reservo?»</p>
+            <a href="#srv-whatsapp">Asistente de WhatsApp · 190 €</a>
+          </div>
+          <div class="ctile">
+            <span class="ctile__label">Ventas</span>
+            <p class="ctile__status">2 pedidos esta noche</p>
+            <p>Pagados con Bizum y listos para recoger por la mañana.</p>
+            <a href="#srv-tienda">Tienda online · 390 €</a>
+          </div>
+          <div class="ctile">
+            <span class="ctile__label">Google Maps</span>
+            <p class="ctile__status">Ficha completa y cuidada</p>
+            <p>Horario, fotos que definen tu negocio y reseñas respondidas.</p>
+            <a href="#srv-google">Google Maps y SEO · 120 €</a>
+          </div>
+        </div>
+
+        <div class="compare__handle" aria-hidden="true"></div>
+        <div class="compare__knob" aria-hidden="true"></div>
+      </div>
+      <p class="compare-note">Ejemplo ilustrativo de un negocio tipo.</p>
+    </div>
+
     <ul class="pills" aria-label="Datos rápidos">
       <li>Atención en galego, castellano, English, Deutsch y français</li>
       <li>Tarifas fijas, IVA incluido</li>
@@ -1688,51 +1579,64 @@ $$('[data-open-tab]').forEach(a => a.addEventListener('click', () => selectTab(d
 })();
 
 /* =============================================================
-   PORTADA: la persiana baja con el scroll
+   PORTADA: comparador antes / después
+   Se mueve arrastrando (ratón o dedo), con los botones o con el
+   teclado (control deslizante oculto pero accesible).
    ============================================================= */
-(function story() {
-  const section = $('#inicio');
-  const clock = $('#story-clock');
-  const captions = $$('.caption', section);
-  const notifs = $$('.notif', section);
-  const checks = $$('.checks li', section);
+(function compare() {
+  const box = $('#compare');
+  const range = $('#compare-range');
+  const buttons = $$('[data-compare]');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
-  const START = 20 * 60, SPAN = 330; // de 20:00 a 01:30
-  const timeAt = p => { const m = Math.round(START + p * SPAN) % 1440; return `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`; };
+  let pos = 100;
 
-  // Hora fija de cada aviso, coherente con el reloj
-  notifs.forEach(n => { $('time', n).textContent = timeAt(Number(n.dataset.at)); });
-
-  // El botón del asistente aparece al terminar la portada, para no tapar el móvil
-  const launcher = $('#chat-open');
-  const toggleLauncher = () => launcher.classList.toggle('is-away', section.getBoundingClientRect().bottom > innerHeight * 0.4);
-  addEventListener('scroll', toggleLauncher, { passive: true });
-  toggleLauncher();
-
-  if (reduce) return; // se queda el estado final, sin animación
-
-  section.classList.add('is-live');
-  let ticking = false;
-  function update() {
-    ticking = false;
-    const total = section.offsetHeight - innerHeight;
-    const p = total > 0 ? clamp(-section.getBoundingClientRect().top / total) : 1;
-    const n = clamp((p - 0.04) / 0.5);   // anochece
-    const s = clamp((p - 0.14) / 0.32);  // baja la persiana
-    section.style.setProperty('--p', p.toFixed(4));
-    section.style.setProperty('--n', n.toFixed(4));
-    section.style.setProperty('--s', s.toFixed(4));
-    clock.textContent = timeAt(p);
-    const step = p < 0.14 ? 0 : p < 0.4 ? 1 : p < 0.88 ? 2 : 3;
-    captions.forEach(c => c.classList.toggle('is-active', Number(c.dataset.step) === step));
-    notifs.forEach(nf => nf.classList.toggle('show', p >= Number(nf.dataset.at)));
-    checks.forEach(c => c.classList.toggle('on', p >= Number(c.dataset.at)));
+  // Mueve la línea (0 = todo "Con Lagoa", 100 = todo "Sin Lagoa")
+  function set(v) {
+    pos = Math.max(0, Math.min(100, v));
+    box.style.setProperty('--pos', pos + '%');
   }
-  const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
-  addEventListener('scroll', onScroll, { passive: true });
-  addEventListener('resize', onScroll);
-  update();
+  // Estado final legible: siempre uno de los dos lados completo
+  function snapTo(v, animate = true) {
+    const target = v >= 50 ? 100 : 0;
+    if (animate && !reduce) {
+      box.classList.add('animate');
+      clearTimeout(snapTo.t);
+      snapTo.t = setTimeout(() => box.classList.remove('animate'), 950);
+    }
+    set(target);
+    range.value = target;
+    range.setAttribute('aria-valuetext', target === 100 ? 'Sin Lagoa' : 'Con Lagoa');
+    buttons.forEach(b => b.setAttribute('aria-pressed', String(Number(b.dataset.compare) === target)));
+  }
+
+  range.addEventListener('input', () => snapTo(Number(range.value)));
+  buttons.forEach(b => b.addEventListener('click', () => snapTo(Number(b.dataset.compare))));
+
+  // Arrastrar con ratón o dedo; al soltar se ajusta al lado más cercano.
+  // En móvil, el gesto vertical sigue haciendo scroll (touch-action: pan-y).
+  let dragging = false;
+  const fromPointer = e => { const r = box.getBoundingClientRect(); set(((e.clientX - r.left) / r.width) * 100); };
+  box.addEventListener('pointerdown', e => {
+    if (e.target.closest('a, button')) return; // los enlaces siguen funcionando
+    dragging = true;
+    box.classList.remove('animate');
+    box.setPointerCapture(e.pointerId);
+    fromPointer(e);
+  });
+  box.addEventListener('pointermove', e => { if (dragging) fromPointer(e); });
+  const release = () => { if (!dragging) return; dragging = false; snapTo(pos); };
+  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(t => box.addEventListener(t, release));
+
+  if (reduce || !('IntersectionObserver' in window)) { snapTo(0, false); return; }
+
+  // Primero se ve "Sin Lagoa"; al aparecer en pantalla, la cortina lo transforma en "Con Lagoa"
+  snapTo(100, false);
+  const io = new IntersectionObserver(([entry]) => {
+    if (!entry.isIntersecting) return;
+    io.disconnect();
+    setTimeout(() => { if (!dragging) snapTo(0); }, 900);
+  }, { threshold: 0.45 });
+  io.observe(box);
 })();
 
 /* =============================================================
