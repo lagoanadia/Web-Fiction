@@ -879,11 +879,11 @@ dialog p { margin-bottom: .7rem; font-size: .95rem; }
 <dialog id="privacy" aria-labelledby="privacy-title">
   <h2 id="privacy-title">Política de privacidad</h2>
   <p><strong>Responsable:</strong> Nadia Lagoa Vilela (Lagoa) · nadialavi.work@gmail.com</p>
-  <p><strong>Qué datos recojo:</strong> los que escribes en los formularios (nombre, negocio, teléfono, email y mensaje) y, si reservas, el día y la hora elegidos.</p>
-  <p><strong>Para qué:</strong> solo para responderte, organizar la cita y, si lo pides, prepararte un presupuesto. No envío publicidad ni cedo tus datos a nadie.</p>
-  <p><strong>Base legal:</strong> tu consentimiento al marcar la casilla del formulario.</p>
-  <p><strong>Proveedores:</strong> las solicitudes de cita se guardan en una base de datos alojada por Neon (neon.tech) a través de Vercel (vercel.com), que también aloja esta web. Los formularios se envían además a mi correo mediante FormSubmit (formsubmit.co). Si escribes por WhatsApp, se aplica la política de WhatsApp (Meta).</p>
-  <p><strong>Cuánto tiempo:</strong> mientras dure la conversación o la relación comercial y, después, el tiempo que exija la ley.</p>
+  <p><strong>Qué datos recojo:</strong> los que escribes en los formularios (nombre, negocio, teléfono, email y mensaje) y, si reservas, el día y la hora elegidos. Si escribes al WhatsApp de Lagoa: tu número, tu nombre de perfil y los mensajes de la conversación.</p>
+  <p><strong>Para qué:</strong> solo para responderte, organizar la cita y, si lo pides, prepararte un presupuesto. En WhatsApp te contesta primero un asistente automático, que puede apuntar tu cita; en cualquier momento puedes pedir hablar conmigo. No envío publicidad ni cedo tus datos a nadie.</p>
+  <p><strong>Base legal:</strong> tu consentimiento al marcar la casilla del formulario o al confirmar la cita por WhatsApp, y atender la solicitud que tú me haces.</p>
+  <p><strong>Proveedores:</strong> las solicitudes de cita se guardan en una base de datos alojada por Neon (neon.tech) a través de Vercel (vercel.com), que también aloja esta web. Los formularios se envían además a mi correo mediante FormSubmit (formsubmit.co). Los mensajes de WhatsApp pasan por la plataforma WhatsApp Business de Meta (Meta Platforms Ireland) y se guardan en esa misma base de datos.</p>
+  <p><strong>Cuánto tiempo:</strong> mientras dure la conversación o la relación comercial y, después, el tiempo que exija la ley. Los mensajes de WhatsApp se borran automáticamente a los 6 meses.</p>
   <p><strong>Tus derechos:</strong> puedes pedir acceso, rectificación o eliminación de tus datos escribiendo a nadialavi.work@gmail.com. También puedes reclamar ante la Agencia Española de Protección de Datos (aepd.es).</p>
   <p><strong>Cookies:</strong> esta web no usa cookies.</p>
   <form method="dialog"><button class="btn">Cerrar</button></form>
@@ -1023,6 +1023,8 @@ $('#year').textContent = new Date().getFullYear();
 /* Política de privacidad */
 const privacy = $('#privacy');
 $$('[data-open-privacy]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); privacy.showModal(); }));
+// Enlace directo (lo envía el bot de WhatsApp): …/#privacidad
+if (location.hash === '#privacidad') privacy.showModal();
 
 /* =============================================================
    Pestañas Reservar / Mensaje (accesibles con flechas)
@@ -1354,7 +1356,7 @@ $$('[data-open-tab]').forEach(a => a.addEventListener('click', () => selectTab(d
       toNadia: 'Hablar con Nadia por WhatsApp',
       bookBtn: 'Ir a reservar',
       calcBtn: 'Abrir calculadora',
-      waIntro: 'Hola, Nadia. Te escribo desde tu web.',
+      waIntro: 'Hola, Nadia. Quiero hablar contigo (te escribo desde tu web).',
       answers: {
         servicios: () => `Ofrezco (IVA incluido):\n${list('es')}\n• ${PACK.name}: ${eur.format(PACK.price)}\nTambién cosas a medida: panel de ventas y stock, facturas automáticas, tarjeta de fidelización y mucho más.`,
         precios: () => `Tarifas fijas de lanzamiento, pago único, IVA incluido:\n${list('es')}\n• ${PACK.name}: ${eur.format(PACK.price)} (ahorras ${eur.format(PACK_SAVING)})\nMantenimiento opcional: ${maintList('es')}.`,
@@ -1402,7 +1404,7 @@ $$('[data-open-tab]').forEach(a => a.addEventListener('click', () => selectTab(d
       toNadia: 'Falar con Nadia por WhatsApp',
       bookBtn: 'Ir reservar',
       calcBtn: 'Abrir calculadora',
-      waIntro: 'Ola, Nadia. Escríboche desde a túa web.',
+      waIntro: 'Ola, Nadia. Quero falar contigo (escríboche desde a túa web).',
       answers: {
         servicios: () => `Ofrezo (IVE incluído):\n${list('gl')}\n• ${PACK.name}: ${eur.format(PACK.price)}\nTamén cousas a medida: panel de vendas e stock, facturas automáticas, tarxeta de fidelización e moito máis.`,
         precios: () => `Tarifas fixas de lanzamento, pagamento único, IVE incluído:\n${list('gl')}\n• ${PACK.name}: ${eur.format(PACK.price)} (aforras ${eur.format(PACK_SAVING)})\nMantemento opcional: ${maintList('gl')}.`,

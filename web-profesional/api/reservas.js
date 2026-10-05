@@ -3,12 +3,15 @@
    Guarda la solicitud de consulta de un cliente. Antes valida todo
    en el servidor: lo que llega del navegador nunca es de fiar.
    ============================================================= */
-import { query } from './_lib/db.js';
 import { enviar, permitir, cuerpo, esJson, fallo, texto } from './_lib/http.js';
-import { huecoReservable, hoyMadrid } from './_lib/horario.js';
+import { huecoReservable } from './_lib/horario.js';
+import { MODALIDADES, guardarCita } from './_lib/citas.js';
 
-export const MODALIDADES = ['Videollamada', 'Llamada de teléfono', 'En persona (solo A Coruña ciudad)'];
-const MAX_CITAS_POR_TELEFONO = 2; // citas futuras activas a la vez (frena reservas en masa)
+const MENSAJES = {
+  ocupada: 'Esa hora ya no está disponible. Elige otra, por favor.',
+  recien_ocupada: 'Esa hora se acaba de ocupar. Elige otra, por favor.',
+  limite: 'Ya tienes citas pendientes con este teléfono. Si necesitas otra, escríbeme por WhatsApp.'
+};
 
 export default async function handler(req, res) {
   if (!permitir(req, res, ['POST'])) return;
@@ -40,31 +43,11 @@ export default async function handler(req, res) {
   if (errores.length) return enviar(res, 400, { error: errores.join(' ') });
 
   try {
-    const bloqueado = await query('SELECT 1 FROM bloqueos WHERE fecha = $1 AND hora = $2', [d.fecha, d.hora]);
-    if (bloqueado.rowCount) return enviar(res, 409, { error: 'Esa hora ya no está disponible. Elige otra, por favor.' });
-
-    // Mismo número aunque se escriba distinto (+34 600…, 600-…): se comparan los 9 últimos dígitos
-    const numero = d.telefono.replace(/\D/g, '').slice(-9);
-    const { rows: [{ n }] } = await query(
-      `SELECT count(*)::int AS n FROM citas
-        WHERE right(regexp_replace(telefono, '[^0-9]', '', 'g'), 9) = $1
-          AND estado <> 'cancelada' AND fecha >= $2`,
-      [numero, hoyMadrid()]
-    );
-    if (n >= MAX_CITAS_POR_TELEFONO) {
-      return enviar(res, 429, { error: 'Ya tienes citas pendientes con este teléfono. Si necesitas otra, escríbeme por WhatsApp.' });
-    }
-
-    const { rows: [cita] } = await query(
-      `INSERT INTO citas (fecha, hora, modalidad, nombre, negocio, telefono, email, nota)
-       VALUES ($1, $2, $3, $4, NULLIF($5, ''), $6, NULLIF($7, ''), NULLIF($8, ''))
-       RETURNING id`,
-      [d.fecha, d.hora, d.modalidad, d.nombre, d.negocio, d.telefono, d.email, d.nota]
-    );
-    enviar(res, 201, { ok: true, id: cita.id });
+    // Las reglas (hora bloqueada, máximo de citas por teléfono, una cita por hora) están en _lib/citas.js
+    const r = await guardarCita(d, 'web');
+    if (r.estado === 201) return enviar(res, 201, { ok: true, id: r.id });
+    enviar(res, r.estado, { error: MENSAJES[r.motivo] });
   } catch (e) {
-    // 23505 = la regla "una cita por hora" de la base de datos ha saltado
-    if (e.code === '23505') return enviar(res, 409, { error: 'Esa hora se acaba de ocupar. Elige otra, por favor.' });
     fallo(res, e);
   }
 }

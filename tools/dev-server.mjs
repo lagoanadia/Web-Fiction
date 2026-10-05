@@ -33,15 +33,18 @@ http.createServer(async (req, res) => {
       res.statusCode = 404;
       return res.end('{"error":"Not found"}');
     }
-    let raw = '';
-    for await (const chunk of req) raw += chunk;
-    if ((req.headers['content-type'] || '').includes('application/json') && raw) {
-      try { req.body = JSON.parse(raw); } catch { req.body = raw; }
-    } else {
-      req.body = raw || undefined;
-    }
     try {
       const mod = await import(pathToFileURL(file).href);
+      // Like Vercel: parse the body, unless the function asks for the raw stream
+      if (mod.config?.api?.bodyParser !== false) {
+        let raw = '';
+        for await (const chunk of req) raw += chunk;
+        if ((req.headers['content-type'] || '').includes('application/json') && raw) {
+          try { req.body = JSON.parse(raw); } catch { req.body = raw; }
+        } else {
+          req.body = raw || undefined;
+        }
+      }
       await mod.default(req, res);
     } catch (e) {
       console.error(e);

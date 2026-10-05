@@ -35,6 +35,34 @@ const ESQUEMA = `
     hora  TIME NOT NULL,
     PRIMARY KEY (fecha, hora)
   );
+
+  -- WhatsApp: una fila por cliente que escribe al número del negocio.
+  -- "paso" y "datos" guardan por dónde va la conversación con el bot
+  -- (por ejemplo, a mitad de una reserva).
+  CREATE TABLE IF NOT EXISTS wa_chats (
+    telefono        TEXT PRIMARY KEY,   -- formato internacional sin "+": 34600111222
+    nombre          TEXT,               -- nombre del perfil de WhatsApp
+    idioma          TEXT NOT NULL DEFAULT 'es',
+    paso            TEXT,
+    datos           JSONB NOT NULL DEFAULT '{}',
+    modo            TEXT NOT NULL DEFAULT 'bot' CHECK (modo IN ('bot', 'humano')),
+    humano_hasta    TIMESTAMPTZ,        -- mientras sea futuro, el bot no contesta
+    sin_leer        INT NOT NULL DEFAULT 0,
+    ultimo_entrante TIMESTAMPTZ,        -- para la ventana de 24 h de WhatsApp
+    actualizado     TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+
+  -- Historial de mensajes (entrantes y salientes). wa_id es el id que da
+  -- WhatsApp: al ser UNIQUE, si Meta reenvía un mensaje no se procesa dos veces.
+  CREATE TABLE IF NOT EXISTS wa_mensajes (
+    id        SERIAL PRIMARY KEY,
+    telefono  TEXT NOT NULL,
+    autor     TEXT NOT NULL CHECK (autor IN ('cliente', 'bot', 'nadia')),
+    texto     TEXT NOT NULL,
+    wa_id     TEXT UNIQUE,
+    creado    TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS wa_mensajes_chat ON wa_mensajes (telefono, creado);
 `;
 
 let pool = null;

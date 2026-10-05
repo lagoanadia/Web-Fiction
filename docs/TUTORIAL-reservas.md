@@ -1,6 +1,6 @@
 # Website with online bookings and a private agenda — complete tutorial
 
-> **What this is:** the step-by-step guide to rebuild the Lagoa website (public site + booking system + private admin panel) for any client, without help.
+> **What this is:** the step-by-step guide to rebuild the Lagoa website (public site + booking system + private admin panel + WhatsApp bot) for any client, without help.
 > Everything here comes from the real, working code in this repository (`web-profesional/`), and every code block below is an exact copy of a real file.
 >
 > **Repository:** `lagoanadia/Web-Fiction` · **Live example:** https://lagoa-webs.vercel.app · **Panel:** https://lagoa-webs.vercel.app/admin
@@ -22,6 +22,7 @@
 10. [Maintenance and troubleshooting](#10-maintenance-and-troubleshooting)
 11. [Security checklist](#11-security-checklist)
 12. [Ideas to extend it](#12-ideas-to-extend-it)
+13. [Part 7 — The WhatsApp bot](#13-part-7--the-whatsapp-bot)
 
 ---
 
@@ -33,7 +34,8 @@ Three pieces that work together:
 |---|---|---|
 | **Public website** | One HTML page: services, prices, budget calculator, chatbot, booking form, contact form, FAQ | `index.html`, `img/`, `robots.txt`, `sitemap.xml` |
 | **Backend (API)** | Small server functions that Vercel runs on demand. They check and save bookings in a Postgres database | `api/` + `package.json` |
-| **Admin panel** | A private page with a password where the owner sees the week, confirms, cancels, blocks slots and adds bookings by hand | `admin/index.html` |
+| **Admin panel** | A private page with a password where the owner sees the week, confirms, cancels, blocks slots and adds bookings by hand, and answers WhatsApp chats | `admin/index.html` |
+| **WhatsApp bot** (optional) | Answers automatically inside WhatsApp, books in the same agenda, hands the chat to the owner when asked (section 13) | `api/whatsapp.js`, `api/_lib/bot.js`… |
 
 How a booking travels:
 
@@ -59,7 +61,7 @@ Blocks a slot ──────────/api/admin/bloqueos────▶ s
 - **Secrets** (database address, panel password) live in Vercel **environment variables**: never in the code, never on GitHub.
 - **Graceful fallback:** if the database fails, the website still sends the booking by email, so no client is lost.
 
-**Costs:** Vercel Hobby (free), Neon free plan (0.5 GB, more than enough for thousands of bookings), FormSubmit (free). A custom domain costs about 10–15 €/year.
+**Costs:** Vercel Hobby (free), Neon free plan (0.5 GB, more than enough for thousands of bookings), FormSubmit (free). A custom domain costs about 10–15 €/year. WhatsApp Cloud API: answering clients inside the 24 h window is free; template messages (reminders, marketing) are paid per message (section 13.2).
 
 > ⚠️ **Vercel Hobby is for personal, non-commercial use.** For a paying client's business, the client's project should be on **Vercel Pro**, or you need to check Vercel's current terms. Mention this cost in your quote.
 
@@ -103,6 +105,8 @@ Use this once you understand the rest of the guide. Estimated time: **1–2 days
 11. **Vercel → Settings → Environment Variables:** `ADMIN_PASSWORD` (a long password, at least 10 characters; the client chooses it). Then **Deployments → ⋯ → Redeploy**.
 12. **Final checks** (section 8.6): make a real booking, see it in `/admin`, confirm, cancel. Activate FormSubmit. Connect the domain. Hand over (section 9).
 
+**Optional — WhatsApp bot:** adapt the texts (13.7), run `tools/whatsapp-test.mjs`, then connect the client's number in Meta and add the 4 `WHATSAPP_…` variables (13.3). Start the Meta business verification early: it can take days.
+
 ---
 
 ## 3. Project structure
@@ -121,21 +125,28 @@ web-profesional/                ← this folder is the "Root Directory" in Verce
 └── api/                        ← every .js here is a server function (URL = path)
     ├── disponibilidad.js       ← GET  /api/disponibilidad
     ├── reservas.js             ← POST /api/reservas
+    ├── whatsapp.js             ← GET/POST /api/whatsapp (Meta calls it: WhatsApp bot)
     ├── admin/
     │   ├── login.js            ← POST /api/admin/login
     │   ├── logout.js           ← POST /api/admin/logout
     │   ├── sesion.js           ← GET  /api/admin/sesion
     │   ├── citas.js            ← GET/POST/PATCH /api/admin/citas
-    │   └── bloqueos.js         ← POST/DELETE /api/admin/bloqueos
+    │   ├── bloqueos.js         ← POST/DELETE /api/admin/bloqueos
+    │   └── whatsapp.js         ← GET/POST/PATCH /api/admin/whatsapp (panel's WhatsApp tab)
     └── _lib/                   ← starts with "_" → NOT a URL, shared code only
         ├── db.js               ← database connection + tables
         ├── horario.js          ← bookable hours, time zone, date helpers
         ├── http.js             ← small helpers for requests/responses
-        └── auth.js             ← password check + signed session cookie
+        ├── auth.js             ← password check + signed session cookie
+        ├── citas.js            ← booking rules shared by the website and the bot
+        ├── negocio.js          ← business data for the bot (services, prices)
+        ├── whatsapp.js         ← talks to Meta (send messages, check signatures)
+        └── bot.js              ← the bot's brain (menu, answers, booking steps)
 
 tools/ (at the repository root, never published)
 ├── dev-server.mjs              ← local server that imitates Vercel
-└── api-test.mjs                ← 38 automatic tests of the API
+├── api-test.mjs                ← 38 automatic tests of the API
+└── whatsapp-test.mjs           ← 49 automatic tests of the WhatsApp bot (fake Meta)
 ```
 
 **Rule of Vercel functions:** the file path is the URL. `api/reservas.js` answers at `/api/reservas`. Folders or files whose name starts with `_` are private helpers and never become URLs.
@@ -433,7 +444,7 @@ It is **not** artificial intelligence: it is a list of **topics**, each with **k
 
 - The user's text is lower-cased and accents are removed (`normalize('NFD')`), so "Cuánto" = "cuanto".
 - The **order of topics matters**: the first topic whose keyword appears wins. Put specific topics (prices of a service) before generic ones (prices).
-- Unknown questions → `fallback` answer + WhatsApp button with the whole conversation already written.
+- Unknown questions → `fallback` answer + WhatsApp button with the whole conversation already written. That text starts with "Quiero hablar contigo", which the WhatsApp bot recognises ("hablar con…") and passes straight to the owner (section 13).
 - Avoid keywords that are part of other words ("bot" matched "botón") or that are too common ("meu" in Galician matched "o meu negocio").
 - Payment terms, discounts or anything you haven't defined with the client must go to the human, never be invented by the bot.
 
@@ -489,7 +500,7 @@ export default async function handler(req, res) {
 
 - Vercel starts it when someone calls the URL ("serverless"). Instances can be reused for a while, which is why the database connection is kept in a variable outside the function.
 - `"type": "module"` in `package.json` lets us use `import`/`export`.
-- HTTP status codes used: **200** OK · **201** created · **400** invalid data · **401** not logged in · **404** not found · **405** wrong method · **409** conflict (slot taken) · **415** not JSON · **429** too many · **500** server error · **503** database not configured.
+- HTTP status codes used: **200** OK · **201** created · **400** invalid data · **401** not logged in / bad signature · **403** wrong verify token · **404** not found · **405** wrong method · **409** conflict (slot taken, or WhatsApp 24 h window closed) · **415** not JSON · **429** too many · **500** server error · **502** WhatsApp refused the message · **503** database or WhatsApp not configured.
 
 ### 5.2 `package.json`
 
@@ -575,6 +586,34 @@ const ESQUEMA = `
     hora  TIME NOT NULL,
     PRIMARY KEY (fecha, hora)
   );
+
+  -- WhatsApp: una fila por cliente que escribe al número del negocio.
+  -- "paso" y "datos" guardan por dónde va la conversación con el bot
+  -- (por ejemplo, a mitad de una reserva).
+  CREATE TABLE IF NOT EXISTS wa_chats (
+    telefono        TEXT PRIMARY KEY,   -- formato internacional sin "+": 34600111222
+    nombre          TEXT,               -- nombre del perfil de WhatsApp
+    idioma          TEXT NOT NULL DEFAULT 'es',
+    paso            TEXT,
+    datos           JSONB NOT NULL DEFAULT '{}',
+    modo            TEXT NOT NULL DEFAULT 'bot' CHECK (modo IN ('bot', 'humano')),
+    humano_hasta    TIMESTAMPTZ,        -- mientras sea futuro, el bot no contesta
+    sin_leer        INT NOT NULL DEFAULT 0,
+    ultimo_entrante TIMESTAMPTZ,        -- para la ventana de 24 h de WhatsApp
+    actualizado     TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+
+  -- Historial de mensajes (entrantes y salientes). wa_id es el id que da
+  -- WhatsApp: al ser UNIQUE, si Meta reenvía un mensaje no se procesa dos veces.
+  CREATE TABLE IF NOT EXISTS wa_mensajes (
+    id        SERIAL PRIMARY KEY,
+    telefono  TEXT NOT NULL,
+    autor     TEXT NOT NULL CHECK (autor IN ('cliente', 'bot', 'nadia')),
+    texto     TEXT NOT NULL,
+    wa_id     TEXT UNIQUE,
+    creado    TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS wa_mensajes_chat ON wa_mensajes (telefono, creado);
 `;
 
 let pool = null;
@@ -740,6 +779,16 @@ export function cuerpo(req) {
   return {};
 }
 
+/** Cuerpo SIN procesar, tal cual llega (hace falta para comprobar firmas).
+    La función debe exportar config = { api: { bodyParser: false } }. */
+export async function cuerpoCrudo(req) {
+  if (Buffer.isBuffer(req.body)) return req.body;
+  if (typeof req.body === 'string') return Buffer.from(req.body);
+  const trozos = [];
+  for await (const t of req) trozos.push(typeof t === 'string' ? Buffer.from(t) : t);
+  return Buffer.concat(trozos);
+}
+
 /** Las peticiones que cambian datos deben ser JSON (protege contra formularios de otras webs) */
 export const esJson = req => (req.headers['content-type'] || '').includes('application/json');
 
@@ -895,14 +944,15 @@ Order of checks:
 1. Method POST and JSON body.
 2. **Honeypot**: if the invisible `_honey` field has text, it is a robot. We answer "OK" so it doesn't try again, but save nothing.
 3. **Validation**: real bookable slot (`huecoReservable`), allowed modality, name, phone format, optional email format, privacy accepted (`=== true`).
-4. Slot not blocked by the owner.
-5. **Anti-abuse:** at most 2 future active bookings per phone. It compares the **last 9 digits**, so `+34 600 111 222`, `600-111-222` and `600111222` are the same person.
-6. `INSERT`. If Postgres raises error **23505** (unique violation), someone took the hour first → **409** with a friendly message.
+4. `guardarCita()` from `api/_lib/citas.js` (shared with the WhatsApp bot, see 13.5) does the rest:
+   - slot not blocked by the owner → otherwise 409;
+   - **anti-abuse:** at most 2 future active bookings per phone. It compares the **last 9 digits**, so `+34 600 111 222`, `600-111-222` and `600111222` are the same person → otherwise 429;
+   - `INSERT`. If Postgres raises error **23505** (unique violation), someone took the hour first → **409** with a friendly message.
 
 **To add a field for a client** (for example "servicio"):
 
 1. Add the column to the `CREATE TABLE` in `db.js`. For an existing database, run once in the Neon SQL editor: `ALTER TABLE citas ADD COLUMN servicio TEXT;`
-2. Read and validate it here (`texto(b.servicio, 80)`) and add it to the `INSERT`.
+2. Read and validate it here (`texto(b.servicio, 80)`) and add it to the `INSERT` inside `guardarCita()` in `api/_lib/citas.js`.
 3. Send it from `guardarEnAgenda()` in `index.html`.
 4. Return it in `CAMPOS` in `api/admin/citas.js` and show it in `tarjetaCita()` in the panel.
 
@@ -914,12 +964,15 @@ File: `web-profesional/api/reservas.js`
    Guarda la solicitud de consulta de un cliente. Antes valida todo
    en el servidor: lo que llega del navegador nunca es de fiar.
    ============================================================= */
-import { query } from './_lib/db.js';
 import { enviar, permitir, cuerpo, esJson, fallo, texto } from './_lib/http.js';
-import { huecoReservable, hoyMadrid } from './_lib/horario.js';
+import { huecoReservable } from './_lib/horario.js';
+import { MODALIDADES, guardarCita } from './_lib/citas.js';
 
-export const MODALIDADES = ['Videollamada', 'Llamada de teléfono', 'En persona (solo A Coruña ciudad)'];
-const MAX_CITAS_POR_TELEFONO = 2; // citas futuras activas a la vez (frena reservas en masa)
+const MENSAJES = {
+  ocupada: 'Esa hora ya no está disponible. Elige otra, por favor.',
+  recien_ocupada: 'Esa hora se acaba de ocupar. Elige otra, por favor.',
+  limite: 'Ya tienes citas pendientes con este teléfono. Si necesitas otra, escríbeme por WhatsApp.'
+};
 
 export default async function handler(req, res) {
   if (!permitir(req, res, ['POST'])) return;
@@ -951,31 +1004,11 @@ export default async function handler(req, res) {
   if (errores.length) return enviar(res, 400, { error: errores.join(' ') });
 
   try {
-    const bloqueado = await query('SELECT 1 FROM bloqueos WHERE fecha = $1 AND hora = $2', [d.fecha, d.hora]);
-    if (bloqueado.rowCount) return enviar(res, 409, { error: 'Esa hora ya no está disponible. Elige otra, por favor.' });
-
-    // Mismo número aunque se escriba distinto (+34 600…, 600-…): se comparan los 9 últimos dígitos
-    const numero = d.telefono.replace(/\D/g, '').slice(-9);
-    const { rows: [{ n }] } = await query(
-      `SELECT count(*)::int AS n FROM citas
-        WHERE right(regexp_replace(telefono, '[^0-9]', '', 'g'), 9) = $1
-          AND estado <> 'cancelada' AND fecha >= $2`,
-      [numero, hoyMadrid()]
-    );
-    if (n >= MAX_CITAS_POR_TELEFONO) {
-      return enviar(res, 429, { error: 'Ya tienes citas pendientes con este teléfono. Si necesitas otra, escríbeme por WhatsApp.' });
-    }
-
-    const { rows: [cita] } = await query(
-      `INSERT INTO citas (fecha, hora, modalidad, nombre, negocio, telefono, email, nota)
-       VALUES ($1, $2, $3, $4, NULLIF($5, ''), $6, NULLIF($7, ''), NULLIF($8, ''))
-       RETURNING id`,
-      [d.fecha, d.hora, d.modalidad, d.nombre, d.negocio, d.telefono, d.email, d.nota]
-    );
-    enviar(res, 201, { ok: true, id: cita.id });
+    // Las reglas (hora bloqueada, máximo de citas por teléfono, una cita por hora) están en _lib/citas.js
+    const r = await guardarCita(d, 'web');
+    if (r.estado === 201) return enviar(res, 201, { ok: true, id: r.id });
+    enviar(res, r.estado, { error: MENSAJES[r.motivo] });
   } catch (e) {
-    // 23505 = la regla "una cita por hora" de la base de datos ha saltado
-    if (e.code === '23505') return enviar(res, 409, { error: 'Esa hora se acaba de ocupar. Elige otra, por favor.' });
     fallo(res, e);
   }
 }
@@ -1226,7 +1259,9 @@ Every function of the panel:
 | `inicio()` | On load: checks `/api/admin/sesion` and shows login or agenda; warns if `ADMIN_PASSWORD` is missing |
 | `setInterval` + `visibilitychange` | Refreshes every minute and when you come back to the tab |
 
-To adapt for a client: the WhatsApp confirmation text inside `tarjetaCita()` (it signs "Nadia · Lagoa"), the colours in `:root`, the title, and the modalities list in the "Nueva cita" dialog (they must match `MODALIDADES` in `api/reservas.js`).
+The **WhatsApp tab** (conversations, replies, pause/resume the bot) is explained in section 13.5.
+
+To adapt for a client: the WhatsApp confirmation text inside `tarjetaCita()` (it signs "Nadia · Lagoa"), the colours in `:root`, the title, and the modalities list in the "Nueva cita" dialog (they must match `MODALIDADES` in `api/_lib/citas.js`).
 
 ---
 
@@ -1308,15 +1343,18 @@ http.createServer(async (req, res) => {
       res.statusCode = 404;
       return res.end('{"error":"Not found"}');
     }
-    let raw = '';
-    for await (const chunk of req) raw += chunk;
-    if ((req.headers['content-type'] || '').includes('application/json') && raw) {
-      try { req.body = JSON.parse(raw); } catch { req.body = raw; }
-    } else {
-      req.body = raw || undefined;
-    }
     try {
       const mod = await import(pathToFileURL(file).href);
+      // Like Vercel: parse the body, unless the function asks for the raw stream
+      if (mod.config?.api?.bodyParser !== false) {
+        let raw = '';
+        for await (const chunk of req) raw += chunk;
+        if ((req.headers['content-type'] || '').includes('application/json') && raw) {
+          try { req.body = JSON.parse(raw); } catch { req.body = raw; }
+        } else {
+          req.body = raw || undefined;
+        }
+      }
       await mod.default(req, res);
     } catch (e) {
       console.error(e);
@@ -1354,7 +1392,7 @@ ADMIN_PASSWORD=una-clave-de-prueba node tools/api-test.mjs
 - **Panel:** confirm, invented status, block/unblock, cancel frees the slot, reactivate conflict, manual bookings.
 - **Attacks:** CSRF without JSON, SQL injection in params and names, logout.
 
-Run them **every time you change the backend**, before deploying.
+Run them **every time you change the backend**, before deploying. The WhatsApp bot has its own 49 tests: section 13.6.
 
 ### 7.4 Manual checklist (browser)
 
@@ -1403,6 +1441,7 @@ Project → **Settings → Environment Variables**:
 |---|---|---|
 | `DATABASE_URL` | (created by Neon) | Don't touch |
 | `ADMIN_PASSWORD` | Long password, ≥ 10 characters | The **client** chooses it; you don't need to know it. A phrase like `pan-de-millo-con-75-pasas` is good |
+| `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_ID`, `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN` | From Meta (section 13.3) | Only if the client has the WhatsApp bot. **Never** set `WHATSAPP_API_URL` in Vercel (it's only for tests) |
 
 **After adding or changing variables you must redeploy** (Deployments → ⋯ → Redeploy). Variables only reach new deployments.
 
@@ -1449,7 +1488,8 @@ Settings → **Domains** → add `www.client.com` and follow the DNS instruction
 | Change | Where |
 |---|---|
 | Bookable hours, days ahead, notice | `api/_lib/horario.js` → push |
-| Prices | `SERVICES`/`PACK` in `index.html` **and** the fixed texts of the service cards + JSON-LD |
+| Prices | `SERVICES`/`PACK` in `index.html` **and** the fixed texts of the service cards + JSON-LD **and** `api/_lib/negocio.js` (WhatsApp bot) |
+| Bot answers | `T` and `CLAVES` in `api/_lib/bot.js` → run `tools/whatsapp-test.mjs` → push |
 | Texts, photos | `index.html`, `img/` |
 | Panel password | Vercel → Environment Variables → `ADMIN_PASSWORD` → Redeploy |
 | Close a holiday | Panel → "Bloquear día" (no code) |
@@ -1469,6 +1509,12 @@ WHERE estado <> 'cancelada' GROUP BY 1 ORDER BY 1;
 
 -- Delete a client's data (GDPR deletion request)
 DELETE FROM citas WHERE telefono LIKE '%600111222%';
+DELETE FROM wa_mensajes WHERE telefono LIKE '%600111222';
+DELETE FROM wa_chats WHERE telefono LIKE '%600111222';
+
+-- WhatsApp: who talked to the bot this month, and how many messages
+SELECT c.nombre, c.telefono, count(*) FROM wa_mensajes m JOIN wa_chats c USING (telefono)
+WHERE m.creado > date_trunc('month', now()) GROUP BY 1, 2 ORDER BY 3 DESC;
 
 -- Delete old bookings (for example, older than 2 years)
 DELETE FROM citas WHERE fecha < current_date - interval '2 years';
@@ -1509,7 +1555,8 @@ Before every delivery:
 - [ ] `/admin` and `/api` excluded in `robots.txt`; panel has `noindex`.
 - [ ] `api/_lib/...` returns 404 in production.
 - [ ] `node tools/api-test.mjs`: 38/38 OK.
-- [ ] Privacy policy names every provider (Vercel, Neon, FormSubmit, Meta) and the owner's details.
+- [ ] Privacy policy names every provider (Vercel, Neon, FormSubmit, Meta) and the owner's details, and (with the bot) that WhatsApp messages are stored and deleted after 6 months.
+- [ ] WhatsApp bot: `node tools/whatsapp-test.mjs`: 49/49 OK; the 4 `WHATSAPP_…` variables only in Vercel; permanent token from a system user (not your personal account); `/api/whatsapp` without a valid signature returns 401.
 - [ ] Neon database in an EU region.
 
 ---
@@ -1521,7 +1568,7 @@ Ordered from easiest to hardest:
 1. **Show the "servicio" in each booking** (hairdresser: cut, colour…): section 5.8 "To add a field".
 2. **Booking duration:** a 60-minute service blocks two 30-minute slots. Store `duracion` and check overlaps in SQL.
 3. **Server-side email** with Resend (https://resend.com, free tier): send the confirmation from `api/reservas.js` instead of FormSubmit, with an `RESEND_API_KEY` variable.
-4. **Automatic reminders:** a **Vercel Cron Job** (`vercel.json` → `"crons"`) that runs every evening, finds tomorrow's confirmed bookings and sends an email or WhatsApp reminder (WhatsApp needs the WhatsApp Business API).
+4. **Automatic reminders:** a **Vercel Cron Job** (`vercel.json` → `"crons"`) that runs every evening, finds tomorrow's confirmed bookings and sends an email or a WhatsApp reminder. For WhatsApp you already have the connection (section 13); the reminder must be a **template** approved in WhatsApp Manager (type *utility*), sent with `type: 'template'` instead of `text`.
 5. **Google Calendar sync** with the `googleapis` library and a service account: each confirmed booking also appears in the owner's calendar.
 6. **Several employees:** add a `profesional` column and include it in the unique index `(fecha, hora, profesional)`.
 7. **Client self-cancellation:** a secret link per booking (random token stored in the table) that lets the client cancel without logging in.
@@ -1529,4 +1576,1184 @@ Ordered from easiest to hardest:
 
 ---
 
-*Built for Lagoa · Estudio digital (A Coruña). Code: `web-profesional/` in this repository. Tests: `tools/api-test.mjs`.*
+## 13. Part 7 — The WhatsApp bot
+
+A real bot **inside WhatsApp**: when someone writes to the business number, the bot answers at once. It shows a menu, answers questions about services, prices and timings, books a consultation in **the same agenda as the website**, lets the client see or cancel their bookings, and passes the chat to the owner when the client asks for a person. The owner answers from the **WhatsApp tab of the panel**.
+
+It's optional: if the `WHATSAPP_…` variables aren't set, nothing changes (the webhook answers 503 and the panel says "WhatsApp aún no está conectado").
+
+### 13.1 How it travels
+
+```
+CLIENT (WhatsApp app)        META (WhatsApp Cloud API)            VERCEL                              NEON
+─────────────────────        ─────────────────────────            ──────                              ────
+Writes "Hola" ─────────────▶ receives it and calls your webhook ─POST /api/whatsapp─▶ 1. checks Meta's signature
+                             (signed with your App secret)                          2. saves the message ──▶ wa_mensajes
+                                                                                    3. reads the chat state ─▶ wa_chats
+                                                                                    4. bot decides the answer
+Sees the answer ◀──────────── delivers it ◀── POST graph.facebook.com/…/messages ─── 5. sends it (+ saves it)
+                                                                                    6. saves the new state ──▶ wa_chats
+Books a slot ─────────────── same path ─────────────────────────────────────────▶ guardarCita() ─────────▶ citas
+
+OWNER (/admin → WhatsApp)
+Reads chats ─────────────────GET /api/admin/whatsapp─────────────────────────────▶ wa_chats + wa_mensajes
+Replies ─────────────────────POST /api/admin/whatsapp ─▶ sends through Meta, pauses the bot 24 h in that chat
+```
+
+### 13.2 Meta's rules you must know (tell the client)
+
+| Rule | What it means in practice |
+|---|---|
+| **One number = API or app** | A number connected to the Cloud API normally **can't be used in the WhatsApp / WhatsApp Business app at the same time**. Use a **new number** for the business bot (a cheap SIM or a number that can receive an SMS or call to verify). Meta also offers "coexistence" for some WhatsApp Business app numbers; check Meta's current docs before promising it. The owner doesn't need the app: they answer from the panel. |
+| **24-hour window** | The business can send **free-form** messages only within 24 h of the client's last message. After that, only **templates** approved by Meta (paid). The panel blocks replies outside the window and explains why. |
+| **Costs** | Replies inside the 24 h window (customer service) are free. Templates (reminders, marketing) are charged per message. Prices change: check Meta's "WhatsApp Business Platform pricing" page. |
+| **Test number** | Meta gives a free **test number** that can write to up to **5 phone numbers you verify**. Perfect for building and demoing. |
+| **Business verification** | To use a real number, have a public display name and higher limits, Meta may ask to verify the business (documents). It can take days: start early. |
+| **Message limits** | Max **3 buttons** (20 characters each), lists with max **10 options** (24-character titles), 1,024 characters of text in a message with buttons. The code trims everything (`corta()`), because Meta rejects the whole message if one part is too long. |
+
+### 13.3 Step by step: connect a number (≈ 1 hour the first time)
+
+Meta renames buttons often. If something isn't where described, search Meta's docs for "WhatsApp Cloud API get started"; the steps are the same.
+
+1. **Meta Business portfolio:** https://business.facebook.com → create one for the client's business (or use theirs).
+2. **App:** https://developers.facebook.com → *My Apps* → *Create app* → use case **"Connect with customers through WhatsApp"** (or type *Business*) → link it to the portfolio.
+3. **API Setup** (left menu *WhatsApp → API Setup*). Here you see:
+   - the **test number** and its **Phone number ID** → `WHATSAPP_PHONE_ID`
+   - a **temporary token** (lasts 24 h, only for a first try)
+   - *To*: **add your own phone** as a recipient and confirm the code they send you.
+4. **App secret:** *App settings → Basic → App secret → Show* → `WHATSAPP_APP_SECRET`.
+5. **Permanent token** (the temporary one expires): business.facebook.com → *Settings → Users → System users → Add* (role Admin) → *Assign assets*: the app (full control) and the WhatsApp account (full control) → *Generate token* → choose the app, expiration **Never**, permissions **`whatsapp_business_messaging`** and **`whatsapp_business_management`** → copy it (it's shown once) → `WHATSAPP_TOKEN`.
+6. **Invent the verify token:** any long random text, e.g. `lagoa-webhook-8f3k2m9q` → `WHATSAPP_VERIFY_TOKEN`.
+7. **Vercel → Settings → Environment Variables:** add the 4 variables (`WHATSAPP_TOKEN`, `WHATSAPP_PHONE_ID`, `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN`) → **Redeploy**.
+8. **Webhook:** Meta → *WhatsApp → Configuration → Webhook → Edit*:
+   - Callback URL: `https://YOUR-DOMAIN/api/whatsapp`
+   - Verify token: the same text as `WHATSAPP_VERIFY_TOKEN`
+   - *Verify and save*. Meta calls your `GET /api/whatsapp`; the code answers with the `challenge` only if the token matches.
+   - Then in *Webhook fields*, **subscribe to `messages`** (without this, nothing arrives).
+9. **Try it:** from your phone (the one added in step 3) send "Hola" to the test number. The bot answers with the greeting and the menu. Open `/admin → WhatsApp`: the conversation is there.
+10. **Real number** (when the client is ready): *WhatsApp → API Setup → Add phone number* → display name (Meta reviews it) → verify by SMS/call → add a payment method in WhatsApp Manager (needed for templates) → copy the **new Phone number ID** into `WHATSAPP_PHONE_ID` → Redeploy. In *App settings → Basic* add the privacy policy URL `https://YOUR-DOMAIN/#privacidad` and switch the app to **Live**.
+11. **Website:** change `CONFIG.whatsapp` in `index.html` to the new number, so every "WhatsApp" button on the site opens the bot.
+
+### 13.4 The design decisions (and why)
+
+- **Signature check (`firmaValida`)**: the webhook URL is public, so anyone could POST fake messages. Meta signs each request with HMAC-SHA256 using the App secret; we recompute it over the **raw body** and compare with `timingSafeEqual`. That's why `api/whatsapp.js` exports `config = { api: { bodyParser: false } }`: if Vercel parsed the JSON first, the bytes could change and the signature would never match.
+- **No duplicate answers:** Meta can deliver the same message twice. `wa_mensajes.wa_id` is `UNIQUE` and the insert uses `ON CONFLICT DO NOTHING`: if nothing was inserted, we already handled it.
+- **Always answer 200** to Meta (after logging errors): if the webhook answers with an error, Meta keeps retrying for days.
+- **Conversation state in the database** (`wa_chats.paso` + `datos`): functions don't remember anything between calls, so "this client is choosing an hour for Tuesday" must be stored. A booking left half-done for 2 hours is forgotten (`MINUTOS_PASO`).
+- **Buttons carry ids** (`tema:precios`, `dia:2026-10-07`, `hora:16:30`, `anular:12`): the bot never guesses from the button text, so translations or typos don't break anything.
+- **Same rules as the website:** both call `guardarCita()` in `api/_lib/citas.js` (blocked slots, max 2 future bookings per phone, unique index → no double bookings). One place to change the rules.
+- **Handover:** "Hablar con Nadia" (or writing "hablar con una persona") sets `modo = 'humano'` for 24 h: the bot stays quiet and the panel shows "Te espera". The client can write "menú" to get the bot back; the owner can press "Devolver al bot".
+- **Clients can cancel only their own bookings:** the query checks that the last 9 digits of the phone match.
+- **Privacy:** messages older than 180 days are deleted (`DIAS_HISTORIAL`), and the privacy policy says so.
+
+The conversation, step by step:
+
+| `paso` | The bot just asked… | Accepts | Next |
+|---|---|---|---|
+| `null` | nothing (free chat) | text (keywords) or any `tema:` button | answer + buttons |
+| `modalidad` | how to meet | `mod:0/1/2` | `dia` |
+| `dia` | which day (list of days with free hours) | `dia:YYYY-MM-DD` | `hora` |
+| `hora` | which hour (list) | `hora:HH:MM` or `volver:dia` | `nombre` |
+| `nombre` | name | text, or `nombre:perfil` (their WhatsApp name) | `negocio` |
+| `negocio` | business name | text or `negocio:no` | `confirmar` |
+| `confirmar` | summary + privacy link | `ok`, `volver:dia`, `tema:cancelar` | saved → `null` |
+
+At any step, "cancelar", "menú" or "hablar con una persona" work, and so does "galego"/"castellano" to change language.
+
+### 13.5 The files
+
+New tables in `api/_lib/db.js` (already shown in 5.3): `wa_chats` (one row per client) and `wa_mensajes` (history).
+
+`api/_lib/citas.js` — booking rules shared by the website and the bot:
+
+File: `web-profesional/api/_lib/citas.js`
+
+```js
+/* =============================================================
+   Guardar citas de clientes (lo usan la web y el bot de WhatsApp)
+   Así las dos entradas siguen exactamente las mismas reglas.
+   ============================================================= */
+import { query } from './db.js';
+import { hoyMadrid } from './horario.js';
+
+export const MODALIDADES = ['Videollamada', 'Llamada de teléfono', 'En persona (solo A Coruña ciudad)'];
+export const MAX_CITAS_POR_TELEFONO = 2; // citas futuras activas a la vez (frena reservas en masa)
+
+/** Mismo número aunque se escriba distinto (+34 600…, 600-…): se comparan los 9 últimos dígitos */
+export const ultimos9 = telefono => String(telefono).replace(/\D/g, '').slice(-9);
+
+const COINCIDE_TELEFONO = `right(regexp_replace(telefono, '[^0-9]', '', 'g'), 9) = $1`;
+
+/** Citas activas de hoy en adelante de un teléfono */
+export async function citasActivasDe(telefono) {
+  const { rows } = await query(
+    `SELECT id, to_char(fecha, 'YYYY-MM-DD') AS fecha, to_char(hora, 'HH24:MI') AS hora, modalidad, estado
+       FROM citas WHERE ${COINCIDE_TELEFONO} AND estado <> 'cancelada' AND fecha >= $2
+      ORDER BY fecha, hora`,
+    [ultimos9(telefono), hoyMadrid()]
+  );
+  return rows;
+}
+
+/** El cliente anula su propia cita (solo si el teléfono coincide) */
+export async function anularCitaDe(id, telefono) {
+  const { rowCount } = await query(
+    `UPDATE citas SET estado = 'cancelada' WHERE id = $2 AND ${COINCIDE_TELEFONO} AND estado <> 'cancelada'`,
+    [ultimos9(telefono), id]
+  );
+  return rowCount > 0;
+}
+
+/** Guarda una cita YA VALIDADA (fecha, hora, modalidad…).
+    Devuelve { estado: 201, id } o { estado: 409 | 429, motivo } */
+export async function guardarCita(d, origen = 'web') {
+  const bloqueado = await query('SELECT 1 FROM bloqueos WHERE fecha = $1 AND hora = $2', [d.fecha, d.hora]);
+  if (bloqueado.rowCount) return { estado: 409, motivo: 'ocupada' };
+
+  if ((await citasActivasDe(d.telefono)).length >= MAX_CITAS_POR_TELEFONO) return { estado: 429, motivo: 'limite' };
+
+  try {
+    const { rows: [cita] } = await query(
+      `INSERT INTO citas (fecha, hora, modalidad, nombre, negocio, telefono, email, nota, origen)
+       VALUES ($1, $2, $3, $4, NULLIF($5, ''), $6, NULLIF($7, ''), NULLIF($8, ''), $9)
+       RETURNING id`,
+      [d.fecha, d.hora, d.modalidad, d.nombre, d.negocio || '', d.telefono, d.email || '', d.nota || '', origen]
+    );
+    return { estado: 201, id: cita.id };
+  } catch (e) {
+    // 23505 = la regla "una cita por hora" de la base de datos ha saltado
+    if (e.code === '23505') return { estado: 409, motivo: 'recien_ocupada' };
+    throw e;
+  }
+}
+```
+
+`api/_lib/negocio.js` — the business data the bot uses (⚠ prices are also in `index.html`):
+
+File: `web-profesional/api/_lib/negocio.js`
+
+```js
+/* =============================================================
+   Datos del negocio que usa el bot de WhatsApp.
+   ⚠ Los precios también están en index.html (const SERVICES y PACK):
+   si cambias uno, cambia el otro.
+   ============================================================= */
+export const WEB = 'https://lagoa-webs.vercel.app';
+export const PRIVACIDAD = `${WEB}/#privacidad`;
+
+export const SERVICIOS = [
+  { id: 'web', es: 'Web con galería y reservas', gl: 'Web con galería e reservas', precio: 290, mes: 15, plazo: { es: '3-4 semanas', gl: '3-4 semanas' } },
+  { id: 'wa', es: 'Asistente de WhatsApp', gl: 'Asistente de WhatsApp', precio: 190, mes: 19, plazo: { es: '2-3 semanas', gl: '2-3 semanas' } },
+  { id: 'shop', es: 'Tienda online pequeña', gl: 'Tenda online pequena', precio: 390, mes: 19, plazo: { es: '4-6 semanas', gl: '4-6 semanas' } },
+  { id: 'seo', es: 'Google Maps y SEO local', gl: 'Google Maps e SEO local', precio: 120, mes: 0, plazo: { es: '1 semana', gl: '1 semana' } }
+];
+export const PACK = { es: 'Pack Web + WhatsApp', gl: 'Pack Web + WhatsApp', precio: 430, mes: 29, plazo: { es: '5-7 semanas', gl: '5-7 semanas' } };
+
+const euros = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
+export const eur = n => euros.format(n);
+```
+
+`api/_lib/whatsapp.js` — talks to Meta: signature check, converts our simple message format (`{texto}`, `{texto, botones}`, `{texto, lista}`) to Meta's format, sends and saves:
+
+File: `web-profesional/api/_lib/whatsapp.js`
+
+```js
+/* =============================================================
+   Conexión con WhatsApp (WhatsApp Cloud API de Meta)
+   Variables de entorno (en Vercel, nunca en el código):
+     WHATSAPP_TOKEN         token de acceso permanente (usuario del sistema)
+     WHATSAPP_PHONE_ID      "Phone number ID" del número del negocio
+     WHATSAPP_VERIFY_TOKEN  palabra secreta que inventas tú para el webhook
+     WHATSAPP_APP_SECRET    "App secret" de la app de Meta (firma los avisos)
+   Solo usa fetch y crypto, que ya vienen con Node: sin librerías.
+   ============================================================= */
+import crypto from 'node:crypto';
+import { query } from './db.js';
+
+// Versión de la API de Meta. Cada versión dura unos 2 años: cuando Meta
+// avise de que caduca, cambia el número aquí (el formato no suele cambiar).
+const API = process.env.WHATSAPP_API_URL || 'https://graph.facebook.com/v23.0';
+
+export const whatsappConfigurado = () =>
+  Boolean(process.env.WHATSAPP_TOKEN && process.env.WHATSAPP_PHONE_ID &&
+          process.env.WHATSAPP_VERIFY_TOKEN && process.env.WHATSAPP_APP_SECRET);
+
+/** Meta firma cada aviso con el App secret: así sabemos que viene de Meta y no de cualquiera */
+export function firmaValida(crudo, cabecera) {
+  const secreto = process.env.WHATSAPP_APP_SECRET;
+  if (!secreto || typeof cabecera !== 'string' || !cabecera.startsWith('sha256=')) return false;
+  const esperada = Buffer.from('sha256=' + crypto.createHmac('sha256', secreto).update(crudo).digest('hex'));
+  const recibida = Buffer.from(cabecera);
+  return esperada.length === recibida.length && crypto.timingSafeEqual(esperada, recibida);
+}
+
+/* WhatsApp limita el largo de cada parte de un mensaje interactivo.
+   Si nos pasamos, rechaza el mensaje entero: por eso se recorta todo. */
+const corta = (t, n) => (t.length > n ? t.slice(0, n - 1) + '…' : t);
+
+/** Convierte nuestro formato sencillo al formato de la API:
+      { texto }                                   → mensaje normal
+      { texto, botones: [{ id, titulo }] }         → hasta 3 botones
+      { texto, lista: { boton, filas: [{ id, titulo, descripcion }] } } → menú de hasta 10 opciones */
+function aFormatoMeta(para, m) {
+  const base = { messaging_product: 'whatsapp', recipient_type: 'individual', to: para };
+  if (m.botones) {
+    return { ...base, type: 'interactive', interactive: {
+      type: 'button',
+      body: { text: corta(m.texto, 1024) },
+      action: { buttons: m.botones.slice(0, 3).map(b => ({ type: 'reply', reply: { id: b.id, title: corta(b.titulo, 20) } })) }
+    } };
+  }
+  if (m.lista) {
+    return { ...base, type: 'interactive', interactive: {
+      type: 'list',
+      body: { text: corta(m.texto, 1024) },
+      action: {
+        button: corta(m.lista.boton, 20),
+        sections: [{ title: corta(m.lista.seccion || 'Opciones', 24), rows: m.lista.filas.slice(0, 10).map(f => ({
+          id: f.id, title: corta(f.titulo, 24), ...(f.descripcion ? { description: corta(f.descripcion, 72) } : {})
+        })) }]
+      }
+    } };
+  }
+  return { ...base, type: 'text', text: { body: corta(m.texto, 4096), preview_url: false } };
+}
+
+/** Texto que se guarda en el historial (lo que verá Nadia en el panel) */
+function textoHistorial(m) {
+  if (m.botones) return `${m.texto}\n[${m.botones.map(b => b.titulo).join('] [')}]`;
+  if (m.lista) return `${m.texto}\n[${m.lista.boton}: ${m.lista.filas.map(f => f.titulo).join(', ')}]`;
+  return m.texto;
+}
+
+/** Envía un mensaje y lo guarda en el historial. autor: 'bot' o 'nadia' */
+export async function enviarWhatsApp(para, mensaje, autor = 'bot') {
+  let r;
+  try {
+    r = await fetch(`${API}/${process.env.WHATSAPP_PHONE_ID}/messages`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${process.env.WHATSAPP_TOKEN}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(aFormatoMeta(para, mensaje)),
+      signal: AbortSignal.timeout(8000) // si Meta no responde, no esperar eternamente
+    });
+  } catch (e) {
+    throw Object.assign(new Error('No se ha podido conectar con WhatsApp.'), { code: 'WA_API' });
+  }
+  const datos = await r.json().catch(() => ({}));
+  if (!r.ok) {
+    const e = new Error(datos.error?.message || `WhatsApp respondió ${r.status}`);
+    e.code = 'WA_API';
+    e.waCode = datos.error?.code; // 131047 = han pasado más de 24 h desde el último mensaje del cliente
+    throw e;
+  }
+  await query('INSERT INTO wa_mensajes (telefono, autor, texto, wa_id) VALUES ($1, $2, $3, $4)',
+    [para, autor, textoHistorial(mensaje), datos.messages?.[0]?.id || null]);
+  return datos;
+}
+```
+
+`api/_lib/bot.js` — the brain: texts in Spanish and Galician (`T`), keywords (`CLAVES`), menu, booking steps, "my bookings":
+
+| Function | What it does |
+|---|---|
+| `temaDe(text)` | Normalises the text (lower case, no accents, ñ→n) and returns the first topic whose keyword appears. **Order matters**: specific topics first |
+| `pareceGallego(text)` | Guesses Galician from the first message, to answer in the client's language |
+| `menu(L)` | The "Ver opciones" list with the 7 topics |
+| `despues(L, text)` | An answer with the 3 standard buttons (Reservar / Menú / Hablar con Nadia) |
+| `diasLibres()` | Free slots for the next 14 days, with the same rules as the website (`huecoReservable` + bookings + blocks) |
+| `preguntarDia`, `preguntarHora` | Send the day list / hour list (or say there's nothing free) |
+| `resumen(L, data)` | Summary with Confirmar / Cambiar hora / Cancelar and the privacy link |
+| `misCitas(L, phone)` | Lists the client's future bookings with a Cancel button for each |
+| `tema(name, chat, L)` | Answers one topic of the menu |
+| `saludo(lang, name)` | Greeting for the first message of a new client |
+| `responder(chat, input)` | **Entry point**: decides the answer from the input and the current `paso`, returns `{mensajes, paso, datos, idioma, humano}` |
+
+File: `web-profesional/api/_lib/bot.js`
+
+```js
+/* =============================================================
+   Cerebro del bot de WhatsApp
+   Recibe lo que ha escrito el cliente y el punto de la conversación
+   en el que está (paso + datos) y decide qué contestar.
+
+   responder(chat, entrada) → { mensajes, paso, datos, idioma, humano }
+     chat:    { telefono, nombre, idioma, paso, datos }
+     entrada: { tipo: 'texto', texto } | { tipo: 'opcion', id, texto } | { tipo: 'otro' }
+
+   Los pasos de una reserva: modalidad → dia → hora → nombre → negocio → confirmar
+   ============================================================= */
+import { query } from './db.js';
+import { DIAS_VISTA, hoyMadrid, sumarDias, horasDelDia, huecoReservable } from './horario.js';
+import { MODALIDADES, MAX_CITAS_POR_TELEFONO, guardarCita, citasActivasDe, anularCitaDe } from './citas.js';
+import { SERVICIOS, PACK, PRIVACIDAD, eur } from './negocio.js';
+
+/* ---------- Textos (castellano y gallego) ---------- */
+const T = {
+  es: {
+    hola: n => `¡Hola${n ? ', ' + n : ''}! Soy el asistente de *Lagoa · Estudio digital*. Te respondo al momento sobre servicios, tarifas y plazos, y puedo reservarte una consulta rápida sin compromiso con Nadia.`,
+    menuTexto: '¿En qué puedo ayudarte? Toca *Ver opciones*.',
+    menuBoton: 'Ver opciones',
+    menu: {
+      servicios: ['Servicios', 'Qué hago y para quién'],
+      precios: ['Tarifas', 'Precios cerrados, IVA incluido'],
+      plazos: ['Plazos', 'Cuánto se tarda'],
+      mantenimiento: ['Mantenimiento', 'Cuotas mensuales opcionales'],
+      reservar: ['Reservar consulta', 'Gratis y sin compromiso'],
+      miscitas: ['Mis citas', 'Ver o cancelar tus citas'],
+      nadia: ['Hablar con Nadia', 'Te responde ella en persona']
+    },
+    b: { menu: 'Menú', reservar: 'Reservar consulta', nadia: 'Hablar con Nadia', confirmar: 'Confirmar', cambiar: 'Cambiar hora', cancelar: 'Cancelar', saltar: 'Saltar', si: 'Sí, cancelarla', no: 'No', soy: n => `Soy ${n}`, dias: 'Ver días', horas: 'Ver horas', otroDia: '« Otro día', libres: n => `${n} ${n === 1 ? 'hora libre' : 'horas libres'}`, anular: f => `Cancelar ${f}` },
+    servicios: () => `Ayudo a negocios en crecimiento de A Coruña a estar en internet sin complicaciones:\n\n${SERVICIOS.map(s => `• *${s.es}*: ${eur(s.precio)}`).join('\n')}\n• *${PACK.es}*: ${eur(PACK.precio)}\n\nTambién cosas a medida: panel de ventas y stock, facturas automáticas, tarjeta de fidelización y mucho más.`,
+    precios: () => `Tarifas fijas de lanzamiento, pago único, *IVA incluido*:\n\n${SERVICIOS.map(s => `• ${s.es}: ${eur(s.precio)}`).join('\n')}\n• ${PACK.es}: ${eur(PACK.precio)}\n\nEl mantenimiento mensual es opcional (escribe *mantenimiento* para verlo).`,
+    plazos: () => `Plazos orientativos:\n\n${[...SERVICIOS, PACK].map(s => `• ${s.es}: ${s.plazo.es}`).join('\n')}\n\nEmpiezan a contar cuando Nadia tiene tus textos y fotos.`,
+    mantenimiento: () => `El mantenimiento es *opcional* y se puede cancelar cuando quieras (IVA incluido):\n\n${[...SERVICIOS.filter(s => s.mes), PACK].map(s => `• ${s.es}: ${eur(s.mes)}/mes`).join('\n')}\n\nIncluye copias de seguridad, revisión y parches en caso de error, cambios pequeños ilimitados y soporte por WhatsApp o email.`,
+    zona: () => 'Nadia trabaja con negocios de A Coruña. Si el tuyo está en otra zona, escríbele y valorará tu caso.',
+    iva: () => 'Todos los precios ya incluyen el IVA (21 %).',
+    pago: () => 'Las condiciones de pago las explica Nadia personalmente. Toca *Hablar con Nadia* y te responderá ella.',
+    gracias: () => '¡Gracias a ti! Si necesitas algo más, aquí estoy.',
+    noEntiendo: 'No estoy seguro de haberte entendido. Puedes elegir una opción del menú o hablar directamente con Nadia.',
+    soloTexto: 'Por ahora solo puedo leer mensajes de texto. Si quieres enviar audios o fotos, toca *Hablar con Nadia*.',
+    nadia: 'Perfecto. He avisado a Nadia y te responderá *personalmente por aquí* en cuanto pueda (normalmente el mismo día).\n\nMientras tanto el asistente queda en pausa. Si quieres volver a usarlo, escribe *menú*.',
+    modalidad: '¡Genial! La consulta rápida es *gratis y sin compromiso* (unos 20 minutos) para ver tu negocio y lo que más tiempo te quita.\n\n¿Cómo la prefieres? (En persona solo en A Coruña ciudad.)',
+    modos: ['Videollamada', 'Llamada', 'En persona'],
+    elegirDia: '¿Qué día te viene bien? Toca *Ver días*.',
+    elegirHora: f => `Horas libres el *${f}* (hora de España). Toca *Ver horas*.`,
+    sinHuecos: 'Ahora mismo no quedan horas libres en las próximas dos semanas. Escribe a Nadia y buscaréis un hueco.',
+    horaOcupada: 'Vaya, esa hora se acaba de ocupar. Elige otra, por favor.',
+    nombre: '¿A nombre de quién apunto la cita? Escribe tu nombre.',
+    nombreMal: 'Escribe tu nombre, por favor (solo texto).',
+    negocio: '¿Cómo se llama tu negocio? Si prefieres no decirlo, toca *Saltar*.',
+    resumen: d => `Revisa tu cita:\n\n📅 *${d.fechaTexto}* a las *${d.hora}*\n💬 ${d.modalidad}\n👤 ${d.nombre}${d.negocio ? `\n🏪 ${d.negocio}` : ''}\n\nAl confirmar aceptas la política de privacidad: ${PRIVACIDAD}`,
+    hecho: d => `¡Listo! Tu solicitud para el *${d.fechaTexto}* a las *${d.hora}* está guardada. Nadia te la confirmará por aquí. ¡Gracias!`,
+    limite: `Ya tienes ${MAX_CITAS_POR_TELEFONO} citas pendientes con este número. Si necesitas otra, habla con Nadia.`,
+    cancelado: 'De acuerdo, no he guardado nada.',
+    sinCitas: 'No tienes citas próximas con este número.',
+    tusCitas: c => `Tus próximas citas:\n\n${c.join('\n')}`,
+    estado: { pendiente: 'pendiente de confirmar', confirmada: 'confirmada' },
+    anularPregunta: f => `¿Seguro que quieres cancelar tu cita del *${f}*?`,
+    anulada: 'Hecho: tu cita está cancelada y la hora queda libre. Si quieres otra, toca *Reservar consulta*.',
+    noAnulada: 'No he encontrado esa cita (puede que ya estuviera cancelada).',
+    usaBotones: 'Elige una de las opciones tocando el botón, o escribe *cancelar* para salir.',
+    fmt: new Intl.DateTimeFormat('es-ES', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' }),
+    fmtMedio: new Intl.DateTimeFormat('es-ES', { weekday: 'long', day: 'numeric', month: 'short', timeZone: 'UTC' }),
+    fmtCorto: new Intl.DateTimeFormat('es-ES', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' })
+  },
+  gl: {
+    hola: n => `Ola${n ? ', ' + n : ''}! Son o asistente de *Lagoa · Estudio dixital*. Respóndoche ao momento sobre servizos, tarifas e prazos, e podo reservarche unha consulta rápida sen compromiso con Nadia.`,
+    menuTexto: 'En que podo axudarche? Toca *Ver opcións*.',
+    menuBoton: 'Ver opcións',
+    menu: {
+      servicios: ['Servizos', 'Que fago e para quen'],
+      precios: ['Tarifas', 'Prezos pechados, IVE incluído'],
+      plazos: ['Prazos', 'Canto se tarda'],
+      mantenimiento: ['Mantemento', 'Cotas mensuais opcionais'],
+      reservar: ['Reservar consulta', 'De balde e sen compromiso'],
+      miscitas: ['As miñas citas', 'Ver ou cancelar as túas citas'],
+      nadia: ['Falar con Nadia', 'Respóndeche ela en persoa']
+    },
+    b: { menu: 'Menú', reservar: 'Reservar consulta', nadia: 'Falar con Nadia', confirmar: 'Confirmar', cambiar: 'Cambiar hora', cancelar: 'Cancelar', saltar: 'Saltar', si: 'Si, cancelala', no: 'Non', soy: n => `Son ${n}`, dias: 'Ver días', horas: 'Ver horas', otroDia: '« Outro día', libres: n => `${n} ${n === 1 ? 'hora libre' : 'horas libres'}`, anular: f => `Cancelar ${f}` },
+    servicios: () => `Axudo a negocios en crecemento da Coruña a estar en internet sen complicacións:\n\n${SERVICIOS.map(s => `• *${s.gl}*: ${eur(s.precio)}`).join('\n')}\n• *${PACK.gl}*: ${eur(PACK.precio)}\n\nTamén cousas a medida: panel de vendas e stock, facturas automáticas, tarxeta de fidelización e moito máis.`,
+    precios: () => `Tarifas fixas de lanzamento, pagamento único, *IVE incluído*:\n\n${SERVICIOS.map(s => `• ${s.gl}: ${eur(s.precio)}`).join('\n')}\n• ${PACK.gl}: ${eur(PACK.precio)}\n\nO mantemento mensual é opcional (escribe *mantemento* para velo).`,
+    plazos: () => `Prazos orientativos:\n\n${[...SERVICIOS, PACK].map(s => `• ${s.gl}: ${s.plazo.gl}`).join('\n')}\n\nComezan a contar cando Nadia ten os teus textos e fotos.`,
+    mantenimiento: () => `O mantemento é *opcional* e pódese cancelar cando queiras (IVE incluído):\n\n${[...SERVICIOS.filter(s => s.mes), PACK].map(s => `• ${s.gl}: ${eur(s.mes)}/mes`).join('\n')}\n\nInclúe copias de seguridade, revisión e parches en caso de erro, cambios pequenos ilimitados e soporte por WhatsApp ou email.`,
+    zona: () => 'Nadia traballa con negocios da Coruña. Se o teu está noutra zona, escríbelle e valorará o teu caso.',
+    iva: () => 'Todos os prezos xa inclúen o IVE (21 %).',
+    pago: () => 'As condicións de pagamento explícaas Nadia persoalmente. Toca *Falar con Nadia* e responderache ela.',
+    gracias: () => 'Grazas a ti! Se precisas algo máis, aquí estou.',
+    noEntiendo: 'Non estou seguro de entenderte. Podes escoller unha opción do menú ou falar directamente con Nadia.',
+    soloTexto: 'Polo de agora só podo ler mensaxes de texto. Se queres enviar audios ou fotos, toca *Falar con Nadia*.',
+    nadia: 'Perfecto. Aviseille a Nadia e responderache *persoalmente por aquí* en canto poida (normalmente o mesmo día).\n\nMentres tanto o asistente queda en pausa. Se queres volver usalo, escribe *menú*.',
+    modalidad: 'Xenial! A consulta rápida é *de balde e sen compromiso* (uns 20 minutos) para ver o teu negocio e o que máis tempo che quita.\n\nComo a prefires? (En persoa só na cidade da Coruña.)',
+    modos: ['Videochamada', 'Chamada', 'En persoa'],
+    elegirDia: 'Que día che vén ben? Toca *Ver días*.',
+    elegirHora: f => `Horas libres o *${f}* (hora de España). Toca *Ver horas*.`,
+    sinHuecos: 'Agora mesmo non quedan horas libres nas próximas dúas semanas. Escríbelle a Nadia e buscaredes un oco.',
+    horaOcupada: 'Vaia, esa hora acaba de ocuparse. Escolle outra, por favor.',
+    nombre: 'A nome de quen apunto a cita? Escribe o teu nome.',
+    nombreMal: 'Escribe o teu nome, por favor (só texto).',
+    negocio: 'Como se chama o teu negocio? Se prefires non dicilo, toca *Saltar*.',
+    resumen: d => `Revisa a túa cita:\n\n📅 *${d.fechaTexto}* ás *${d.hora}*\n💬 ${d.modalidad}\n👤 ${d.nombre}${d.negocio ? `\n🏪 ${d.negocio}` : ''}\n\nAo confirmar aceptas a política de privacidade: ${PRIVACIDAD}`,
+    hecho: d => `Listo! A túa solicitude para o *${d.fechaTexto}* ás *${d.hora}* está gardada. Nadia confirmarácha por aquí. Grazas!`,
+    limite: `Xa tes ${MAX_CITAS_POR_TELEFONO} citas pendentes con este número. Se precisas outra, fala con Nadia.`,
+    cancelado: 'De acordo, non gardei nada.',
+    sinCitas: 'Non tes citas próximas con este número.',
+    tusCitas: c => `As túas próximas citas:\n\n${c.join('\n')}`,
+    estado: { pendiente: 'pendente de confirmar', confirmada: 'confirmada' },
+    anularPregunta: f => `Seguro que queres cancelar a túa cita do *${f}*?`,
+    anulada: 'Feito: a túa cita está cancelada e a hora queda libre. Se queres outra, toca *Reservar consulta*.',
+    noAnulada: 'Non atopei esa cita (pode que xa estivese cancelada).',
+    usaBotones: 'Escolle unha das opcións tocando o botón, ou escribe *cancelar* para saír.',
+    fmt: new Intl.DateTimeFormat('gl-ES', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' }),
+    fmtMedio: new Intl.DateTimeFormat('gl-ES', { weekday: 'long', day: 'numeric', month: 'short', timeZone: 'UTC' }),
+    fmtCorto: new Intl.DateTimeFormat('gl-ES', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' })
+  }
+};
+
+/* ---------- Palabras clave para entender texto libre ----------
+   El orden importa: se elige el PRIMER tema que coincida. */
+const CLAVES = [
+  ['nadia', ['hablar con', 'falar con', 'una persona', 'unha persoa', 'humano', 'llamame', 'chamame']],
+  ['miscitas', ['mis citas', 'mi cita', 'as minas citas', 'a mina cita', 'anular']],
+  ['cancelar', ['cancelar', 'salir', 'sair', 'parar']],
+  ['menu', ['menu', 'inicio', 'opciones', 'opcions', 'volver']],
+  ['reservar', ['reserv', 'consulta rapida', 'cita', 'quedar', 'reunion', 'cafe']],
+  ['iva', ['iva', 'ive', 'impuesto', 'imposto']],
+  ['mantenimiento', ['mantenimiento', 'mantemento', 'cuota', 'cota', 'mensual', 'al mes', 'ao mes']],
+  ['plazos', ['plazo', 'prazo', 'cuanto tarda', 'canto tarda', 'semanas', 'cuanto tiempo', 'canto tempo']],
+  ['pago', ['pagar', 'pago', 'pagamento', 'financ', 'fraccion', 'factura']],
+  ['precios', ['precio', 'prezo', 'cuesta', 'custa', 'cuanto vale', 'canto vale', 'tarifa', 'coste', 'custo', 'presupuesto', 'orzamento', 'euros']],
+  ['servicios', ['servicio', 'servizo', 'que haces', 'que fas', 'ofreces', 'web', 'tienda', 'tenda', 'google', 'whatsapp', 'seo']],
+  ['zona', ['zona', 'donde', 'onde', 'coruna', 'ciudad', 'cidade']],
+  ['gracias', ['gracias', 'grazas']],
+  ['hola', ['hola', 'ola', 'buenas', 'boas', 'buenos dias', 'bos dias']]
+];
+const normaliza = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ñ/g, 'n').trim();
+export function temaDe(texto) {
+  const q = normaliza(texto);
+  if (/^(galego|en galego)$/.test(q)) return 'idioma:gl';
+  if (/^(castellano|espanol|en castellano)$/.test(q)) return 'idioma:es';
+  const hit = CLAVES.find(([, palabras]) => palabras.some(p => q.includes(p)));
+  return hit ? hit[0] : null;
+}
+/** ¿El primer mensaje está en gallego? (para contestar en su idioma) */
+export const pareceGallego = texto => /\b(ola|boas|bos dias|grazas|queria|teno|tes|canto|prezo)\b/.test(normaliza(texto));
+
+/* ---------- Mensajes reutilizables ---------- */
+const btn = (id, titulo) => ({ id, titulo });
+const t = idioma => T[idioma] || T.es;
+
+function menu(L) {
+  return {
+    texto: L.menuTexto,
+    lista: {
+      boton: L.menuBoton, seccion: 'Lagoa',
+      filas: Object.entries(L.menu).map(([id, [titulo, descripcion]]) => ({ id: `tema:${id}`, titulo, descripcion }))
+    }
+  };
+}
+const despues = (L, texto) => ({ texto, botones: [btn('tema:reservar', L.b.reservar), btn('tema:menu', L.b.menu), btn('tema:nadia', L.b.nadia)] });
+
+/* ---------- Huecos libres (mismas reglas que la web) ---------- */
+async function diasLibres() {
+  const hoy = hoyMadrid();
+  const hasta = sumarDias(hoy, DIAS_VISTA);
+  const { rows } = await query(
+    `SELECT to_char(fecha, 'YYYY-MM-DD') || ' ' || to_char(hora, 'HH24:MI') AS k
+       FROM citas WHERE estado <> 'cancelada' AND fecha BETWEEN $1 AND $2
+     UNION
+     SELECT to_char(fecha, 'YYYY-MM-DD') || ' ' || to_char(hora, 'HH24:MI')
+       FROM bloqueos WHERE fecha BETWEEN $1 AND $2`, [hoy, hasta]);
+  const ocupados = new Set(rows.map(r => r.k));
+  const dias = [];
+  for (let i = 0; i <= DIAS_VISTA; i++) {
+    const fecha = sumarDias(hoy, i);
+    const horas = horasDelDia(fecha).filter(h => huecoReservable(fecha, h) && !ocupados.has(`${fecha} ${h}`));
+    if (horas.length) dias.push({ fecha, horas });
+  }
+  return dias;
+}
+
+const fechaLarga = (L, f) => { const s = L.fmt.format(new Date(f + 'T00:00:00Z')); return s.charAt(0).toUpperCase() + s.slice(1); };
+const fechaCorta = (L, f) => L.fmtCorto.format(new Date(f + 'T00:00:00Z')).replace(/[.,]/g, '');
+const fechaMedia = (L, f) => { const s = L.fmtMedio.format(new Date(f + 'T00:00:00Z')).replace(/\./g, ''); return s.charAt(0).toUpperCase() + s.slice(1); };
+
+async function preguntarDia(L, datos, aviso) {
+  const dias = (await diasLibres()).slice(0, 10); // WhatsApp admite 10 opciones por lista
+  if (!dias.length) return { mensajes: [{ texto: L.sinHuecos, botones: [btn('tema:nadia', L.b.nadia), btn('tema:menu', L.b.menu)] }], paso: null, datos: {} };
+  const mensajes = aviso ? [{ texto: aviso }] : [];
+  mensajes.push({ texto: L.elegirDia, lista: { boton: L.b.dias, seccion: 'Días', filas: dias.map(d => ({ id: `dia:${d.fecha}`, titulo: fechaMedia(L, d.fecha), descripcion: L.b.libres(d.horas.length) })) } });
+  return { mensajes, paso: 'dia', datos };
+}
+
+async function preguntarHora(L, datos, aviso) {
+  const dia = (await diasLibres()).find(d => d.fecha === datos.fecha);
+  if (!dia) return preguntarDia(L, datos, L.horaOcupada);
+  const mensajes = aviso ? [{ texto: aviso }] : [];
+  mensajes.push({ texto: L.elegirHora(fechaLarga(L, datos.fecha)), lista: { boton: L.b.horas, seccion: 'Horas', filas: [
+    ...dia.horas.map(h => ({ id: `hora:${h}`, titulo: h })),
+    { id: 'volver:dia', titulo: L.b.otroDia }
+  ] } });
+  return { mensajes, paso: 'hora', datos };
+}
+
+function resumen(L, d) {
+  return { texto: L.resumen({ ...d, fechaTexto: fechaLarga(L, d.fecha) }), botones: [btn('ok', L.b.confirmar), btn('volver:dia', L.b.cambiar), btn('tema:cancelar', L.b.cancelar)] };
+}
+
+async function misCitas(L, telefono) {
+  const citas = await citasActivasDe(telefono);
+  if (!citas.length) return { mensajes: [{ texto: L.sinCitas, botones: [btn('tema:reservar', L.b.reservar), btn('tema:menu', L.b.menu)] }], paso: null, datos: {} };
+  const lineas = citas.map(c => `• *${fechaLarga(L, c.fecha)}* a las ${c.hora} · ${c.modalidad} (${L.estado[c.estado]})`);
+  const botones = citas.slice(0, 2).map(c => btn(`anular:${c.id}`, L.b.anular(fechaCorta(L, c.fecha))));
+  return { mensajes: [{ texto: L.tusCitas(lineas), botones: [...botones, btn('tema:menu', L.b.menu)] }], paso: null, datos: {} };
+}
+
+/* ---------- Temas del menú ---------- */
+async function tema(nombre, chat, L) {
+  const info = { servicios: L.servicios, precios: L.precios, plazos: L.plazos, mantenimiento: L.mantenimiento, zona: L.zona, iva: L.iva, gracias: L.gracias };
+  if (info[nombre]) return { mensajes: [despues(L, info[nombre]())], paso: null, datos: {} };
+  switch (nombre) {
+    case 'menu': return { mensajes: [menu(L)], paso: null, datos: {} };
+    case 'hola': return { mensajes: [{ texto: L.hola(chat.nombre) }, menu(L)], paso: null, datos: {} };
+    case 'pago': return { mensajes: [{ texto: L.pago(), botones: [btn('tema:nadia', L.b.nadia), btn('tema:menu', L.b.menu)] }], paso: null, datos: {} };
+    case 'nadia': return { mensajes: [{ texto: L.nadia }], paso: null, datos: {}, humano: true };
+    case 'cancelar': return { mensajes: [{ texto: L.cancelado, botones: [btn('tema:menu', L.b.menu)] }], paso: null, datos: {} };
+    case 'miscitas': return misCitas(L, chat.telefono);
+    case 'reservar':
+      if ((await citasActivasDe(chat.telefono)).length >= MAX_CITAS_POR_TELEFONO) {
+        return { mensajes: [{ texto: L.limite, botones: [btn('tema:miscitas', L.menu.miscitas[0]), btn('tema:nadia', L.b.nadia)] }], paso: null, datos: {} };
+      }
+      return { mensajes: [{ texto: L.modalidad, botones: L.modos.map((m, i) => btn(`mod:${i}`, m)) }], paso: 'modalidad', datos: {} };
+  }
+  return { mensajes: [{ texto: L.noEntiendo, botones: [btn('tema:menu', L.b.menu), btn('tema:nadia', L.b.nadia)] }], paso: null, datos: {} };
+}
+
+/** Saludo para el primer mensaje de un cliente nuevo */
+export const saludo = (idioma, nombre) => ({ texto: t(idioma).hola(nombre) });
+
+/* ---------- Punto de entrada ---------- */
+export async function responder(chat, entrada) {
+  let idioma = chat.idioma || 'es';
+  const datos = { ...(chat.datos || {}) };
+  const id = entrada.tipo === 'opcion' ? entrada.id : '';
+  const texto = entrada.tipo === 'texto' ? String(entrada.texto || '').trim() : '';
+  const fin = r => ({ idioma, paso: null, datos: {}, humano: false, ...r });
+
+  // Audios, fotos, ubicaciones… el bot no los entiende
+  if (entrada.tipo === 'otro') {
+    const L = t(idioma);
+    return fin({ mensajes: [{ texto: L.soloTexto, botones: [btn('tema:nadia', L.b.nadia), btn('tema:menu', L.b.menu)] }], paso: chat.paso, datos });
+  }
+
+  // Cambiar de idioma en cualquier momento
+  const temaTexto = texto ? temaDe(texto) : null;
+  if (temaTexto?.startsWith('idioma:')) {
+    idioma = temaTexto.slice(7);
+    return fin({ mensajes: [menu(t(idioma))] });
+  }
+  const L = t(idioma);
+
+  // Botones y listas: el id dice exactamente qué ha elegido
+  if (id.startsWith('tema:')) return fin(await tema(id.slice(5), chat, L));
+  if (id.startsWith('anular:')) {
+    const n = Number(id.slice(7));
+    const cita = (await citasActivasDe(chat.telefono)).find(c => c.id === n);
+    if (!cita) return fin({ mensajes: [{ texto: L.noAnulada, botones: [btn('tema:menu', L.b.menu)] }] });
+    return fin({ mensajes: [{ texto: L.anularPregunta(`${fechaLarga(L, cita.fecha)} ${cita.hora}`), botones: [btn(`anularok:${n}`, L.b.si), btn('tema:miscitas', L.b.no)] }] });
+  }
+  if (id.startsWith('anularok:')) {
+    const ok = await anularCitaDe(Number(id.slice(9)), chat.telefono);
+    return fin({ mensajes: [{ texto: ok ? L.anulada : L.noAnulada, botones: [btn('tema:reservar', L.b.reservar), btn('tema:menu', L.b.menu)] }] });
+  }
+
+  // Palabras que funcionan en cualquier paso: cancelar, menú, hablar con Nadia
+  if (['cancelar', 'menu', 'nadia'].includes(temaTexto)) return fin(await tema(temaTexto, chat, L));
+
+  // ¿Está a mitad de una reserva?
+  switch (chat.paso) {
+    case 'modalidad': {
+      const m = id.match(/^mod:(\d)$/);
+      if (!m) return fin({ mensajes: [{ texto: L.usaBotones, botones: L.modos.map((x, i) => btn(`mod:${i}`, x)) }], paso: 'modalidad', datos });
+      datos.modalidad = MODALIDADES[Number(m[1])];
+      return fin(await preguntarDia(L, datos));
+    }
+    case 'dia': {
+      const m = id.match(/^dia:(\d{4}-\d{2}-\d{2})$/);
+      if (!m) return fin(await preguntarDia(L, datos, L.usaBotones));
+      datos.fecha = m[1];
+      return fin(await preguntarHora(L, datos));
+    }
+    case 'hora': {
+      if (id === 'volver:dia') return fin(await preguntarDia(L, datos));
+      const m = id.match(/^hora:(\d{2}:\d{2})$/);
+      if (!m) return fin(await preguntarHora(L, datos, L.usaBotones));
+      const dia = (await diasLibres()).find(d => d.fecha === datos.fecha);
+      if (!dia || !dia.horas.includes(m[1])) return fin(await preguntarHora(L, datos, L.horaOcupada));
+      datos.hora = m[1];
+      const botones = chat.nombre ? [btn('nombre:perfil', L.b.soy(chat.nombre))] : null;
+      return fin({ mensajes: [botones ? { texto: L.nombre, botones } : { texto: L.nombre }], paso: 'nombre', datos });
+    }
+    case 'nombre': {
+      const nombre = id === 'nombre:perfil' ? chat.nombre : texto;
+      if (!nombre || nombre.length > 100) return fin({ mensajes: [{ texto: L.nombreMal }], paso: 'nombre', datos });
+      datos.nombre = nombre;
+      return fin({ mensajes: [{ texto: L.negocio, botones: [btn('negocio:no', L.b.saltar)] }], paso: 'negocio', datos });
+    }
+    case 'negocio': {
+      datos.negocio = id === 'negocio:no' ? '' : texto.slice(0, 120);
+      if (id !== 'negocio:no' && !texto) return fin({ mensajes: [{ texto: L.negocio, botones: [btn('negocio:no', L.b.saltar)] }], paso: 'negocio', datos });
+      return fin({ mensajes: [resumen(L, datos)], paso: 'confirmar', datos });
+    }
+    case 'confirmar': {
+      if (id === 'volver:dia') return fin(await preguntarDia(L, datos));
+      if (id !== 'ok') return fin({ mensajes: [{ texto: L.usaBotones }, resumen(L, datos)], paso: 'confirmar', datos });
+      if (!huecoReservable(datos.fecha, datos.hora)) return fin(await preguntarDia(L, datos, L.horaOcupada));
+      const r = await guardarCita({ ...datos, telefono: '+' + chat.telefono, nota: 'Reservada por WhatsApp' }, 'whatsapp');
+      if (r.estado === 429) return fin({ mensajes: [{ texto: L.limite, botones: [btn('tema:miscitas', L.menu.miscitas[0]), btn('tema:nadia', L.b.nadia)] }] });
+      if (r.estado !== 201) return fin(await preguntarHora(L, datos, L.horaOcupada));
+      return fin({ mensajes: [{ texto: L.hecho({ ...datos, fechaTexto: fechaLarga(L, datos.fecha) }), botones: [btn('tema:miscitas', L.menu.miscitas[0]), btn('tema:menu', L.b.menu)] }] });
+    }
+  }
+
+  // Sin reserva en marcha: texto libre → buscar el tema por palabras clave
+  if (texto) return fin(await tema(temaTexto || 'desconocido', chat, L));
+  return fin(await tema('menu', chat, L));
+}
+```
+
+`api/whatsapp.js` — the webhook that Meta calls:
+
+File: `web-profesional/api/whatsapp.js`
+
+```js
+/* =============================================================
+   /api/whatsapp  (webhook de WhatsApp — lo llama Meta, no la web)
+   GET  → Meta comprueba que el webhook es tuyo (una sola vez, al configurarlo)
+   POST → Meta avisa de cada mensaje que recibe el número del negocio.
+          Se comprueba la firma, se guarda el mensaje y el bot contesta.
+   ============================================================= */
+import crypto from 'node:crypto';
+import { query } from './_lib/db.js';
+import { cuerpoCrudo, parametros } from './_lib/http.js';
+import { whatsappConfigurado, firmaValida, enviarWhatsApp } from './_lib/whatsapp.js';
+import { responder, temaDe, pareceGallego, saludo } from './_lib/bot.js';
+
+// Para comprobar la firma hace falta el cuerpo EXACTO que envió Meta,
+// así que le pedimos a Vercel que no lo convierta a JSON.
+export const config = { api: { bodyParser: false } };
+
+const HORAS_HUMANO = 24;  // tras "Hablar con Nadia", el bot calla durante este tiempo
+const MINUTOS_PASO = 120; // una reserva a medias se olvida tras 2 horas sin respuesta
+
+export default async function handler(req, res) {
+  if (req.method === 'GET') return verificar(req, res);
+  if (req.method !== 'POST') return responderTexto(res, 405, '');
+  if (!whatsappConfigurado()) return responderTexto(res, 503, 'WhatsApp no configurado');
+
+  const crudo = await cuerpoCrudo(req);
+  if (!firmaValida(crudo, req.headers['x-hub-signature-256'])) return responderTexto(res, 401, 'Firma no válida');
+
+  let aviso;
+  try { aviso = JSON.parse(crudo.toString('utf8')); } catch { return responderTexto(res, 400, ''); }
+
+  for (const entry of aviso.entry || []) {
+    for (const cambio of entry.changes || []) {
+      const v = cambio.value || {};
+      if (v.metadata?.phone_number_id !== process.env.WHATSAPP_PHONE_ID) continue;
+      const nombres = Object.fromEntries((v.contacts || []).map(c => [c.wa_id, c.profile?.name]));
+      // v.statuses (enviado, entregado, leído) llegan también aquí: no los necesitamos
+      for (const m of v.messages || []) {
+        try { await atender(m, nombres[m.from]); } catch (e) { console.error('WhatsApp:', e); }
+      }
+    }
+  }
+  // Siempre 200: si respondemos con error, Meta repite el aviso durante días
+  responderTexto(res, 200, 'ok');
+}
+
+function responderTexto(res, estado, texto) {
+  res.statusCode = estado;
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.end(texto);
+}
+
+/** Meta manda hub.verify_token (tu palabra secreta) y espera que le devolvamos hub.challenge */
+function verificar(req, res) {
+  const p = parametros(req);
+  const esperado = Buffer.from(process.env.WHATSAPP_VERIFY_TOKEN || '');
+  const recibido = Buffer.from(p.get('hub.verify_token') || '');
+  const ok = p.get('hub.mode') === 'subscribe' && esperado.length > 0 &&
+    esperado.length === recibido.length && crypto.timingSafeEqual(esperado, recibido);
+  return ok ? responderTexto(res, 200, p.get('hub.challenge') || '') : responderTexto(res, 403, 'Token incorrecto');
+}
+
+/** Traduce el mensaje de Meta a algo sencillo para el bot */
+function leerEntrada(m) {
+  if (m.type === 'text') return { tipo: 'texto', texto: m.text?.body || '' };
+  if (m.type === 'interactive') {
+    const r = m.interactive?.button_reply || m.interactive?.list_reply || {};
+    return { tipo: 'opcion', id: r.id || '', texto: r.title || '' };
+  }
+  if (m.type === 'button') return { tipo: 'texto', texto: m.button?.text || '' };
+  return { tipo: 'otro' };
+}
+
+async function atender(m, nombrePerfil) {
+  const telefono = m.from;
+  const entrada = leerEntrada(m);
+
+  // 1. Guardar el mensaje. Si ya existía, Meta lo está repitiendo: no se contesta dos veces.
+  const nuevo = await query(
+    `INSERT INTO wa_mensajes (telefono, autor, texto, wa_id) VALUES ($1, 'cliente', $2, $3)
+     ON CONFLICT (wa_id) DO NOTHING RETURNING id`,
+    [telefono, entrada.texto || `[${m.type}]`, m.id]
+  );
+  if (!nuevo.rowCount) return;
+
+  // 2. Crear o actualizar la conversación. (xmax = 0) es true solo si la fila es nueva.
+  const { rows: [chat] } = await query(
+    `INSERT INTO wa_chats (telefono, nombre, idioma, sin_leer, ultimo_entrante)
+     VALUES ($1, $2, $3, 1, now())
+     ON CONFLICT (telefono) DO UPDATE SET
+       nombre = COALESCE(EXCLUDED.nombre, wa_chats.nombre),
+       sin_leer = wa_chats.sin_leer + 1,
+       ultimo_entrante = now()
+     RETURNING *, (xmax = 0) AS es_nuevo`,
+    [telefono, nombrePerfil || null, pareceGallego(entrada.texto) ? 'gl' : 'es']
+  );
+
+  // 3. Si Nadia está atendiendo, el bot calla (salvo que el cliente pida el menú)
+  const enPausa = chat.modo === 'humano' && chat.humano_hasta && new Date(chat.humano_hasta) > new Date();
+  const pideMenu = entrada.id === 'tema:menu' || (entrada.tipo === 'texto' && temaDe(entrada.texto) === 'menu');
+  if (enPausa && !pideMenu) return;
+
+  // 4. Una reserva a medias de hace horas se olvida
+  if (chat.paso && Date.now() - new Date(chat.actualizado).getTime() > MINUTOS_PASO * 60e3) {
+    chat.paso = null;
+    chat.datos = {};
+  }
+
+  // 5. El bot decide qué contestar
+  const r = await responder(chat, entrada);
+  const esSaludo = entrada.tipo === 'texto' && temaDe(entrada.texto) === 'hola';
+  if (chat.es_nuevo && !esSaludo) r.mensajes.unshift(saludo(r.idioma, chat.nombre));
+
+  // 6. Enviar las respuestas en orden y guardar en qué punto se ha quedado
+  for (const mensaje of r.mensajes) await enviarWhatsApp(telefono, mensaje);
+  await query(
+    `UPDATE wa_chats SET paso = $2, datos = $3, idioma = $4,
+       modo = $5, humano_hasta = CASE WHEN $5 = 'humano' THEN now() + make_interval(hours => $6) END,
+       actualizado = now()
+     WHERE telefono = $1`,
+    [telefono, r.paso, JSON.stringify(r.datos || {}), r.idioma, r.humano ? 'humano' : 'bot', HORAS_HUMANO]
+  );
+}
+```
+
+`api/admin/whatsapp.js` — the private API behind the panel's WhatsApp tab:
+
+File: `web-profesional/api/admin/whatsapp.js`
+
+```js
+/* =============================================================
+   /api/admin/whatsapp  (solo con sesión)
+   GET                       → lista de conversaciones
+   GET   ?telefono=34600…    → mensajes de una conversación (y la marca como leída)
+   POST  { telefono, texto } → Nadia contesta (el bot se pausa 24 h en ese chat)
+   PATCH { telefono, modo }  → 'bot' (el bot vuelve a contestar) o 'humano' (pausarlo)
+   ============================================================= */
+import { query } from '../_lib/db.js';
+import { enviar, permitir, cuerpo, esJson, parametros, fallo, texto } from '../_lib/http.js';
+import { sesionActiva } from '../_lib/auth.js';
+import { whatsappConfigurado, enviarWhatsApp } from '../_lib/whatsapp.js';
+
+const DIAS_HISTORIAL = 180; // los mensajes más antiguos se borran (privacidad: no guardar de más)
+const RE_TELEFONO = /^\d{8,15}$/;
+const EN_PAUSA = `(modo = 'humano' AND humano_hasta > now())`;
+const VENTANA_ABIERTA = `(ultimo_entrante > now() - interval '24 hours')`;
+
+export default async function handler(req, res) {
+  if (!permitir(req, res, ['GET', 'POST', 'PATCH'])) return;
+  if (!sesionActiva(req)) return enviar(res, 401, { error: 'Tu sesión ha caducado. Vuelve a entrar.' });
+  if (req.method !== 'GET' && !esJson(req)) return enviar(res, 415, { error: 'Formato no válido.' });
+
+  try {
+    if (req.method === 'GET') {
+      const telefono = parametros(req).get('telefono');
+      return telefono ? await conversacion(res, telefono) : await lista(res);
+    }
+    if (req.method === 'POST') return await contestar(req, res);
+    return await cambiarModo(req, res);
+  } catch (e) {
+    fallo(res, e);
+  }
+}
+
+async function lista(res) {
+  await query(`DELETE FROM wa_mensajes WHERE creado < now() - make_interval(days => $1)`, [DIAS_HISTORIAL]);
+  const { rows } = await query(
+    `SELECT c.telefono, c.nombre, c.sin_leer, ${EN_PAUSA} AS en_pausa, u.texto AS ultimo, u.autor AS ultimo_autor, u.creado AS ultimo_en
+       FROM wa_chats c
+       LEFT JOIN LATERAL (SELECT texto, autor, creado FROM wa_mensajes m
+                           WHERE m.telefono = c.telefono ORDER BY creado DESC, id DESC LIMIT 1) u ON true
+      ORDER BY u.creado DESC NULLS LAST
+      LIMIT 100`);
+  enviar(res, 200, {
+    configurado: whatsappConfigurado(),
+    chats: rows,
+    esperando: rows.filter(c => c.en_pausa && c.sin_leer > 0).length
+  });
+}
+
+async function conversacion(res, telefono) {
+  if (!RE_TELEFONO.test(telefono)) return enviar(res, 400, { error: 'Teléfono no válido.' });
+  const { rows: [chat] } = await query(
+    `UPDATE wa_chats SET sin_leer = 0 WHERE telefono = $1
+     RETURNING telefono, nombre, ${EN_PAUSA} AS en_pausa, humano_hasta, ${VENTANA_ABIERTA} AS ventana_abierta`, [telefono]);
+  if (!chat) return enviar(res, 404, { error: 'No existe esa conversación.' });
+  const { rows } = await query(
+    `SELECT * FROM (SELECT id, autor, texto, creado FROM wa_mensajes WHERE telefono = $1 ORDER BY creado DESC, id DESC LIMIT 200) t
+      ORDER BY creado, id`, [telefono]);
+  enviar(res, 200, { chat, mensajes: rows });
+}
+
+async function contestar(req, res) {
+  const b = cuerpo(req) || {};
+  const telefono = texto(b.telefono, 20);
+  const mensaje = texto(b.texto, 4000);
+  if (!RE_TELEFONO.test(telefono) || !mensaje) return enviar(res, 400, { error: 'Escribe un mensaje.' });
+  if (!whatsappConfigurado()) return enviar(res, 503, { error: 'WhatsApp aún no está configurado en Vercel.' });
+
+  const { rows: [chat] } = await query(`SELECT ${VENTANA_ABIERTA} AS ventana_abierta FROM wa_chats WHERE telefono = $1`, [telefono]);
+  if (!chat) return enviar(res, 404, { error: 'No existe esa conversación.' });
+  // Regla de WhatsApp: pasadas 24 h desde el último mensaje del cliente, la empresa
+  // solo puede escribirle con una plantilla aprobada por Meta.
+  if (!chat.ventana_abierta) {
+    return enviar(res, 409, { error: 'Han pasado más de 24 h desde su último mensaje: WhatsApp no deja escribirle desde aquí. Llámale o espera a que vuelva a escribir.' });
+  }
+
+  try {
+    await enviarWhatsApp(telefono, { texto: mensaje }, 'nadia');
+  } catch (e) {
+    if (e.code !== 'WA_API') throw e;
+    return enviar(res, 502, { error: `WhatsApp no ha aceptado el mensaje: ${e.message}` });
+  }
+  // Mientras Nadia habla, el bot no interrumpe
+  await query(`UPDATE wa_chats SET modo = 'humano', humano_hasta = now() + interval '24 hours', paso = NULL, datos = '{}' WHERE telefono = $1`, [telefono]);
+  enviar(res, 201, { ok: true });
+}
+
+async function cambiarModo(req, res) {
+  const { telefono, modo } = cuerpo(req) || {};
+  if (!RE_TELEFONO.test(String(telefono)) || !['bot', 'humano'].includes(modo)) return enviar(res, 400, { error: 'Datos no válidos.' });
+  const { rowCount } = await query(
+    modo === 'bot'
+      ? `UPDATE wa_chats SET modo = 'bot', humano_hasta = NULL, paso = NULL, datos = '{}' WHERE telefono = $1`
+      : `UPDATE wa_chats SET modo = 'humano', humano_hasta = now() + interval '24 hours' WHERE telefono = $1`,
+    [telefono]);
+  if (!rowCount) return enviar(res, 404, { error: 'No existe esa conversación.' });
+  enviar(res, 200, { ok: true });
+}
+```
+
+**Panel (`admin/index.html`)**, new functions:
+
+| Function | What it does |
+|---|---|
+| `verPestana('agenda' \| 'wa')` | Switches between the Agenda and WhatsApp tabs |
+| `cargarChats()` | Loads the chat list, the green number on the tab (clients waiting) and the notice |
+| `abrirChat(phone)` | Opens a conversation (marks it as read), shows "bot en pausa hasta…" and hides the reply box if the 24 h window is closed |
+| `conNegritas(text)` | Shows WhatsApp's `*bold*` as bold, without `innerHTML` (safe against injected HTML) |
+| `accionWa()` | Sends a reply or toggles the bot, then reloads the chat |
+| `refrescarWa()` | Every 15 s: reloads the open chat or the list |
+
+New API rows (add to 5.12):
+
+| Method | URL | Access | Body / params | Answers |
+|---|---|---|---|---|
+| GET | `/api/whatsapp` | Meta | `?hub.mode&hub.verify_token&hub.challenge` | 200 challenge · 403 |
+| POST | `/api/whatsapp` | Meta (signed) | Meta's webhook JSON | 200 · 401 bad signature · 503 not configured |
+| GET | `/api/admin/whatsapp` | Session | `?telefono=` (optional) | 200 `{chats[], esperando, configurado}` or `{chat, mensajes[]}` |
+| POST | `/api/admin/whatsapp` | Session | `{telefono, texto}` | 201 · 409 window closed · 502 Meta refused · 503 |
+| PATCH | `/api/admin/whatsapp` | Session | `{telefono, modo: 'bot'\|'humano'}` | 200 · 404 |
+
+### 13.6 Testing it on your computer (without Meta)
+
+`tools/whatsapp-test.mjs` pretends to be Meta in both directions: it sends **signed** fake messages to your local webhook and runs a fake Graph API on port 3078 that records what the bot sends. Nothing reaches real WhatsApp.
+
+```bash
+# terminal 1: the dev server with fake WhatsApp variables
+DATABASE_URL=postgres://postgres:YOURPASSWORD@localhost:5432/lagoa_test \
+ADMIN_PASSWORD=una-clave-de-prueba \
+WHATSAPP_TOKEN=token-de-prueba WHATSAPP_PHONE_ID=PHONE1 \
+WHATSAPP_VERIFY_TOKEN=verifica-esto WHATSAPP_APP_SECRET=secreto-app \
+WHATSAPP_API_URL=http://127.0.0.1:3078/v23.0 \
+node tools/dev-server.mjs web-profesional
+
+# terminal 2
+psql "postgres://postgres:YOURPASSWORD@localhost:5432/lagoa_test" -c "TRUNCATE citas, bloqueos, wa_chats, wa_mensajes RESTART IDENTITY;"
+ADMIN_PASSWORD=una-clave-de-prueba node tools/whatsapp-test.mjs
+```
+
+**All 49 lines must say OK.** They cover webhook verification, fake and missing signatures, Meta repeating a message, the menu, prices, unknown text, audio, other business numbers, the whole booking flow, a slot taken while the client is confirming, the website and the bot competing for the same hour, "my bookings", cancelling (and another number trying to cancel it), the 2-booking limit, handover to the owner, replying from the panel, the 24 h window, Galician, a forgotten half-done booking, and the panel API without a session.
+
+`WHATSAPP_API_URL` exists only for these tests; in Vercel, **don't set it** (the code uses the real `https://graph.facebook.com/v23.0`).
+
+File: `tools/whatsapp-test.mjs`
+
+```js
+// =============================================================
+// Automatic tests for the WhatsApp bot, WITHOUT touching real WhatsApp.
+// This script pretends to be Meta in both directions:
+//   - it sends signed webhook messages to /api/whatsapp (like Meta does)
+//   - it runs a fake "Graph API" on port 3078 that records what the bot sends
+// 1. Start the dev server with these variables (see the tutorial):
+//      WHATSAPP_TOKEN=token-de-prueba WHATSAPP_PHONE_ID=PHONE1
+//      WHATSAPP_VERIFY_TOKEN=verifica-esto WHATSAPP_APP_SECRET=secreto-app
+//      WHATSAPP_API_URL=http://127.0.0.1:3078/v23.0
+// 2. Empty the tables:
+//      psql "$DATABASE_URL" -c "TRUNCATE citas, bloqueos, wa_chats, wa_mensajes RESTART IDENTITY;"
+// 3. Run:  ADMIN_PASSWORD=… node tools/whatsapp-test.mjs
+// Every line must start with OK. Never run this against a real client's database.
+// =============================================================
+import http from 'node:http';
+import crypto from 'node:crypto';
+
+const B = process.env.BASE_URL || 'http://localhost:3077';
+const SECRET = process.env.WHATSAPP_APP_SECRET || 'secreto-app';
+const PHONE_ID = process.env.WHATSAPP_PHONE_ID || 'PHONE1';
+const VERIFY = process.env.WHATSAPP_VERIFY_TOKEN || 'verifica-esto';
+const PASSWORD = process.env.ADMIN_PASSWORD || 'contrasena-de-prueba';
+
+let fallos = 0;
+const ok = (cond, msg) => { if (!cond) fallos++; console.log((cond ? 'OK   ' : 'FAIL ') + msg); };
+
+// ---------- Fake Meta Graph API: records every message the bot sends ----------
+let enviados = [];
+let n = 0;
+const graph = http.createServer(async (req, res) => {
+  let raw = '';
+  for await (const c of req) raw += c;
+  const body = JSON.parse(raw || '{}');
+  enviados.push({ url: req.url, auth: req.headers.authorization, body });
+  res.setHeader('Content-Type', 'application/json');
+  res.end(JSON.stringify({ messaging_product: 'whatsapp', messages: [{ id: `wamid.out.${++n}` }] }));
+}).listen(3078);
+
+// ---------- Helpers ----------
+let wamid = 0;
+async function webhook(payload, { firma = true, secreto = SECRET } = {}) {
+  const raw = JSON.stringify(payload);
+  const headers = { 'Content-Type': 'application/json' };
+  if (firma) headers['X-Hub-Signature-256'] = 'sha256=' + crypto.createHmac('sha256', secreto).update(raw).digest('hex');
+  const r = await fetch(`${B}/api/whatsapp`, { method: 'POST', headers, body: raw });
+  return r.status;
+}
+const aviso = (from, mensaje, { nombre = 'Cliente Prueba', phoneId = PHONE_ID, id } = {}) => ({
+  object: 'whatsapp_business_account',
+  entry: [{ id: 'WABA', changes: [{ field: 'messages', value: {
+    messaging_product: 'whatsapp',
+    metadata: { display_phone_number: '34600000000', phone_number_id: phoneId },
+    contacts: [{ profile: { name: nombre }, wa_id: from }],
+    messages: [{ from, id: id || `wamid.in.${++wamid}`, timestamp: String(Math.floor(Date.now() / 1000)), ...mensaje }]
+  } }] }]
+});
+const texto = t => ({ type: 'text', text: { body: t } });
+const boton = (id, title = id) => ({ type: 'interactive', interactive: { type: 'button_reply', button_reply: { id, title } } });
+const fila = (id, title = id) => ({ type: 'interactive', interactive: { type: 'list_reply', list_reply: { id, title } } });
+
+/** Sends a message as the customer and returns what the bot answered */
+async function cliente(from, mensaje, opciones) {
+  enviados = [];
+  const s = await webhook(aviso(from, mensaje, opciones));
+  return { s, r: enviados.map(e => e.body) };
+}
+const cuerpo = m => m.text?.body || m.interactive?.body?.text || '';
+const ids = m => m.interactive?.action?.buttons?.map(b => b.reply.id) || m.interactive?.action?.sections?.[0]?.rows?.map(r => r.id) || [];
+
+let cookie = '';
+async function admin(p, { method = 'GET', body } = {}) {
+  const h = { cookie };
+  if (body) h['Content-Type'] = 'application/json';
+  const r = await fetch(B + p, { method, headers: h, body: body ? JSON.stringify(body) : undefined });
+  const sc = r.headers.get('set-cookie');
+  if (sc?.startsWith('lagoa_admin=')) cookie = sc.split(';')[0];
+  return { s: r.status, d: await r.json().catch(() => ({})) };
+}
+
+try {
+  // ---------- Webhook verification (GET) ----------
+  let r = await fetch(`${B}/api/whatsapp?hub.mode=subscribe&hub.verify_token=${VERIFY}&hub.challenge=12345`);
+  ok(r.status === 200 && (await r.text()) === '12345', 'verificación con el token correcto devuelve el challenge');
+  r = await fetch(`${B}/api/whatsapp?hub.mode=subscribe&hub.verify_token=otro&hub.challenge=12345`);
+  ok(r.status === 403, 'verificación con token incorrecto → 403');
+
+  // ---------- Signature ----------
+  ok(await webhook(aviso('34611111111', texto('hola')), { firma: false }) === 401, 'aviso sin firma → 401');
+  ok(await webhook(aviso('34611111111', texto('hola')), { secreto: 'falso' }) === 401, 'aviso con firma falsa → 401');
+  ok(enviados.length === 0, 'con firma mala el bot no contesta nada');
+
+  // ---------- First contact ----------
+  const A = '34611111111';
+  let c = await cliente(A, texto('Hola'), { id: 'wamid.repetido' });
+  ok(c.s === 200 && c.r.length === 2, 'primer "Hola" → saludo + menú');
+  ok(cuerpo(c.r[0]).includes('Cliente Prueba') && c.r[1].interactive?.type === 'list', 'saludo con su nombre de WhatsApp y menú en lista');
+  ok(enviados[0].auth === 'Bearer token-de-prueba' && enviados[0].url === `/v23.0/${PHONE_ID}/messages`, 'llama a la API de Meta con el token y el Phone ID');
+  c = await cliente(A, texto('Hola'), { id: 'wamid.repetido' });
+  ok(c.r.length === 0, 'Meta repite el mismo mensaje → no se contesta dos veces');
+
+  c = await cliente(A, texto('¿Cuánto cuesta una web?'));
+  ok(c.r.length === 1 && cuerpo(c.r[0]).includes('290') && cuerpo(c.r[0]).includes('IVA'), 'pregunta de precio → tarifas con IVA');
+  ok(ids(c.r[0]).join() === 'tema:reservar,tema:menu,tema:nadia', 'debajo, botones Reservar / Menú / Hablar con Nadia');
+  c = await cliente(A, fila('tema:plazos', 'Plazos'));
+  ok(cuerpo(c.r[0]).includes('semanas'), 'opción Plazos del menú → plazos');
+  c = await cliente(A, texto('blablabla xyz'));
+  ok(cuerpo(c.r[0]).includes('No estoy seguro'), 'texto que no entiende → ofrece menú o Nadia');
+  c = await cliente(A, { type: 'audio', audio: { id: 'x' } });
+  ok(cuerpo(c.r[0]).includes('solo puedo leer'), 'audio → explica que solo lee texto');
+  c = await cliente('34699999999', texto('hola'), { phoneId: 'OTRO' });
+  ok(c.r.length === 0, 'aviso para otro número de empresa → se ignora');
+
+  // ---------- Booking ----------
+  c = await cliente(A, boton('tema:reservar'));
+  ok(ids(c.r[0]).join() === 'mod:0,mod:1,mod:2', 'Reservar → elegir modalidad (3 botones)');
+  c = await cliente(A, boton('mod:0', 'Videollamada'));
+  const dias = ids(c.r[0]);
+  ok(dias.length > 0 && dias.length <= 10 && dias.every(d => /^dia:\d{4}-\d{2}-\d{2}$/.test(d)), `lista de días libres (${dias.length})`);
+  ok(c.r[0].interactive.action.sections[0].rows.every(f => f.title.length <= 24), 'títulos de la lista ≤ 24 caracteres (límite de WhatsApp)');
+  c = await cliente(A, texto('mañana'));
+  ok(cuerpo(c.r[0]).includes('Elige') && ids(c.r[1]).length === dias.length, 'escribe en vez de elegir → se lo pide otra vez');
+  const fecha = dias[0].slice(4);
+  c = await cliente(A, fila(dias[0]));
+  const horas = ids(c.r[0]);
+  ok(horas.length >= 2 && horas.at(-1) === 'volver:dia', 'lista de horas de ese día + "Otro día"');
+  const hora = horas[0].slice(5);
+  c = await cliente(A, fila(horas[0]));
+  ok(ids(c.r[0]).join() === 'nombre:perfil', 'pide el nombre con botón "Soy Cliente Prueba"');
+  c = await cliente(A, boton('nombre:perfil'));
+  ok(ids(c.r[0]).join() === 'negocio:no', 'pide el negocio (con Saltar)');
+  c = await cliente(A, texto('Peluquería Sol'));
+  ok(cuerpo(c.r[0]).includes('Peluquería Sol') && cuerpo(c.r[0]).includes('privacidad') && ids(c.r[0])[0] === 'ok', 'resumen con privacidad y botón Confirmar');
+  c = await cliente(A, boton('ok', 'Confirmar'));
+  ok(cuerpo(c.r[0]).includes('Listo'), 'Confirmar → cita guardada');
+  let d = (await fetch(`${B}/api/disponibilidad`).then(x => x.json())).ocupados;
+  ok(d.includes(`${fecha} ${hora}`), 'la hora reservada por WhatsApp ya sale ocupada en la web');
+
+  // ---------- Admin: login and see it ----------
+  ok((await admin('/api/admin/login', { method: 'POST', body: { password: PASSWORD } })).s === 200, 'login en el panel');
+  let a = await admin(`/api/admin/citas?desde=${fecha}&hasta=${fecha}`);
+  const cita = a.d.citas.find(x => x.hora === hora);
+  ok(cita && cita.origen === 'whatsapp' && cita.telefono === '+' + A && cita.nombre === 'Cliente Prueba' && cita.estado === 'pendiente', 'la cita aparece en la agenda: origen whatsapp, pendiente');
+
+  // ---------- Same slot from the web → taken ----------
+  r = await fetch(`${B}/api/reservas`, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fecha, hora, modalidad: 'Videollamada', nombre: 'Web', telefono: '622222222', privacidad: true }) });
+  ok(r.status === 409, 'la web no puede reservar la misma hora → 409');
+
+  // ---------- Booking a slot that gets taken meanwhile ----------
+  const Bnum = '34622222222';
+  await cliente(Bnum, boton('tema:reservar'));
+  await cliente(Bnum, boton('mod:1'));
+  c = await cliente(Bnum, fila(dias[0]));
+  const horaB = ids(c.r[0])[0];
+  await cliente(Bnum, fila(horaB));
+  await cliente(Bnum, texto('Bea'));
+  await cliente(Bnum, boton('negocio:no'));
+  await admin('/api/admin/citas', { method: 'POST', body: { fecha, hora: horaB.slice(5), nombre: 'Ocupa', telefono: '633' } });
+  c = await cliente(Bnum, boton('ok'));
+  ok(cuerpo(c.r[0]).includes('ocupar') && c.r[1]?.interactive?.type === 'list', 'la hora se ocupa antes de confirmar → avisa y ofrece otras horas');
+
+  // ---------- My bookings and cancel ----------
+  c = await cliente(A, texto('mis citas'));
+  ok(cuerpo(c.r[0]).includes(hora) && ids(c.r[0])[0] === `anular:${cita.id}`, 'Mis citas → muestra la cita con botón Cancelar');
+  c = await cliente(A, boton(`anular:${cita.id}`));
+  ok(ids(c.r[0])[0] === `anularok:${cita.id}`, 'pide confirmación antes de cancelar');
+  c = await cliente('34644444444', boton(`anularok:${cita.id}`));
+  a = await admin(`/api/admin/citas?desde=${fecha}&hasta=${fecha}`);
+  ok(a.d.citas.find(x => x.id === cita.id).estado === 'pendiente', 'otro número NO puede cancelar esa cita');
+  c = await cliente(A, boton(`anularok:${cita.id}`));
+  a = await admin(`/api/admin/citas?desde=${fecha}&hasta=${fecha}`);
+  ok(cuerpo(c.r[0]).includes('cancelada') && a.d.citas.find(x => x.id === cita.id).estado === 'cancelada', 'su dueño sí la cancela y la hora queda libre');
+
+  // ---------- Limit of 2 bookings per phone ----------
+  for (const [i, idDia] of [[0, dias[0]], [1, dias[1] || dias[0]]]) {
+    await cliente(A, boton('tema:reservar'));
+    await cliente(A, boton('mod:0'));
+    c = await cliente(A, fila(idDia));
+    await cliente(A, fila(ids(c.r[0])[i === 0 ? 1 : 0]));
+    await cliente(A, boton('nombre:perfil'));
+    await cliente(A, boton('negocio:no'));
+    c = await cliente(A, boton('ok'));
+  }
+  c = await cliente(A, boton('tema:reservar'));
+  ok(cuerpo(c.r[0]).includes('Ya tienes 2'), 'tercera reserva con el mismo número → no deja');
+
+  // ---------- Cancel mid-flow ----------
+  await cliente(Bnum, boton('tema:reservar'));
+  c = await cliente(Bnum, texto('cancelar'));
+  ok(cuerpo(c.r[0]).includes('no he guardado'), '"cancelar" a mitad de reserva → sale sin guardar');
+
+  // ---------- Talk to Nadia (bot pauses) ----------
+  c = await cliente(Bnum, boton('tema:nadia'));
+  ok(cuerpo(c.r[0]).includes('He avisado a Nadia'), 'Hablar con Nadia → avisa y pausa el bot');
+  c = await cliente(Bnum, texto('¿Me puedes hacer un descuento?'));
+  ok(c.r.length === 0, 'con el bot en pausa, el bot no contesta');
+  a = await admin('/api/admin/whatsapp');
+  const chatB = a.d.chats.find(x => x.telefono === Bnum);
+  ok(a.d.configurado && chatB.en_pausa && chatB.sin_leer > 0 && a.d.esperando === 1, 'el panel lo marca como "te espera"');
+  a = await admin(`/api/admin/whatsapp?telefono=${Bnum}`);
+  ok(a.d.mensajes.at(-1).texto.includes('descuento') && a.d.chat.ventana_abierta, 'el panel muestra la conversación completa');
+  a = await admin('/api/admin/whatsapp');
+  ok(a.d.chats.find(x => x.telefono === Bnum).sin_leer === 0, 'al abrirla se marca como leída');
+  enviados = [];
+  a = await admin('/api/admin/whatsapp', { method: 'POST', body: { telefono: Bnum, texto: 'Hola Bea, soy Nadia 🙂' } });
+  ok(a.s === 201 && enviados[0]?.body.text.body === 'Hola Bea, soy Nadia 🙂', 'Nadia contesta desde el panel → sale por WhatsApp');
+  a = await admin(`/api/admin/whatsapp?telefono=${Bnum}`);
+  ok(a.d.mensajes.at(-1).autor === 'nadia', 'su respuesta queda en el historial como "nadia"');
+  c = await cliente(Bnum, texto('menú'));
+  ok(c.r[0]?.interactive?.type === 'list', 'el cliente escribe "menú" → el bot vuelve');
+  await cliente(Bnum, boton('tema:nadia'));
+  a = await admin('/api/admin/whatsapp', { method: 'PATCH', body: { telefono: Bnum, modo: 'bot' } });
+  c = await cliente(Bnum, texto('precio'));
+  ok(a.s === 200 && cuerpo(c.r[0]).includes('Tarifas'), 'Nadia devuelve el chat al bot desde el panel');
+
+  // ---------- 24 h window ----------
+  const pg = (await import('../web-profesional/node_modules/pg/lib/index.js')).default;
+  const db = new pg.Client({ connectionString: process.env.DATABASE_URL || 'postgres://postgres@127.0.0.1:54329/lagoa' });
+  await db.connect();
+  await db.query(`UPDATE wa_chats SET ultimo_entrante = now() - interval '25 hours' WHERE telefono = $1`, [Bnum]);
+  a = await admin('/api/admin/whatsapp', { method: 'POST', body: { telefono: Bnum, texto: 'hola?' } });
+  ok(a.s === 409, 'más de 24 h sin mensajes del cliente → el panel no deja escribir (regla de WhatsApp)');
+
+  // ---------- Galician + stale flow ----------
+  const G = '34655555555';
+  c = await cliente(G, texto('Ola! Canto custa unha tenda?'), { nombre: 'Xiana' });
+  ok(c.r.length === 2 && cuerpo(c.r[0]).startsWith('Ola, Xiana') && cuerpo(c.r[1]).includes('IVE'), 'cliente en gallego → contesta en gallego');
+  c = await cliente(G, texto('castellano'));
+  ok(c.r[0].interactive.action.button === 'Ver opciones', '"castellano" → cambia a castellano');
+  await cliente(G, boton('tema:reservar'));
+  await db.query(`UPDATE wa_chats SET actualizado = now() - interval '3 hours' WHERE telefono = $1`, [G]);
+  c = await cliente(G, texto('precio'));
+  ok(cuerpo(c.r[0]).includes('Tarifas'), 'reserva abandonada hace horas → se olvida y contesta normal');
+  await db.end();
+
+  // ---------- Admin API is private ----------
+  const anon = await fetch(`${B}/api/admin/whatsapp`);
+  ok(anon.status === 401, 'sin sesión no se pueden leer los chats → 401');
+} catch (e) {
+  fallos++;
+  console.log('FAIL excepción: ' + e.stack);
+} finally {
+  graph.close();
+  console.log(fallos ? `\n${fallos} FALLO(S)` : '\nTodo OK');
+  process.exit(fallos ? 1 : 0);
+}
+```
+
+### 13.7 Adapting the bot for a client
+
+1. **Texts:** `T.es` and `T.gl` in `bot.js` (delete `gl` and `pareceGallego` if the client doesn't need Galician).
+2. **Menu:** `T.es.menu` (max 10 rows). Each key is a topic that `tema()` must answer.
+3. **Keywords:** `CLAVES`. Test them like this: `node -e "import('./web-profesional/api/_lib/bot.js').then(b => console.log(b.temaDe('cuánto cuesta')))"`. Avoid words that appear inside common phrases ("vale" = "OK" in Spanish, "nadia" in "Hola Nadia").
+4. **Business data:** `negocio.js` (services, prices, timings, website URL).
+5. **Booking options:** `MODALIDADES` in `citas.js` and `T.es.modos` (button labels, same order, max 3). A hairdresser might use "Corte / Color / Peinado" instead.
+6. **Never let the bot invent:** discounts, payment terms or anything not agreed with the client → send to the human (`pago` topic does this).
+7. Run `tools/whatsapp-test.mjs` and adjust the assertions that check texts you changed.
+
+### 13.8 Problems and solutions
+
+| Symptom | Probable cause | Fix |
+|---|---|---|
+| Meta says "The callback URL or verify token couldn't be validated" | Token different from `WHATSAPP_VERIFY_TOKEN`, no redeploy after adding it, or wrong URL | Same text in both places; Redeploy; open `https://YOUR-DOMAIN/api/whatsapp?hub.mode=subscribe&hub.verify_token=YOUR-TOKEN&hub.challenge=1` → must show `1` |
+| Verified, but the bot never answers | Not subscribed to the **`messages`** field | Configuration → Webhook fields → `messages` → Subscribe |
+| Vercel Logs show 401 on `/api/whatsapp` | `WHATSAPP_APP_SECRET` wrong (or from another app) | Copy it again from App settings → Basic; Redeploy |
+| Logs: `WhatsApp: … access token … expired` (code 190) | Using the 24 h temporary token | Create the permanent system-user token (13.3 step 5) |
+| Logs: recipient not in allowed list (code 131030) | Test number writing to a phone you didn't add | API Setup → *To* → add and verify the phone |
+| Panel: "Han pasado más de 24 h…" | Meta's 24 h rule | Call the client or wait until they write; for reminders you need templates |
+| Bot answers in the wrong language | First message guessed wrong | The client writes "castellano" or "galego" |
+| Prices differ between web and bot | Changed only one place | `SERVICES`/`PACK` in `index.html` **and** `negocio.js` |
+| Meta says the API version is deprecated | Each version lasts ~2 years | Change `v23.0` in `api/_lib/whatsapp.js` to the current version |
+
+---
+
+*Built for Lagoa · Estudio digital (A Coruña). Code: `web-profesional/` in this repository. Tests: `tools/api-test.mjs` and `tools/whatsapp-test.mjs`.*

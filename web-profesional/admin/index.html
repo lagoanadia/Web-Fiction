@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Agenda · Lagoa</title>
+<title>Panel · Lagoa</title>
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#161513">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -113,13 +113,42 @@ dialog form { display: grid; gap: .8rem; }
 .toast { position: fixed; left: 50%; bottom: 20px; translate: -50% 0; z-index: 50; background: var(--ink); color: var(--paper); padding: .7rem 1.1rem; border-radius: 999px; font-size: .9rem; box-shadow: 0 10px 30px rgba(0,0,0,.25); max-width: calc(100% - 32px); }
 .toast--error { background: var(--bad); }
 .loading { padding: 2rem 0; text-align: center; color: var(--ink-2); }
+
+/* Pestañas Agenda / WhatsApp */
+.tabs { display: flex; gap: .3rem; padding-top: .8rem; }
+.tab { position: relative; border: 0; background: transparent; padding: .45rem .9rem; border-radius: 999px; font-weight: 600; font-size: .92rem; cursor: pointer; color: var(--ink-2); }
+.tab[aria-selected=true] { background: var(--ink); color: var(--paper); }
+.badge { display: inline-grid; place-items: center; min-width: 1.3rem; height: 1.3rem; padding: 0 .35rem; margin-left: .35rem; border-radius: 999px; background: #1b7a46; color: #fff; font-size: .72rem; }
+
+/* WhatsApp: lista de conversaciones */
+.chats { list-style: none; margin: .6rem 0 2rem; padding: 0; }
+.chat-item { width: 100%; display: grid; grid-template-columns: 1fr auto; gap: .1rem .6rem; text-align: left; border: 0; background: var(--card); border-radius: 14px; padding: .75rem .9rem; margin-bottom: .45rem; cursor: pointer; box-shadow: 0 1px 0 var(--line); }
+.chat-item:hover { background: #fff; }
+.chat-item__name { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chat-item__time { font-size: .75rem; color: var(--ink-2); }
+.chat-item__last { grid-column: 1 / -1; font-size: .86rem; color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chat-item--espera { border-left: 4px solid #1b7a46; }
+.chat-item .chips { margin: .2rem 0 0; grid-column: 1 / -1; }
+
+/* WhatsApp: conversación */
+.conv__head { display: flex; align-items: center; gap: .6rem; padding: .8rem 0; flex-wrap: wrap; }
+.conv__head h2 { margin: 0; font-size: 1.1rem; flex: 1; min-width: 0; }
+.conv__head h2 small { display: block; font-weight: 500; font-size: .8rem; color: var(--ink-2); }
+.bubbles { display: flex; flex-direction: column; gap: .4rem; padding: .8rem; background: var(--paper-2); border-radius: 18px; max-height: 60vh; overflow-y: auto; }
+.bubble { max-width: 85%; padding: .5rem .75rem; border-radius: 14px; background: #fff; white-space: pre-line; overflow-wrap: anywhere; font-size: .92rem; }
+.bubble--bot, .bubble--nadia { align-self: flex-end; background: #dcefd9; }
+.bubble--nadia { background: #c9e6c4; }
+.bubble small { display: block; font-size: .7rem; color: var(--ink-2); margin-top: .2rem; }
+.reply { display: grid; gap: .5rem; margin: .7rem 0 2rem; }
+.reply textarea { resize: vertical; min-height: 70px; }
+.reply__actions { display: flex; justify-content: flex-end; gap: .5rem; flex-wrap: wrap; }
 </style>
 </head>
 <body>
 
 <header class="top">
   <div class="wrap">
-    <span class="brand">Lagoa <small>Agenda</small></span>
+    <span class="brand">Lagoa <small>Panel</small></span>
     <button class="btn btn--sm" id="btn-nueva" type="button" hidden>+ Nueva cita</button>
     <button class="btn btn--ghost btn--sm" id="btn-salir" type="button" hidden>Salir</button>
   </div>
@@ -140,6 +169,11 @@ dialog form { display: grid; gap: .8rem; }
 </section>
 
 <!-- AGENDA -->
+<nav class="wrap tabs" id="pestanas" role="tablist" aria-label="Secciones" hidden>
+  <button class="tab" role="tab" id="tab-agenda" aria-selected="true" aria-controls="vista-agenda" type="button">Agenda</button>
+  <button class="tab" role="tab" id="tab-wa" aria-selected="false" aria-controls="vista-wa" type="button">WhatsApp<span class="badge" id="wa-badge" hidden></span></button>
+</nav>
+
 <main class="wrap" id="vista-agenda" hidden>
   <div class="toolbar">
     <h2 id="titulo-semana" aria-live="polite">Semana</h2>
@@ -150,6 +184,29 @@ dialog form { display: grid; gap: .8rem; }
   <p class="notice" id="aviso-pendientes" hidden></p>
   <p class="legend"><span>Pendiente: el cliente espera tu confirmación</span><span>Bloqueado: no se ofrece en la web</span></p>
   <div id="dias" aria-live="polite"><p class="loading">Cargando…</p></div>
+</main>
+
+<!-- WHATSAPP -->
+<main class="wrap" id="vista-wa" hidden>
+  <section id="wa-lista">
+    <div class="toolbar"><h2>Conversaciones de WhatsApp</h2></div>
+    <p class="notice" id="wa-aviso" hidden></p>
+    <ul class="chats" id="wa-chats" aria-live="polite"><li class="loading">Cargando…</li></ul>
+  </section>
+  <section id="wa-conv" hidden>
+    <div class="conv__head">
+      <button class="btn btn--ghost btn--sm" type="button" id="wa-volver" aria-label="Volver a las conversaciones">←</button>
+      <h2 id="wa-titulo"></h2>
+      <button class="btn btn--ghost btn--sm" type="button" id="wa-modo"></button>
+    </div>
+    <div class="bubbles" id="wa-mensajes" role="log" tabindex="0"></div>
+    <p class="notice" id="wa-ventana" hidden>Han pasado más de 24 h desde su último mensaje: WhatsApp no deja escribirle desde aquí hasta que vuelva a escribir.</p>
+    <form class="reply" id="wa-form">
+      <label for="wa-texto" class="visually-hidden">Tu respuesta</label>
+      <textarea id="wa-texto" rows="3" maxlength="4000" placeholder="Escribe tu respuesta. Al enviarla, el bot se pausa 24 h en este chat." required></textarea>
+      <div class="reply__actions"><button class="btn btn--wa" type="submit">Enviar por WhatsApp</button></div>
+    </form>
+  </section>
 </main>
 
 <!-- NUEVA CITA -->
@@ -233,15 +290,15 @@ let datos = null;
 
 function mostrarLogin() {
   $('#vista-login').hidden = false;
-  $('#vista-agenda').hidden = true;
+  $('#vista-agenda').hidden = $('#vista-wa').hidden = $('#pestanas').hidden = true;
   $('#btn-nueva').hidden = $('#btn-salir').hidden = true;
   setTimeout(() => $('#password').focus(), 50);
 }
 function mostrarAgenda() {
   $('#vista-login').hidden = true;
-  $('#vista-agenda').hidden = false;
+  $('#pestanas').hidden = false;
   $('#btn-nueva').hidden = $('#btn-salir').hidden = false;
-  cargar();
+  verPestana(pestana);
 }
 
 /* ---------- Acceso ---------- */
@@ -392,6 +449,7 @@ function tarjetaCita(c) {
   const nombresEstado = { pendiente: 'Pendiente', confirmada: 'Confirmada', cancelada: 'Cancelada' };
   chips.append(el('span', { class: `chip chip--${c.estado}` }, nombresEstado[c.estado]), el('span', { class: 'chip' }, c.modalidad));
   if (c.origen === 'panel') chips.append(el('span', { class: 'chip' }, 'Añadida a mano'));
+  if (c.origen === 'whatsapp') chips.append(el('span', { class: 'chip' }, 'Por WhatsApp'));
   card.append(chips);
 
   const contacto = el('div', { class: 'cita__contact' });
@@ -478,6 +536,130 @@ $('#form-cita').addEventListener('submit', async e => {
   }
 });
 
+/* ---------- Pestañas ---------- */
+let pestana = 'agenda';
+function verPestana(cual) {
+  pestana = cual;
+  $('#tab-agenda').setAttribute('aria-selected', String(cual === 'agenda'));
+  $('#tab-wa').setAttribute('aria-selected', String(cual === 'wa'));
+  $('#vista-agenda').hidden = cual !== 'agenda';
+  $('#vista-wa').hidden = cual !== 'wa';
+  $('#btn-nueva').hidden = cual !== 'agenda';
+  if (cual === 'agenda') cargar(); else { chatAbierto ? abrirChat(chatAbierto) : cargarChats(); }
+  if (cual === 'agenda') cargarChats(); // para el número de mensajes esperando
+}
+$('#tab-agenda').addEventListener('click', () => verPestana('agenda'));
+$('#tab-wa').addEventListener('click', () => verPestana('wa'));
+
+/* ---------- WhatsApp ---------- */
+let chatAbierto = null;
+const fmtHora = new Intl.DateTimeFormat('es-ES', { hour: '2-digit', minute: '2-digit' });
+const fmtDiaHora = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+const cuando = iso => { const d = new Date(iso); return d.toDateString() === new Date().toDateString() ? fmtHora.format(d) : fmtDiaHora.format(d); };
+const bonito = tel => '+' + tel.replace(/^(\d{2})(\d{3})(\d{2})(\d{2})(\d{2})$/, '$1 $2 $3 $4 $5');
+
+function refrescarWa() {
+  if (pestana === 'wa' && chatAbierto) abrirChat(chatAbierto, true);
+  else cargarChats();
+}
+
+async function cargarChats() {
+  let d;
+  try { d = await api('/api/admin/whatsapp'); }
+  catch (ex) { if (pestana === 'wa') $('#wa-chats').replaceChildren(el('li', { class: 'msg msg--error' }, ex.message)); return; }
+  const badge = $('#wa-badge');
+  badge.hidden = !d.esperando;
+  badge.textContent = d.esperando;
+  $('#tab-wa').setAttribute('aria-label', d.esperando ? `WhatsApp, ${d.esperando} esperando respuesta` : 'WhatsApp');
+  const avisoWa = $('#wa-aviso');
+  avisoWa.hidden = d.configurado && !d.esperando;
+  avisoWa.textContent = !d.configurado
+    ? 'WhatsApp aún no está conectado: faltan las variables WHATSAPP_… en Vercel (mira el tutorial).'
+    : `${d.esperando === 1 ? '1 persona espera' : d.esperando + ' personas esperan'} tu respuesta.`;
+  if (pestana !== 'wa' || chatAbierto) return;
+  const ul = $('#wa-chats');
+  ul.replaceChildren();
+  if (!d.chats.length) ul.append(el('li', { class: 'day__closed' }, 'Todavía no ha escrito nadie.'));
+  for (const c of d.chats) {
+    const espera = c.en_pausa && c.sin_leer > 0;
+    const b = el('button', { type: 'button', class: 'chat-item' + (espera ? ' chat-item--espera' : '') });
+    b.append(el('span', { class: 'chat-item__name' }, c.nombre || bonito(c.telefono)), el('span', { class: 'chat-item__time' }, c.ultimo_en ? cuando(c.ultimo_en) : ''));
+    const autor = { cliente: '', bot: 'Bot: ', nadia: 'Tú: ' }[c.ultimo_autor] || '';
+    b.append(el('span', { class: 'chat-item__last' }, autor + (c.ultimo || '').split('\n')[0].replace(/\*/g, '')));
+    const chips = el('span', { class: 'chips' });
+    if (espera) chips.append(el('span', { class: 'chip chip--pendiente' }, 'Te espera'));
+    else if (c.en_pausa) chips.append(el('span', { class: 'chip' }, 'Bot en pausa'));
+    if (chips.childElementCount) b.append(chips);
+    b.addEventListener('click', () => abrirChat(c.telefono));
+    const li = el('li'); li.append(b); ul.append(li);
+  }
+}
+
+async function abrirChat(telefono, silencioso = false) {
+  chatAbierto = telefono;
+  $('#wa-lista').hidden = true;
+  $('#wa-conv').hidden = false;
+  let d;
+  try { d = await api(`/api/admin/whatsapp?telefono=${telefono}`); }
+  catch (ex) { if (!silencioso) aviso(ex.message, true); return; }
+  if (chatAbierto !== telefono) return;
+  const { chat, mensajes } = d;
+  const h2 = $('#wa-titulo');
+  h2.replaceChildren(document.createTextNode(chat.nombre || bonito(chat.telefono)), el('small', {}, `${bonito(chat.telefono)} · ${chat.en_pausa ? 'bot en pausa hasta las ' + fmtHora.format(new Date(chat.humano_hasta)) : 'contesta el bot'}`));
+  const bModo = $('#wa-modo');
+  bModo.textContent = chat.en_pausa ? 'Devolver al bot' : 'Pausar bot';
+  bModo.dataset.modo = chat.en_pausa ? 'bot' : 'humano';
+  $('#wa-ventana').hidden = chat.ventana_abierta;
+  $('#wa-form').hidden = !chat.ventana_abierta;
+
+  const caja = $('#wa-mensajes');
+  const abajo = caja.scrollHeight - caja.scrollTop - caja.clientHeight < 40;
+  caja.replaceChildren();
+  const quien = { cliente: chat.nombre || 'Cliente', bot: 'Bot', nadia: 'Tú' };
+  for (const m of mensajes) {
+    const b = el('div', { class: `bubble bubble--${m.autor}` });
+    b.append(...conNegritas(m.texto));
+    b.append(el('small', {}, `${quien[m.autor]} · ${cuando(m.creado)}`));
+    caja.append(b);
+  }
+  if (!silencioso || abajo) caja.scrollTop = caja.scrollHeight;
+  cargarChats(); // actualiza el contador
+}
+
+/** WhatsApp marca la negrita con *asteriscos*: se muestra igual que en el móvil (sin innerHTML) */
+function conNegritas(texto) {
+  return texto.split(/(\*[^*\n]+\*)/).map(t => /^\*[^*\n]+\*$/.test(t) ? el('strong', {}, t.slice(1, -1)) : document.createTextNode(t));
+}
+
+$('#wa-volver').addEventListener('click', () => {
+  chatAbierto = null;
+  $('#wa-conv').hidden = true;
+  $('#wa-lista').hidden = false;
+  cargarChats();
+});
+
+$('#wa-modo').addEventListener('click', e => {
+  const modo = e.currentTarget.dataset.modo;
+  accionWa(e.currentTarget, () => api('/api/admin/whatsapp', { method: 'PATCH', body: { telefono: chatAbierto, modo } }), modo === 'bot' ? 'El bot vuelve a contestar' : 'Bot en pausa 24 h');
+});
+
+$('#wa-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const texto = $('#wa-texto').value.trim();
+  if (!texto) return;
+  accionWa($('button[type=submit]', e.target), async () => {
+    await api('/api/admin/whatsapp', { method: 'POST', body: { telefono: chatAbierto, texto } });
+    $('#wa-texto').value = '';
+  }, 'Enviado');
+});
+
+async function accionWa(boton, fn, textoOk) {
+  boton.disabled = true;
+  try { await fn(); aviso(textoOk); await abrirChat(chatAbierto); }
+  catch (ex) { aviso(ex.message, true); }
+  finally { boton.disabled = false; }
+}
+
 /* ---------- Al abrir el panel y cada minuto ---------- */
 (async function inicio() {
   try {
@@ -496,7 +678,12 @@ $('#form-cita').addEventListener('submit', async e => {
   }
 })();
 setInterval(() => { if (!document.hidden && !$('#vista-agenda').hidden && !dlg.open) cargar(); }, 60000);
-document.addEventListener('visibilitychange', () => { if (!document.hidden && !$('#vista-agenda').hidden) cargar(); });
+setInterval(() => { if (!document.hidden && !$('#pestanas').hidden) refrescarWa(); }, 15000);
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) return;
+  if (!$('#vista-agenda').hidden) cargar();
+  if (!$('#pestanas').hidden) refrescarWa();
+});
 </script>
 </body>
 </html>

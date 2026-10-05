@@ -31,6 +31,16 @@ export function cuerpo(req) {
   return {};
 }
 
+/** Cuerpo SIN procesar, tal cual llega (hace falta para comprobar firmas).
+    La función debe exportar config = { api: { bodyParser: false } }. */
+export async function cuerpoCrudo(req) {
+  if (Buffer.isBuffer(req.body)) return req.body;
+  if (typeof req.body === 'string') return Buffer.from(req.body);
+  const trozos = [];
+  for await (const t of req) trozos.push(typeof t === 'string' ? Buffer.from(t) : t);
+  return Buffer.concat(trozos);
+}
+
 /** Las peticiones que cambian datos deben ser JSON (protege contra formularios de otras webs) */
 export const esJson = req => (req.headers['content-type'] || '').includes('application/json');
 
