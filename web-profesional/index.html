@@ -64,8 +64,8 @@
   --ink-2: #5f5a52;        /* texto secundario */
   --line: #d8d0c0;
   --dark: #12110f;         /* secciones oscuras */
-  --accent: #a53f2b;       /* enlaces y detalles */
-  --accent-2: #86321f;
+  --accent: #6b8e23;       /* verde oliva: enlaces y detalles */
+  --accent-2: #556b2f;     /* verde oliva oscuro */
   --sun: #e6ab63;          /* luz de atardecer sobre oscuro */
   --wa: #1b7a46;
   --ok: #2f6b3a;
@@ -87,7 +87,7 @@
 html { -webkit-text-size-adjust: 100%; scroll-padding-top: 72px; }
 @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 17px; line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
-img { display: block; max-width: 100%; }
+img { display: block; max-width: 100%; filter: saturate(1.15) contrast(1.08); }
 a { color: var(--accent); text-underline-offset: .2em; }
 h1, h2, h3, p { margin: 0; overflow-wrap: break-word; }
 button, input, select, textarea { font: inherit; color: inherit; }
