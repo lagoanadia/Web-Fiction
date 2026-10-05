@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin
 Disallow: /api
 
-Sitemap: https://nadialavi.vercel.app/sitemap.xml
+Sitemap: https://lagoa-webs.vercel.app/sitemap.xml
