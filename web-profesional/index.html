@@ -139,7 +139,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .btn--wa:hover { background: #155f37; }
 .btn--light { background: #fff; color: var(--ink); }
 .btn--light:hover { background: #e8e8ed; }
-.btn[disabled], .btn[aria-disabled="true"] { opacity: .45; cursor: not-allowed; }
+.btn[disabled], .btn[aria-disabled="true"] { background: #d9d3bf; color: #6b5a55; cursor: not-allowed; }
 .link-arrow { font-weight: 600; }
 .link-arrow::after { content: " ›"; }
 .actions { display: flex; flex-wrap: wrap; gap: .7rem; margin-top: 1.8rem; align-items: center; }
@@ -451,16 +451,24 @@ dialog p { margin-bottom: .7rem; font-size: .95rem; }
   display: inline-flex; gap: .5rem; align-items: center;
 }
 .chat-launcher { transition: opacity .4s var(--ease), transform .4s var(--ease); }
+.chat-launcher svg { width: 22px; height: 22px; flex: none; }
+.chat-launcher__text { white-space: nowrap; }
+@media (max-width: 739px) {
+  .chat-launcher { width: 54px; height: 54px; padding: 0; justify-content: center; right: 14px; bottom: 14px; }
+  .chat-launcher__text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .chat-launcher::before { position: absolute; top: 6px; right: 6px; }
+}
 .chat-launcher::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: #34c759; box-shadow: 0 0 0 3px rgba(52,199,89,.25); }
 .chat {
-  position: fixed; right: 16px; bottom: 16px; z-index: 95;
+  position: fixed; right: 16px; bottom: 16px; z-index: 120; /* por encima de la barra de menú */
   width: min(390px, calc(100vw - 32px)); height: min(620px, calc(100dvh - 32px));
   display: flex; flex-direction: column; overflow: hidden;
   background: var(--card); border-radius: 26px; box-shadow: 0 30px 80px rgba(0,0,0,.35);
 }
 .chat__head { display: flex; align-items: center; gap: .7rem; padding: .9rem 1rem; background: rgba(246,243,234,.96); border-bottom: 1px solid var(--line); }
 .chat__avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(140deg, #a53f2b, #ad8350); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: .85rem; flex: none; }
-.chat__head strong { display: block; font-size: .95rem; }
+.chat__head > div:not(.chat__lang) { min-width: 0; }
+.chat__head strong { display: block; font-size: .95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .chat__head span { font-size: .75rem; color: var(--ink-2); }
 .chat__lang { margin-left: auto; display: flex; gap: 2px; background: #e3decb; border-radius: 9px; padding: 2px; }
 .chat__lang button { border: 0; background: none; cursor: pointer; border-radius: 7px; padding: .2rem .5rem; font-size: .72rem; font-weight: 700; color: var(--ink-2); }
@@ -476,11 +484,13 @@ dialog p { margin-bottom: .7rem; font-size: .95rem; }
 .msg .msg__actions a, .msg .msg__actions button { font-size: .8rem; padding: .35rem .75rem; border-radius: 999px; border: 0; background: #fff; color: var(--accent); font-weight: 600; text-decoration: none; cursor: pointer; }
 .msg .msg__actions .wa { background: var(--wa); color: #fff; }
 .typing { align-self: flex-start; background: #ece8d8; border-radius: 18px; padding: .55rem .9rem; color: #777; }
-.chat__quick { display: flex; gap: .4rem; overflow-x: auto; padding: .5rem .7rem 0; scrollbar-width: none; }
+.chat__quick { display: flex; flex-wrap: wrap; gap: .4rem; padding: .5rem .7rem 0; }
 .chat__quick button { flex: none; border: 0; border-radius: 999px; background: var(--accent-soft); color: var(--accent-2); padding: .4rem .85rem; font-size: .82rem; font-weight: 600; cursor: pointer; }
 .chat__form { display: flex; gap: .5rem; padding: .6rem .7rem .8rem; }
 .chat__form input { flex: 1; min-width: 0; border-radius: 999px; padding: .65rem 1rem; border: 1px solid var(--line); }
 .chat__form button { flex: none; width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--accent); color: #fff; cursor: pointer; font-size: 1rem; }
+/* En móvil el chat ocupa toda la pantalla (va al final para ganar a la regla general) */
+@media (max-width: 739px) { .chat { inset: 0; width: 100%; height: 100dvh; border-radius: 0; } }
 </style>
 </head>
 
@@ -1006,12 +1016,12 @@ dialog p { margin-bottom: .7rem; font-size: .95rem; }
 </dialog>
 
 <!-- Chatbot -->
-<button type="button" class="chat-launcher" id="chat-open" aria-controls="chat" aria-expanded="false">Asistente virtual</button>
+<button type="button" class="chat-launcher" id="chat-open" aria-controls="chat" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg><span class="chat-launcher__text">Asistente virtual</span></button>
 <div class="chat" id="chat" role="dialog" aria-labelledby="chat-title" hidden>
   <div class="chat__head">
     <span class="chat__avatar" aria-hidden="true">L</span>
     <div>
-      <strong id="chat-title">Lagoa · asistente virtual</strong>
+      <strong id="chat-title">Asistente Lagoa</strong>
       <span id="chat-sub">Respuesta inmediata</span>
     </div>
     <div class="chat__lang" role="group" aria-label="Idioma">
