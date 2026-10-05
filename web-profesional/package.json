@@ -1,0 +1,12 @@
+{
+  "name": "lagoa-web",
+  "private": true,
+  "description": "Web de Lagoa con reservas y panel de agenda (funciones de Vercel + Postgres)",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "pg": "^8.23.1"
+  }
+}

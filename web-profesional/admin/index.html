@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Agenda · Lagoa</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#161513">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* =============================================================
+   Panel de agenda de Lagoa (privado)
+   Mismos colores y letras que la web pública.
+   ============================================================= */
+:root {
+  --paper: #f4f0e8; --paper-2: #e9e3d6; --card: #fbf9f4; --line: #d8d0c0;
+  --ink: #161513; --ink-2: #5f5a52;
+  --accent: #556b2f;          /* verde oliva */
+  --pend: #9a6a12; --pend-bg: #f6ead2;
+  --ok: #2f6b3a; --ok-bg: #e3efe3;
+  --bad: #a3261a; --bad-bg: #f6e4e0;
+  --sans: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --serif: "Cormorant Garamond", Georgia, serif;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+button, input, select, textarea { font: inherit; color: inherit; }
+a { color: var(--accent); }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+[hidden] { display: none !important; }
+.visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.wrap { max-width: 860px; margin: 0 auto; padding: 0 16px; }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; min-height: 40px; padding: .5rem 1rem; border-radius: 999px; border: 0; background: var(--ink); color: var(--paper); font-weight: 600; font-size: .9rem; cursor: pointer; text-decoration: none; white-space: nowrap; }
+.btn:hover { background: #2c2a26; }
+.btn--ghost { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--line); }
+.btn--ghost:hover { background: var(--paper-2); }
+.btn--ok { background: var(--ok); color: #fff; }
+.btn--wa { background: #1b7a46; color: #fff; }
+.btn--danger { background: transparent; color: var(--bad); box-shadow: inset 0 0 0 1.5px #e3b7ae; }
+.btn--sm { min-height: 34px; padding: .35rem .8rem; font-size: .82rem; }
+.btn[disabled] { opacity: .5; cursor: progress; }
+
+/* Cabecera */
+.top { position: sticky; top: 0; z-index: 10; background: rgba(244,240,232,.95); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.top .wrap { display: flex; align-items: center; gap: .6rem; height: 60px; }
+.brand { font-family: var(--serif); font-style: italic; font-size: 1.6rem; margin-right: auto; }
+.brand small { font-family: var(--sans); font-style: normal; font-size: .75rem; color: var(--ink-2); margin-left: .4rem; letter-spacing: .08em; text-transform: uppercase; }
+
+/* Acceso */
+.login { min-height: calc(100vh - 60px); display: grid; place-items: center; padding: 24px 16px; }
+.login form { width: min(360px, 100%); background: var(--card); padding: 1.6rem; border-radius: 20px; display: grid; gap: .9rem; box-shadow: 0 1px 0 var(--line); }
+.login h1 { font-family: var(--serif); font-weight: 400; font-style: italic; font-size: 2.2rem; margin: 0; line-height: 1; }
+label { font-size: .85rem; font-weight: 600; }
+input, select, textarea { width: 100%; padding: .7rem .85rem; border-radius: 12px; border: 1px solid var(--line); background: #fff; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--ink); }
+.field { display: grid; gap: .3rem; }
+.msg { padding: .7rem .9rem; border-radius: 12px; font-size: .9rem; }
+.msg--error { background: var(--bad-bg); color: var(--bad); }
+
+/* Barra de semana */
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; padding: 1rem 0 .5rem; }
+.toolbar h2 { flex: 1 1 100%; margin: 0; font-size: 1.15rem; }
+@media (min-width: 640px) { .toolbar h2 { flex: 1; order: -1; } }
+.notice { margin: .6rem 0; padding: .8rem 1rem; border-radius: 14px; background: var(--pend-bg); color: #5c3f08; font-weight: 600; }
+.legend { display: flex; flex-wrap: wrap; gap: .4rem 1rem; font-size: .8rem; color: var(--ink-2); margin-bottom: .6rem; }
+
+/* Días y huecos */
+.day { margin: 1rem 0 1.4rem; }
+.day__head { display: flex; align-items: baseline; justify-content: space-between; gap: .5rem; padding-bottom: .4rem; border-bottom: 1px solid var(--line); margin-bottom: .5rem; }
+.day__head h3 { margin: 0; font-size: 1rem; }
+.free-list { margin-top: .3rem; }
+.free-list > summary { font-size: .88rem; color: var(--ink-2); cursor: pointer; padding: .35rem 0; }
+.free-list[open] > summary { margin-bottom: .2rem; }
+.day__head h3 .today { font-size: .72rem; background: var(--ink); color: var(--paper); padding: .1rem .5rem; border-radius: 999px; margin-left: .4rem; text-transform: none; vertical-align: middle; }
+.day__closed { color: var(--ink-2); font-size: .9rem; padding: .3rem 0; }
+.slot { display: flex; align-items: center; gap: .7rem; padding: .45rem .2rem; border-bottom: 1px dashed var(--line); }
+.slot__time { font-variant-numeric: tabular-nums; font-weight: 700; width: 3.2rem; flex: none; }
+.slot__label { flex: 1; color: var(--ink-2); font-size: .9rem; }
+.slot--blocked .slot__label { color: var(--bad); }
+.slot--past { opacity: .45; }
+.slot__actions { display: flex; gap: .35rem; flex-wrap: wrap; justify-content: flex-end; }
+
+.cita { background: var(--card); border-radius: 16px; padding: .9rem 1rem; margin: .5rem 0; box-shadow: 0 1px 0 var(--line); border-left: 4px solid var(--pend); }
+.cita--confirmada { border-left-color: var(--ok); }
+.cita--cancelada { border-left-color: var(--line); opacity: .6; }
+.cita__top { display: flex; flex-wrap: wrap; align-items: baseline; gap: .3rem .7rem; }
+.cita__time { font-weight: 700; font-size: 1.1rem; font-variant-numeric: tabular-nums; }
+.cita__name { font-weight: 700; font-size: 1.05rem; }
+.cita__biz { color: var(--ink-2); }
+.chips { display: flex; flex-wrap: wrap; gap: .3rem; margin: .45rem 0; }
+.chip { font-size: .74rem; font-weight: 600; padding: .15rem .55rem; border-radius: 999px; background: var(--paper-2); color: var(--ink-2); }
+.chip--pendiente { background: var(--pend-bg); color: var(--pend); }
+.chip--confirmada { background: var(--ok-bg); color: var(--ok); }
+.chip--cancelada { background: var(--bad-bg); color: var(--bad); }
+.cita__contact { display: flex; flex-wrap: wrap; gap: .2rem 1rem; font-size: .9rem; }
+.cita__note { margin: .5rem 0 0; font-size: .9rem; background: var(--paper); padding: .5rem .7rem; border-radius: 10px; white-space: pre-line; }
+.cita__actions { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .7rem; }
+.cancelled-list { margin-top: .4rem; }
+.cancelled-list summary { font-size: .85rem; color: var(--ink-2); cursor: pointer; }
+
+/* Diálogo de nueva cita */
+dialog { width: min(480px, calc(100% - 24px)); border: 0; border-radius: 20px; padding: 1.3rem; background: var(--card); }
+dialog::backdrop { background: rgba(0,0,0,.45); }
+dialog h2 { margin: 0 0 1rem; font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 1.9rem; }
+dialog form { display: grid; gap: .8rem; }
+.row-2 { display: grid; gap: .8rem; grid-template-columns: 1fr 1fr; }
+.dialog__actions { display: flex; justify-content: flex-end; gap: .5rem; margin-top: .4rem; }
+
+/* Avisos flotantes */
+.toast { position: fixed; left: 50%; bottom: 20px; translate: -50% 0; z-index: 50; background: var(--ink); color: var(--paper); padding: .7rem 1.1rem; border-radius: 999px; font-size: .9rem; box-shadow: 0 10px 30px rgba(0,0,0,.25); max-width: calc(100% - 32px); }
+.toast--error { background: var(--bad); }
+.loading { padding: 2rem 0; text-align: center; color: var(--ink-2); }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <span class="brand">Lagoa <small>Agenda</small></span>
+    <button class="btn btn--sm" id="btn-nueva" type="button" hidden>+ Nueva cita</button>
+    <button class="btn btn--ghost btn--sm" id="btn-salir" type="button" hidden>Salir</button>
+  </div>
+</header>
+
+<!-- ACCESO -->
+<section class="login" id="vista-login" hidden>
+  <form id="form-login" autocomplete="on">
+    <h1>Tu agenda</h1>
+    <p style="margin:0;color:var(--ink-2);font-size:.92rem">Introduce tu contraseña para ver y gestionar las citas.</p>
+    <div class="field">
+      <label for="password">Contraseña</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required>
+    </div>
+    <div class="msg msg--error" id="login-error" role="alert" hidden></div>
+    <button class="btn" type="submit">Entrar</button>
+  </form>
+</section>
+
+<!-- AGENDA -->
+<main class="wrap" id="vista-agenda" hidden>
+  <div class="toolbar">
+    <h2 id="titulo-semana" aria-live="polite">Semana</h2>
+    <button class="btn btn--ghost btn--sm" type="button" id="btn-ant" aria-label="Semana anterior">←</button>
+    <button class="btn btn--ghost btn--sm" type="button" id="btn-hoy">Hoy</button>
+    <button class="btn btn--ghost btn--sm" type="button" id="btn-sig" aria-label="Semana siguiente">→</button>
+  </div>
+  <p class="notice" id="aviso-pendientes" hidden></p>
+  <p class="legend"><span>Pendiente: el cliente espera tu confirmación</span><span>Bloqueado: no se ofrece en la web</span></p>
+  <div id="dias" aria-live="polite"><p class="loading">Cargando…</p></div>
+</main>
+
+<!-- NUEVA CITA -->
+<dialog id="dlg-cita" aria-labelledby="dlg-titulo">
+  <h2 id="dlg-titulo">Nueva cita</h2>
+  <form id="form-cita">
+    <div class="row-2">
+      <div class="field"><label for="c-fecha">Fecha</label><input id="c-fecha" name="fecha" type="date" required></div>
+      <div class="field"><label for="c-hora">Hora</label><input id="c-hora" name="hora" type="time" step="900" required></div>
+    </div>
+    <div class="field"><label for="c-nombre">Nombre</label><input id="c-nombre" name="nombre" type="text" required></div>
+    <div class="row-2">
+      <div class="field"><label for="c-tel">Teléfono</label><input id="c-tel" name="telefono" type="tel"></div>
+      <div class="field"><label for="c-negocio">Negocio</label><input id="c-negocio" name="negocio" type="text"></div>
+    </div>
+    <div class="field">
+      <label for="c-modalidad">Modalidad</label>
+      <select id="c-modalidad" name="modalidad">
+        <option>Videollamada</option>
+        <option>Llamada de teléfono</option>
+        <option>En persona (solo A Coruña ciudad)</option>
+      </select>
+    </div>
+    <div class="field"><label for="c-nota">Nota</label><textarea id="c-nota" name="nota" rows="2"></textarea></div>
+    <div class="msg msg--error" id="cita-error" role="alert" hidden></div>
+    <div class="dialog__actions">
+      <button class="btn btn--ghost" type="button" id="btn-cancelar-dlg">Cancelar</button>
+      <button class="btn" type="submit">Guardar cita</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+'use strict';
+const $ = (s, r = document) => r.querySelector(s);
+const el = (tag, attrs = {}, text) => {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) k === 'class' ? (n.className = v) : n.setAttribute(k, v);
+  if (text !== undefined) n.textContent = text;
+  return n;
+};
+
+/* ---------- Fechas como texto "AAAA-MM-DD" (sin líos de zonas horarias) ---------- */
+const hoyTexto = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+const aFecha = t => { const [y, m, d] = t.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d)); };
+const sumarDias = (t, n) => { const d = aFecha(t); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+const lunesDe = t => { const dia = aFecha(t).getUTCDay(); return sumarDias(t, dia === 0 ? -6 : 1 - dia); };
+const fmtLargo = new Intl.DateTimeFormat('es-ES', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
+const fmtCorto = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'short', timeZone: 'UTC' });
+const mayuscula = t => t.charAt(0).toUpperCase() + t.slice(1);
+const ahoraMinutos = () => { const d = new Date(); return d.getHours() * 60 + d.getMinutes(); };
+const minutos = h => { const [a, b] = h.split(':').map(Number); return a * 60 + b; };
+
+/* ---------- Llamadas a la API ---------- */
+async function api(url, { method = 'GET', body } = {}) {
+  const r = await fetch(url, {
+    method, credentials: 'same-origin',
+    headers: body ? { 'Content-Type': 'application/json' } : {},
+    body: body ? JSON.stringify(body) : undefined
+  });
+  const data = await r.json().catch(() => ({}));
+  if (r.status === 401) { mostrarLogin(); throw new Error(data.error || 'Tu sesión ha caducado.'); }
+  if (!r.ok) throw new Error(data.error || 'Algo ha fallado. Inténtalo de nuevo.');
+  return data;
+}
+
+let toastTimer;
+function aviso(texto, error = false) {
+  const t = $('#toast');
+  t.textContent = texto; t.hidden = false;
+  t.className = 'toast' + (error ? ' toast--error' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.hidden = true; }, 3200);
+}
+
+/* ---------- Estado ---------- */
+let semana = lunesDe(hoyTexto());
+let datos = null;
+
+function mostrarLogin() {
+  $('#vista-login').hidden = false;
+  $('#vista-agenda').hidden = true;
+  $('#btn-nueva').hidden = $('#btn-salir').hidden = true;
+  setTimeout(() => $('#password').focus(), 50);
+}
+function mostrarAgenda() {
+  $('#vista-login').hidden = true;
+  $('#vista-agenda').hidden = false;
+  $('#btn-nueva').hidden = $('#btn-salir').hidden = false;
+  cargar();
+}
+
+/* ---------- Acceso ---------- */
+$('#form-login').addEventListener('submit', async e => {
+  e.preventDefault();
+  const err = $('#login-error'); err.hidden = true;
+  const btn = $('button[type=submit]', e.target); btn.disabled = true;
+  try {
+    const r = await fetch('/api/admin/login', {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: $('#password').value })
+    });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(data.error || 'No se ha podido entrar.');
+    $('#password').value = '';
+    mostrarAgenda();
+  } catch (ex) {
+    err.textContent = ex.message; err.hidden = false;
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+$('#btn-salir').addEventListener('click', async () => {
+  await fetch('/api/admin/logout', { method: 'POST', credentials: 'same-origin' }).catch(() => {});
+  mostrarLogin();
+});
+
+/* ---------- Cargar y pintar la semana ---------- */
+async function cargar() {
+  try {
+    datos = await api(`/api/admin/citas?desde=${semana}&hasta=${sumarDias(semana, 6)}`);
+    pintar();
+  } catch (ex) {
+    if (!$('#vista-agenda').hidden) $('#dias').replaceChildren(el('p', { class: 'msg msg--error' }, ex.message));
+  }
+}
+
+function pintar() {
+  const fin = sumarDias(semana, 6);
+  $('#titulo-semana').textContent = `Semana del ${fmtCorto.format(aFecha(semana))} al ${fmtCorto.format(aFecha(fin))}`;
+  const avisoPend = $('#aviso-pendientes');
+  avisoPend.hidden = !datos.pendientesTotal;
+  avisoPend.textContent = datos.pendientesTotal === 1
+    ? 'Tienes 1 cita pendiente de confirmar.'
+    : `Tienes ${datos.pendientesTotal} citas pendientes de confirmar.`;
+
+  const hoy = hoyTexto();
+  const bloqueos = new Set(datos.bloqueos);
+  const cont = $('#dias');
+  cont.replaceChildren();
+
+  for (let i = 0; i < 7; i++) {
+    const fecha = sumarDias(semana, i);
+    const delDia = datos.citas.filter(c => c.fecha === fecha);
+    const activas = delDia.filter(c => c.estado !== 'cancelada');
+    const canceladas = delDia.filter(c => c.estado === 'cancelada');
+    const horario = datos.horario[aFecha(fecha).getUTCDay()] || [];
+    const pasado = fecha < hoy;
+
+    const dia = el('section', { class: 'day', 'aria-label': fmtLargo.format(aFecha(fecha)) });
+    const cab = el('div', { class: 'day__head' });
+    const h3 = el('h3', {}, mayuscula(fmtLargo.format(aFecha(fecha))));
+    if (fecha === hoy) h3.append(el('span', { class: 'today' }, 'Hoy'));
+    cab.append(h3);
+
+    // Botón para cerrar todos los huecos libres del día
+    const libresDia = horario.filter(h => !bloqueos.has(`${fecha} ${h}`) && !activas.some(c => c.hora === h));
+    if (!pasado && libresDia.length) {
+      const b = el('button', { class: 'btn btn--ghost btn--sm', type: 'button' }, 'Bloquear día');
+      b.addEventListener('click', () => bloquearVarios(fecha, libresDia, b));
+      cab.append(b);
+    }
+    dia.append(cab);
+
+    // Todas las horas del día: las del horario + las de citas añadidas a mano
+    const horas = [...new Set([...horario, ...activas.map(c => c.hora), ...[...bloqueos].filter(k => k.startsWith(fecha)).map(k => k.slice(11))])]
+      .sort((a, b) => minutos(a) - minutos(b));
+
+    if (!horas.length) dia.append(el('p', { class: 'day__closed' }, 'Sin horario de consultas.'));
+
+    // Primero lo importante (citas y huecos bloqueados); las horas libres, plegadas
+    const libres = [];
+    for (const h of horas) {
+      const cita = activas.find(c => c.hora === h);
+      if (cita) { dia.append(tarjetaCita(cita)); continue; }
+      const yaPaso = pasado || (fecha === hoy && minutos(h) <= ahoraMinutos());
+      if (bloqueos.has(`${fecha} ${h}`)) { if (!yaPaso) dia.append(filaHueco(fecha, h, true, false)); continue; }
+      if (!yaPaso) libres.push(h); // las horas libres que ya han pasado no se muestran
+    }
+    if (libres.length) {
+      const det = el('details', { class: 'free-list' });
+      det.append(el('summary', {}, `${libres.length} ${libres.length === 1 ? 'hora libre' : 'horas libres'}`));
+      libres.forEach(h => det.append(filaHueco(fecha, h, false, false)));
+      dia.append(det);
+    } else if (horas.length && !activas.length && !dia.querySelector('.slot')) {
+      dia.append(el('p', { class: 'day__closed' }, pasado ? 'Sin citas.' : 'Sin horas libres.'));
+    }
+
+    if (canceladas.length) {
+      const det = el('details', { class: 'cancelled-list' });
+      det.append(el('summary', {}, `${canceladas.length} cancelada${canceladas.length > 1 ? 's' : ''}`));
+      canceladas.forEach(c => det.append(tarjetaCita(c)));
+      dia.append(det);
+    }
+    cont.append(dia);
+  }
+}
+
+function filaHueco(fecha, hora, bloqueado, yaPaso) {
+  const fila = el('div', { class: 'slot' + (bloqueado ? ' slot--blocked' : '') + (yaPaso ? ' slot--past' : '') });
+  fila.append(el('span', { class: 'slot__time' }, hora), el('span', { class: 'slot__label' }, bloqueado ? 'Bloqueado' : yaPaso ? 'Pasado' : 'Libre'));
+  if (!yaPaso) {
+    const acc = el('div', { class: 'slot__actions' });
+    if (bloqueado) {
+      const b = el('button', { class: 'btn btn--ghost btn--sm', type: 'button' }, 'Abrir');
+      b.addEventListener('click', () => accion(b, () => api(`/api/admin/bloqueos?fecha=${fecha}&hora=${hora}`, { method: 'DELETE' }), 'Hueco abierto'));
+      acc.append(b);
+    } else {
+      const add = el('button', { class: 'btn btn--ghost btn--sm', type: 'button', 'aria-label': `Añadir cita el ${fecha} a las ${hora}` }, '+ Cita');
+      add.addEventListener('click', () => abrirNueva(fecha, hora));
+      const b = el('button', { class: 'btn btn--ghost btn--sm', type: 'button' }, 'Bloquear');
+      b.addEventListener('click', () => accion(b, () => api('/api/admin/bloqueos', { method: 'POST', body: { fecha, hora } }), 'Hueco bloqueado'));
+      acc.append(add, b);
+    }
+    fila.append(acc);
+  }
+  return fila;
+}
+
+/** Número para WhatsApp: solo dígitos y con prefijo de España si falta */
+function telefonoWa(t) {
+  let d = (t || '').replace(/\D/g, '');
+  if (d.startsWith('00')) d = d.slice(2);
+  if (d.length === 9) d = '34' + d;
+  return d;
+}
+
+function tarjetaCita(c) {
+  const card = el('article', { class: `cita cita--${c.estado}` });
+  const top = el('div', { class: 'cita__top' });
+  top.append(el('span', { class: 'cita__time' }, c.hora), el('span', { class: 'cita__name' }, c.nombre));
+  if (c.negocio) top.append(el('span', { class: 'cita__biz' }, c.negocio));
+  card.append(top);
+
+  const chips = el('div', { class: 'chips' });
+  const nombresEstado = { pendiente: 'Pendiente', confirmada: 'Confirmada', cancelada: 'Cancelada' };
+  chips.append(el('span', { class: `chip chip--${c.estado}` }, nombresEstado[c.estado]), el('span', { class: 'chip' }, c.modalidad));
+  if (c.origen === 'panel') chips.append(el('span', { class: 'chip' }, 'Añadida a mano'));
+  card.append(chips);
+
+  const contacto = el('div', { class: 'cita__contact' });
+  if (c.telefono) contacto.append(el('a', { href: `tel:${c.telefono.replace(/[^\d+]/g, '')}` }, c.telefono));
+  if (c.email) contacto.append(el('a', { href: `mailto:${c.email}` }, c.email));
+  card.append(contacto);
+  if (c.nota) card.append(el('p', { class: 'cita__note' }, c.nota));
+
+  const acc = el('div', { class: 'cita__actions' });
+  if (c.estado === 'pendiente') {
+    const b = el('button', { class: 'btn btn--ok btn--sm', type: 'button' }, 'Confirmar');
+    b.addEventListener('click', () => accion(b, () => api('/api/admin/citas', { method: 'PATCH', body: { id: c.id, estado: 'confirmada' } }), 'Cita confirmada'));
+    acc.append(b);
+  }
+  if (c.telefono && c.estado !== 'cancelada') {
+    const texto = `Hola, ${c.nombre}. Te confirmo la consulta del ${fmtLargo.format(aFecha(c.fecha))} a las ${c.hora} (${c.modalidad}). ¡Hasta entonces! Nadia · Lagoa`;
+    acc.append(el('a', { class: 'btn btn--wa btn--sm', href: `https://wa.me/${telefonoWa(c.telefono)}?text=${encodeURIComponent(texto)}`, target: '_blank', rel: 'noopener' }, 'WhatsApp'));
+  }
+  if (c.estado !== 'cancelada') {
+    const b = el('button', { class: 'btn btn--danger btn--sm', type: 'button' }, 'Cancelar');
+    b.addEventListener('click', () => {
+      if (!confirm(`¿Cancelar la cita de ${c.nombre} (${c.hora})? El hueco volverá a quedar libre en la web.`)) return;
+      accion(b, () => api('/api/admin/citas', { method: 'PATCH', body: { id: c.id, estado: 'cancelada' } }), 'Cita cancelada');
+    });
+    acc.append(b);
+  } else {
+    const b = el('button', { class: 'btn btn--ghost btn--sm', type: 'button' }, 'Reactivar');
+    b.addEventListener('click', () => accion(b, () => api('/api/admin/citas', { method: 'PATCH', body: { id: c.id, estado: 'pendiente' } }), 'Cita reactivada'));
+    acc.append(b);
+  }
+  card.append(acc);
+  return card;
+}
+
+/** Ejecuta una acción, muestra el resultado y recarga la semana */
+async function accion(boton, fn, textoOk) {
+  boton.disabled = true;
+  try { await fn(); aviso(textoOk); await cargar(); }
+  catch (ex) { aviso(ex.message, true); boton.disabled = false; }
+}
+
+async function bloquearVarios(fecha, horas, boton) {
+  if (!confirm(`¿Bloquear las ${horas.length} horas libres de este día?`)) return;
+  boton.disabled = true;
+  try {
+    for (const hora of horas) await api('/api/admin/bloqueos', { method: 'POST', body: { fecha, hora } });
+    aviso('Día bloqueado');
+  } catch (ex) { aviso(ex.message, true); }
+  await cargar();
+}
+
+/* ---------- Navegación entre semanas ---------- */
+$('#btn-ant').addEventListener('click', () => { semana = sumarDias(semana, -7); cargar(); });
+$('#btn-sig').addEventListener('click', () => { semana = sumarDias(semana, 7); cargar(); });
+$('#btn-hoy').addEventListener('click', () => { semana = lunesDe(hoyTexto()); cargar(); });
+
+/* ---------- Nueva cita a mano ---------- */
+const dlg = $('#dlg-cita');
+function abrirNueva(fecha = hoyTexto(), hora = '') {
+  $('#form-cita').reset();
+  $('#cita-error').hidden = true;
+  $('#c-fecha').value = fecha;
+  $('#c-hora').value = hora;
+  dlg.showModal();
+  $(hora ? '#c-nombre' : '#c-hora').focus();
+}
+$('#btn-nueva').addEventListener('click', () => abrirNueva());
+$('#btn-cancelar-dlg').addEventListener('click', () => dlg.close());
+$('#form-cita').addEventListener('submit', async e => {
+  e.preventDefault();
+  const f = Object.fromEntries(new FormData(e.target));
+  const err = $('#cita-error'); err.hidden = true;
+  const btn = $('button[type=submit]', e.target); btn.disabled = true;
+  try {
+    await api('/api/admin/citas', { method: 'POST', body: f });
+    dlg.close();
+    aviso('Cita guardada');
+    semana = lunesDe(f.fecha);
+    await cargar();
+  } catch (ex) {
+    err.textContent = ex.message; err.hidden = false;
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+/* ---------- Al abrir el panel y cada minuto ---------- */
+(async function inicio() {
+  try {
+    const r = await fetch('/api/admin/sesion', { credentials: 'same-origin' });
+    const s = await r.json();
+    if (!s.configurada) {
+      mostrarLogin();
+      const err = $('#login-error');
+      err.textContent = 'Falta configurar la contraseña (ADMIN_PASSWORD) en Vercel.';
+      err.hidden = false;
+      return;
+    }
+    s.activa ? mostrarAgenda() : mostrarLogin();
+  } catch {
+    mostrarLogin();
+  }
+})();
+setInterval(() => { if (!document.hidden && !$('#vista-agenda').hidden && !dlg.open) cargar(); }, 60000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden && !$('#vista-agenda').hidden) cargar(); });
+</script>
+</body>
+</html>

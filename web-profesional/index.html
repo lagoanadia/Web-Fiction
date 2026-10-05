@@ -1062,43 +1062,106 @@ $$('[data-open-tab]').forEach(a => a.addEventListener('click', () => selectTab(d
     g.hidden = false;
   }
 
-  /** Horas libres de un día, quitando las que no respetan la antelación mínima */
+  /* Disponibilidad: la del servidor (agenda real) si responde; si no, la de CONFIG
+     y las reservas se envían por email como antes. */
+  let horario = CONFIG.availability;
+  let diasVista = CONFIG.daysAhead;
+  let antelacion = CONFIG.minHoursNotice;
+  let ocupados = new Set();   // "AAAA-MM-DD HH:MM" ya reservadas o bloqueadas
+  let conServidor = false;
+
+  const pad = n => String(n).padStart(2, '0');
+  const iso = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+  /** Horas libres de un día: ni ocupadas ni sin la antelación mínima */
   function slotsFor(date) {
-    const list = CONFIG.availability[date.getDay()] || [];
-    const limit = Date.now() + CONFIG.minHoursNotice * 3600e3;
+    const list = horario[date.getDay()] || [];
+    const limit = Date.now() + antelacion * 3600e3;
     return list.filter(t => {
+      if (ocupados.has(`${iso(date)} ${t}`)) return false;
       const [h, m] = t.split(':').map(Number);
       const d = new Date(date); d.setHours(h, m, 0, 0);
       return d.getTime() > limit;
     });
   }
 
-  // Próximos días con al menos una hora disponible
-  const today = new Date(); today.setHours(0, 0, 0, 0);
-  for (let i = 0; i <= CONFIG.daysAhead; i++) {
-    const d = new Date(today); d.setDate(today.getDate() + i);
-    if (!slotsFor(d).length) continue;
-    const b = el('button', { type: 'button', class: 'choice', 'aria-pressed': 'false', 'aria-label': fmtLong.format(d) });
-    const [wd, ...rest] = fmtDay.format(d).split(' ');
-    b.append(el('small', {}, wd.replace(',', '')), document.createTextNode(rest.join(' ')));
-    b.addEventListener('click', () => {
-      state.date = d; state.time = null;
-      $$('.choice', daysBox).forEach(x => x.setAttribute('aria-pressed', String(x === b)));
-      renderSlots();
-    });
-    daysBox.append(b);
+  /** Pinta los próximos días con al menos una hora libre */
+  function renderDays() {
+    daysBox.replaceChildren();
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    for (let i = 0; i <= diasVista; i++) {
+      const d = new Date(today); d.setDate(today.getDate() + i);
+      if (!slotsFor(d).length) continue;
+      const selected = state.date && iso(state.date) === iso(d);
+      const b = el('button', { type: 'button', class: 'choice', 'aria-pressed': String(!!selected), 'aria-label': fmtLong.format(d) });
+      const [wd, ...rest] = fmtDay.format(d).split(' ');
+      b.append(el('small', {}, wd.replace(',', '')), document.createTextNode(rest.join(' ')));
+      b.addEventListener('click', () => {
+        state.date = d; state.time = null;
+        $$('.choice', daysBox).forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+        renderSlots();
+      });
+      daysBox.append(b);
+    }
+    if (!daysBox.children.length) daysBox.append(el('p', { class: 'muted small' }, 'No quedan horas libres en los próximos días. Escríbeme por WhatsApp y buscamos un hueco.'));
   }
 
   function renderSlots() {
     slotsBox.replaceChildren();
-    slotsFor(state.date).forEach(t => {
-      const b = el('button', { type: 'button', class: 'choice', 'aria-pressed': 'false' }, t);
+    const libres = slotsFor(state.date);
+    if (!libres.length) {
+      slotsBox.append(el('p', { class: 'muted small' }, 'Ya no quedan horas libres este día. Elige otro.'));
+      return;
+    }
+    libres.forEach(t => {
+      const b = el('button', { type: 'button', class: 'choice', 'aria-pressed': String(state.time === t) }, t);
       b.addEventListener('click', () => {
         state.time = t;
         $$('.choice', slotsBox).forEach(x => x.setAttribute('aria-pressed', String(x === b)));
       });
       slotsBox.append(b);
     });
+  }
+
+  async function cargarDisponibilidad() {
+    try {
+      const r = await fetch('/api/disponibilidad', { cache: 'no-store' });
+      if (!r.ok) throw new Error('sin servidor');
+      const d = await r.json();
+      horario = d.horario; diasVista = d.diasVista; antelacion = d.antelacionHoras;
+      ocupados = new Set(d.ocupados);
+      conServidor = true;
+    } catch {
+      conServidor = false; // web estática o base de datos sin configurar
+    }
+    if (state.time && state.date && !slotsFor(state.date).includes(state.time)) state.time = null;
+    renderDays();
+    if (state.date) renderSlots();
+  }
+
+  renderDays();
+  cargarDisponibilidad();
+
+  /** Guarda la reserva en la agenda. Devuelve 'ok', 'fallback' (usar email) o un error para el cliente */
+  async function guardarEnAgenda(f) {
+    try {
+      const r = await fetch('/api/reservas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fecha: iso(state.date), hora: state.time,
+          modalidad: f.get('modalidad'), nombre: f.get('nombre'), negocio: f.get('negocio'),
+          telefono: f.get('telefono'), email: f.get('email'), nota: f.get('nota'),
+          privacidad: true, _honey: f.get('_honey') || ''
+        })
+      });
+      if (r.ok) return { estado: 'ok' };
+      if ([400, 409, 429].includes(r.status)) {
+        const d = await r.json().catch(() => ({}));
+        return { estado: 'error', mensaje: d.error || 'No se ha podido reservar esa hora.', ocupada: r.status === 409 };
+      }
+    } catch { /* sin conexión con el servidor */ }
+    return { estado: 'fallback' };
   }
 
   const form = $('#form-reserva');
@@ -1128,15 +1191,34 @@ $$('[data-open-tab]').forEach(a => a.addEventListener('click', () => selectTab(d
     const summary = `Hola Nadia, quiero reservar una consulta rápida.\n${Object.entries(data).slice(1).map(([k, v]) => `${k}: ${v}`).join('\n')}`;
     const btn = $('button[type=submit]', form);
     btn.disabled = true; btn.textContent = 'Enviando…';
-    const ok = await sendToEmail(`Nueva reserva: ${data.Nombre} · ${when}`, data);
+
+    let ok;
+    if (conServidor) {
+      const r = await guardarEnAgenda(f);
+      if (r.estado === 'error') {
+        btn.disabled = false; btn.textContent = 'Solicitar cita';
+        status.hidden = false; status.dataset.type = 'error'; status.textContent = r.mensaje;
+        if (r.ocupada) { state.time = null; await cargarDisponibilidad(); }
+        return;
+      }
+      if (r.estado === 'ok') {
+        ok = true;
+        sendToEmail(`Nueva reserva: ${data.Nombre} · ${when}`, data); // aviso por email a Nadia
+      } else {
+        ok = await sendToEmail(`Nueva reserva: ${data.Nombre} · ${when}`, data);
+      }
+    } else {
+      ok = await sendToEmail(`Nueva reserva: ${data.Nombre} · ${when}`, data);
+    }
+
     btn.disabled = false; btn.textContent = 'Solicitar cita';
     showStatus(status, ok, summary);
     if (ok) {
       status.textContent = `Solicitud enviada: ${when} (${data.Modalidad}). Recibirás la confirmación por WhatsApp o email.`;
       form.reset();
-      $$('.choice', form).forEach(x => x.setAttribute('aria-pressed', 'false'));
       state.date = state.time = null;
       slotsBox.replaceChildren(el('p', { class: 'muted small' }, 'Selecciona primero un día.'));
+      cargarDisponibilidad();
     }
   });
 })();
