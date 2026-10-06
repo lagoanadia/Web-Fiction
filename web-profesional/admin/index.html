@@ -350,6 +350,10 @@ function pintar() {
   const hoy = hoyTexto();
   const bloqueos = new Set(datos.bloqueos);
   const cont = $('#dias');
+  // Recordar qué desplegables (horas libres / canceladas) estaban abiertos,
+  // porque se reconstruye todo el DOM y si no, se cerrarían solos.
+  const abiertos = new Set([...cont.querySelectorAll('details[open]')]
+    .map(d => `${d.closest('.day')?.dataset.fecha}:${d.className}`));
   cont.replaceChildren();
 
   for (let i = 0; i < 7; i++) {
@@ -360,7 +364,7 @@ function pintar() {
     const horario = datos.horario[aFecha(fecha).getUTCDay()] || [];
     const pasado = fecha < hoy;
 
-    const dia = el('section', { class: 'day', 'aria-label': fmtLargo.format(aFecha(fecha)) });
+    const dia = el('section', { class: 'day', 'data-fecha': fecha, 'aria-label': fmtLargo.format(aFecha(fecha)) });
     const cab = el('div', { class: 'day__head' });
     const h3 = el('h3', {}, mayuscula(fmtLargo.format(aFecha(fecha))));
     if (fecha === hoy) h3.append(el('span', { class: 'today' }, 'Hoy'));
@@ -392,6 +396,7 @@ function pintar() {
     }
     if (libres.length) {
       const det = el('details', { class: 'free-list' });
+      if (abiertos.has(`${fecha}:free-list`)) det.open = true;
       det.append(el('summary', {}, `${libres.length} ${libres.length === 1 ? 'hora libre' : 'horas libres'}`));
       libres.forEach(h => det.append(filaHueco(fecha, h, false, false)));
       dia.append(det);
@@ -401,6 +406,7 @@ function pintar() {
 
     if (canceladas.length) {
       const det = el('details', { class: 'cancelled-list' });
+      if (abiertos.has(`${fecha}:cancelled-list`)) det.open = true;
       det.append(el('summary', {}, `${canceladas.length} cancelada${canceladas.length > 1 ? 's' : ''}`));
       canceladas.forEach(c => det.append(tarjetaCita(c)));
       dia.append(det);
