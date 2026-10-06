@@ -2753,6 +2753,20 @@ try {
 | Bot answers in the wrong language | First message guessed wrong | The client writes "castellano" or "galego" |
 | Prices differ between web and bot | Changed only one place | `SERVICES`/`PACK` in `index.html` **and** `negocio.js` |
 | Meta says the API version is deprecated | Each version lasts ~2 years | Change `v23.0` in `api/_lib/whatsapp.js` to the current version |
+| Everything looks configured (webhook verified, `messages` subscribed) but a real message from your phone produces **no log at all** — not even an error | The test WhatsApp Business Account is actually delivering its events to Meta's own internal app (`WA DevX Webhook Events 1P App`), not to yours. The green "Subscribed" toggle in *Webhook fields* only means the **app** is configured to receive events — it doesn't guarantee the **WABA** is sending them to this particular app | See 13.9 below to check and fix it with the Graph API Explorer |
+
+### 13.9 Deep debugging: the test number sends its events to someone else's app
+
+If you've verified the webhook, subscribed to `messages`, and clicking the dashboard's "Test" button (next to the `messages` row in *Webhook fields*) does produce a log line in Vercel — but a **real** message from your own phone produces nothing at all — the test WABA itself may not be pointed at your app. This is separate from the webhook URL/token configuration, and Meta's UI gives no obvious warning about it.
+
+1. Go to https://developers.facebook.com/tools/explorer
+2. Pick your app (top right) and paste a valid access token (the temporary one from API Setup works).
+3. Clear the request path and type: `YOUR_WABA_ID/subscribed_apps` (the Business Account ID, not the Phone Number ID) → method **GET** → *Submit*.
+4. Read the `data` array:
+   - Your app's name is there → the WABA is fine, look elsewhere (token expired, phone_number_id mismatch, etc. — see the table above).
+   - Only `WA DevX Webhook Events 1P App` (or another app) is there, yours is missing → that's the bug.
+5. Fix it: same path, switch the method to **POST**, *Submit*. This subscribes your app to the WABA (it's added, the other one isn't necessarily removed — that's fine, both can coexist).
+6. Re-run the GET to confirm your app now appears, then send a real WhatsApp message again and check the Vercel logs.
 
 ---
 
