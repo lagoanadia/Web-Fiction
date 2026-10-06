@@ -5,40 +5,42 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Servicios de Nadia Lagoa</title>
 <meta name="description" content="Muestrario visual de los servicios digitales de Nadia Lagoa Vilela, desarrolladora de software en A Coruña y la Costa da Morte. Todos los negocios de las demos son ficticios.">
-<meta name="theme-color" content="#1F4D4A">
+<meta name="theme-color" content="#12110f">
 
-<!-- Única dependencia externa permitida: Google Fonts -->
+<!-- Única dependencia externa permitida: Google Fonts (mismas que lagoa-webs.vercel.app) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=Fraunces:ital,opsz,wght@1,9..144,400..600&family=IBM+Plex+Mono:wght@400;500;600&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Manrope:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
 /* =========================================================
    1. TOKENS DE DISEÑO
-   Paleta "papel cálido + verde marino" definida una sola vez.
+   Misma paleta "papel cálido + verde oliva" que lagoa-webs.vercel.app,
+   definida una sola vez.
    ========================================================= */
 :root {
-  --paper: #EDE5D6;        /* fondo de la página */
-  --card: #FFFBF3;         /* tarjetas */
-  --ink: #1B2624;          /* texto principal */
-  --ink-soft: #4A5552;     /* texto secundario (contraste AA sobre papel) */
-  --green: #1F4D4A;        /* verde marino */
-  --green-dark: #173B39;
-  --green-tint: #DCE6E1;
-  --terra: #C0522B;        /* acento terracota (fondos y textos grandes) */
-  --terra-ink: #9C3E1B;    /* terracota oscurecido para texto pequeño */
-  --terra-tint: #F5DDD0;
-  --line: #D6CBB6;
-  --wa-bg: #E9E1D4;        /* fondo del chat */
-  --wa-out: #D7EBDD;       /* burbuja enviada */
+  /* Misma paleta que lagoa-webs.vercel.app (estilo editorial, fotos de Galicia) */
+  --paper: #f4f0e8;        /* fondo de la página */
+  --card: #fbf9f4;         /* tarjetas */
+  --ink: #161513;          /* texto principal */
+  --ink-soft: #5f5a52;     /* texto secundario (contraste AA sobre papel) */
+  --green: #6b8e23;        /* verde oliva: acento principal */
+  --green-dark: #556b2f;
+  --green-tint: #e4e9d0;
+  --terra: #e6ab63;        /* acento cálido (luz de atardecer) */
+  --terra-ink: #96672e;    /* oscurecido para texto pequeño */
+  --terra-tint: #fbebd3;
+  --line: #d8d0c0;
+  --wa-bg: #E9E1D4;        /* fondo del chat (demo WhatsApp) */
+  --wa-out: #D7EBDD;       /* burbuja enviada (demo WhatsApp) */
 
-  --f-display: "Archivo", "Arial Narrow", sans-serif;
-  --f-serif: "Fraunces", Georgia, serif;
-  --f-body: "Work Sans", system-ui, sans-serif;
-  --f-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --f-display: "Cormorant Garamond", Georgia, serif;
+  --f-serif: "Cormorant Garamond", Georgia, serif;
+  --f-body: "Manrope", system-ui, sans-serif;
+  --f-mono: "DM Mono", ui-monospace, monospace;
 
   --radius: 14px;
-  --shadow: 0 1px 0 rgba(27,38,36,.06), 0 12px 30px -18px rgba(27,38,36,.45);
+  --shadow: 0 1px 0 rgba(22,21,19,.06), 0 12px 30px -18px rgba(22,21,19,.45);
   --gutter: 16px;
 }
 
@@ -90,11 +92,10 @@ h1, h2, h3, h4 { margin: 0; overflow-wrap: break-word; }
 /* Tipografía de apoyo */
 .display {
   font-family: var(--f-display);
-  font-stretch: 72%;
-  font-weight: 800;
+  font-weight: 300;
   text-transform: uppercase;
   line-height: .95;
-  letter-spacing: .005em;
+  letter-spacing: .02em;
 }
 .serif-i { font-family: var(--f-serif); font-style: italic; font-weight: 400; }
 .mono {
@@ -228,7 +229,7 @@ h1, h2, h3, h4 { margin: 0; overflow-wrap: break-word; }
   background: var(--ink);
   border-radius: 42px;
   padding: 11px;
-  box-shadow: 0 30px 60px -30px rgba(23,59,57,.7), inset 0 0 0 2px #34413E;
+  box-shadow: 0 30px 60px -30px rgba(22,21,19,.7), inset 0 0 0 2px #3a332c;
 }
 .phone__screen {
   position: relative;
@@ -498,15 +499,15 @@ mark { background: #FFF0B3; color: inherit; padding: 0 .1em; border-radius: 2px;
    9. PACK + MANTENIMIENTO
    ========================================================= */
 .pack { background: var(--green); color: #F4EEE2; border-top: 0; }
-.pack .service__kicker { color: #F2B79C; }
+.pack .service__kicker { color: var(--terra); }
 .pack h2 { color: #fff; }
-.pack .service__tag { color: #CFE0DA; }
+.pack .service__tag { color: var(--green-tint); }
 .pack-grid { display: grid; gap: 2rem; }
 @media (min-width: 920px) { .pack-grid { grid-template-columns: 340px 1fr; gap: 3rem; align-items: start; } }
 .pack .price { background: var(--green-dark); box-shadow: none; }
 .pack .price__amount { color: #fff; }
-.pack .price__amount small, .pack .price__label { color: #DCE6E1; }
-.pack .price__label b { color: #F2B79C; }
+.pack .price__amount small, .pack .price__label { color: var(--green-tint); }
+.pack .price__label b { color: var(--terra); }
 .pack .chip { background: rgba(255,255,255,.12); color: #fff; }
 .pack .includes li::before { background-color: var(--terra); }
 .save { display: inline-block; background: var(--terra); color: #fff; font-family: var(--f-mono); font-size: .75rem; letter-spacing: .06em; text-transform: uppercase; padding: .25rem .6rem; border-radius: 6px; margin-bottom: 1rem; }
@@ -522,7 +523,7 @@ mark { background: #FFF0B3; color: inherit; padding: 0 .1em; border-radius: 2px;
 .flow__node p { font-size: .8rem; color: var(--ink-soft); margin: .35rem 0 0; line-height: 1.35; }
 .flow__node--core { background: var(--green); color: #fff; border-color: var(--green); }
 .flow__node--core svg { color: #fff; }
-.flow__node--core p { color: #DCE6E1; }
+.flow__node--core p { color: var(--green-tint); }
 .flow__link { position: relative; text-align: center; font-size: .78rem; font-family: var(--f-serif); font-style: italic; color: var(--terra-ink); padding: 1.6rem .4rem; line-height: 1.3; }
 /* Flecha: vertical en móvil, horizontal en escritorio */
 .flow__link::before { content: ""; position: absolute; left: 50%; top: 4px; bottom: 4px; border-left: 2px dashed var(--terra); }
@@ -559,13 +560,13 @@ mark { background: #FFF0B3; color: inherit; padding: 0 .1em; border-radius: 2px;
    ========================================================= */
 .site-foot { background: var(--ink); color: #E6DED0; padding-block: 3rem 2rem; }
 .site-foot h2 { font-size: clamp(2.4rem, 10vw, 4.6rem); color: #fff; }
-.site-foot h2 em { font-family: var(--f-serif); font-style: italic; font-weight: 400; text-transform: none; color: #F2B79C; font-stretch: normal; }
+.site-foot h2 em { font-family: var(--f-serif); font-style: italic; font-weight: 400; text-transform: none; color: var(--terra); font-stretch: normal; }
 .contact { display: grid; gap: .8rem; margin: 1.5rem 0 2rem; }
 @media (min-width: 700px) { .contact { grid-template-columns: repeat(3, 1fr); } }
-.contact a, .contact div { display: block; background: #26332F; border-radius: 12px; padding: .9rem 1rem; color: #fff; text-decoration: none; overflow-wrap: anywhere; }
-.contact a:hover { background: #2E3D39; }
-.contact .mono { color: #F2B79C; display: block; margin-bottom: .2rem; }
-.foot-note { font-size: .82rem; color: #B9B1A3; border-top: 1px solid #34413E; padding-top: 1rem; }
+.contact a, .contact div { display: block; background: rgba(255,255,255,.07); border-radius: 12px; padding: .9rem 1rem; color: #fff; text-decoration: none; overflow-wrap: anywhere; }
+.contact a:hover { background: rgba(255,255,255,.12); }
+.contact .mono { color: var(--terra); display: block; margin-bottom: .2rem; }
+.foot-note { font-size: .82rem; color: #B9B1A3; border-top: 1px solid rgba(255,255,255,.14); padding-top: 1rem; }
 </style>
 </head>
 
@@ -594,12 +595,12 @@ mark { background: #FFF0B3; color: inherit; padding: 0 .1em; border-radius: 2px;
     <nav class="toc" aria-labelledby="toc-title">
       <h2 id="toc-title" class="mono">Índice de servicios</h2>
       <ol>
-        <li><a href="#web"><span class="toc__n">01</span><span class="toc__t">Web con galería y reservas</span><span class="toc__p">375 €</span></a></li>
-        <li><a href="#whatsapp"><span class="toc__n">02</span><span class="toc__t">Asistente de WhatsApp</span><span class="toc__p">275 €</span></a></li>
-        <li><a href="#tienda"><span class="toc__n">03</span><span class="toc__t">Tienda online pequeña</span><span class="toc__p">575 €</span></a></li>
-        <li><a href="#google"><span class="toc__n">04</span><span class="toc__t">Google Maps y SEO local</span><span class="toc__p">175 €</span></a></li>
-        <li><a href="#pack"><span class="toc__n">05</span><span class="toc__t">Pack web + WhatsApp</span><span class="toc__p">575 €</span></a></li>
-        <li><a href="#mantenimiento"><span class="toc__n">06</span><span class="toc__t">Mantenimiento opcional</span><span class="toc__p">desde 20 €/mes</span></a></li>
+        <li><a href="#web"><span class="toc__n">01</span><span class="toc__t">Web con galería y reservas</span><span class="toc__p">290 €</span></a></li>
+        <li><a href="#whatsapp"><span class="toc__n">02</span><span class="toc__t">Asistente de WhatsApp</span><span class="toc__p">190 €</span></a></li>
+        <li><a href="#tienda"><span class="toc__n">03</span><span class="toc__t">Tienda online pequeña</span><span class="toc__p">390 €</span></a></li>
+        <li><a href="#google"><span class="toc__n">04</span><span class="toc__t">Google Maps y SEO local</span><span class="toc__p">120 €</span></a></li>
+        <li><a href="#pack"><span class="toc__n">05</span><span class="toc__t">Pack web + WhatsApp</span><span class="toc__p">430 €</span></a></li>
+        <li><a href="#mantenimiento"><span class="toc__n">06</span><span class="toc__t">Mantenimiento opcional</span><span class="toc__p">desde 15 €/mes</span></a></li>
       </ol>
     </nav>
   </div>
@@ -618,12 +619,12 @@ mark { background: #FFF0B3; color: inherit; padding: 0 .1em; border-radius: 2px;
       <p class="service__tag serif-i">Tu escaparate abierto las 24 horas, con agenda incluida.</p>
 
       <div class="price">
-        <span class="price__amount">375 €<small> + IVA</small></span>
+        <span class="price__amount">290 €<small>IVA incluido</small></span>
         <span class="price__label"><b>Precio de lanzamiento</b>pago único</span>
       </div>
       <div class="meta">
         <span class="chip"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.5V8l2.5 1.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Plazo: 3 a 4 semanas</span>
-        <span class="chip">Mantenimiento opcional: 20 €/mes</span>
+        <span class="chip">Mantenimiento opcional: 15 €/mes</span>
       </div>
 
       <div class="includes">
@@ -772,12 +773,12 @@ mark { background: #FFF0B3; color: inherit; padding: 0 .1em; border-radius: 2px;
       <p class="service__tag serif-i">Responde a las 22:47 aunque tú ya estés en el sofá.</p>
 
       <div class="price">
-        <span class="price__amount">275 €<small> + IVA</small></span>
+        <span class="price__amount">190 €<small>IVA incluido</small></span>
         <span class="price__label"><b>Precio de lanzamiento</b>pago único</span>
       </div>
       <div class="meta">
         <span class="chip"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.5V8l2.5 1.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Plazo: 2 a 3 semanas</span>
-        <span class="chip">Mantenimiento opcional: 25 €/mes</span>
+        <span class="chip">Mantenimiento opcional: 19 €/mes</span>
       </div>
 
       <div class="includes">
@@ -838,12 +839,12 @@ mark { background: #FFF0B3; color: inherit; padding: 0 .1em; border-radius: 2px;
       <p class="service__tag serif-i">Pedidos de la empanada del domingo, sin llamadas.</p>
 
       <div class="price">
-        <span class="price__amount">575 €<small> + IVA</small></span>
+        <span class="price__amount">390 €<small>IVA incluido</small></span>
         <span class="price__label"><b>Precio de lanzamiento</b>pago único</span>
       </div>
       <div class="meta">
         <span class="chip"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.5V8l2.5 1.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Plazo: 4 a 6 semanas</span>
-        <span class="chip">Mantenimiento opcional: 25 €/mes</span>
+        <span class="chip">Mantenimiento opcional: 19 €/mes</span>
       </div>
 
       <div class="includes">
@@ -944,7 +945,7 @@ mark { background: #FFF0B3; color: inherit; padding: 0 .1em; border-radius: 2px;
       <p class="service__tag serif-i">Que te encuentren cuando buscan “cerca de mí”.</p>
 
       <div class="price">
-        <span class="price__amount">175 €<small> + IVA</small></span>
+        <span class="price__amount">120 €<small>IVA incluido</small></span>
         <span class="price__label"><b>Precio de lanzamiento</b>pago único</span>
       </div>
       <div class="meta">
@@ -963,7 +964,7 @@ mark { background: #FFF0B3; color: inherit; padding: 0 .1em; border-radius: 2px;
         </ul>
       </div>
       <p class="warning" role="note">
-        <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" style="flex:none"><path d="M10 2l9 16H1z" fill="#C0522B"/><path d="M10 8v4.5M10 14.6v.4" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+        <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" style="flex:none"><path d="M10 2l9 16H1z" fill="#e6ab63"/><path d="M10 8v4.5M10 14.6v.4" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
         <span>Mejoramos tu visibilidad; no se puede garantizar una posición concreta en Google.</span>
       </p>
     </div>
@@ -1074,14 +1075,14 @@ mark { background: #FFF0B3; color: inherit; padding: 0 .1em; border-radius: 2px;
 
     <div class="pack-grid">
       <div>
-        <span class="save">Ahorras 75 €</span>
+        <span class="save">Ahorras 50 €</span>
         <div class="price">
-          <span class="price__amount">575 €<small> + IVA</small></span>
-          <span class="price__label"><b>Precio de lanzamiento</b>en vez de 650 €</span>
+          <span class="price__amount">430 €<small>IVA incluido</small></span>
+          <span class="price__label"><b>Precio de lanzamiento</b>en vez de 480 €</span>
         </div>
         <div class="meta">
           <span class="chip">Plazo: 5 a 7 semanas</span>
-          <span class="chip">Mantenimiento opcional: 35 €/mes</span>
+          <span class="chip">Mantenimiento opcional: 29 €/mes</span>
         </div>
         <div class="includes">
           <h3 class="mono">Qué incluye</h3>
@@ -1138,12 +1139,12 @@ mark { background: #FFF0B3; color: inherit; padding: 0 .1em; border-radius: 2px;
         <h2 id="maint-title" class="display">Mantenimiento mensual</h2>
         <p class="serif-i" style="font-size:1.15rem;color:var(--green);margin-top:.6rem">Para que todo siga funcionando sin que tengas que pensar en ello.</p>
         <ul class="maint-prices">
-          <li><span>Web con galería y reservas</span><b>20 €/mes</b></li>
-          <li><span>Asistente de WhatsApp</span><b>25 €/mes</b></li>
-          <li><span>Tienda online pequeña</span><b>25 €/mes</b></li>
-          <li><span>Pack web + WhatsApp</span><b>35 €/mes</b></li>
+          <li><span>Web con galería y reservas</span><b>15 €/mes</b></li>
+          <li><span>Asistente de WhatsApp</span><b>19 €/mes</b></li>
+          <li><span>Tienda online pequeña</span><b>19 €/mes</b></li>
+          <li><span>Pack web + WhatsApp</span><b>29 €/mes</b></li>
         </ul>
-        <p class="fineprint">Precios + IVA. Google Maps y SEO local no necesita mantenimiento.</p>
+        <p class="fineprint">Precios con IVA incluido. Google Maps y SEO local no necesita mantenimiento.</p>
       </div>
       <div>
         <ul class="maint-list">
@@ -1183,7 +1184,7 @@ mark { background: #FFF0B3; color: inherit; padding: 0 .1em; border-radius: 2px;
       <a href="mailto:nadialavi.work@gmail.com"><span class="mono">Email</span>nadialavi.work@gmail.com</a>
       <a href="https://lagoa-webs.vercel.app" target="_blank" rel="noopener"><span class="mono">Web</span>lagoa-webs.vercel.app</a>
     </div>
-    <p class="foot-note">Precios de lanzamiento, sin IVA (21 %). Los plazos son orientativos y empiezan cuando tengo los textos y las fotos. Todos los negocios, personas, teléfonos y reseñas de las demos son ficticios.</p>
+    <p class="foot-note">Precios de lanzamiento, IVA (21 %) incluido. Los plazos son orientativos y empiezan cuando tengo los textos y las fotos. Todos los negocios, personas, teléfonos y reseñas de las demos son ficticios.</p>
   </div>
 </footer>
 
