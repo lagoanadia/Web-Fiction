@@ -254,10 +254,13 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .pack__price small { font-family: var(--mono); font-size: .8rem; margin-left: .5rem; opacity: .8; }
 .pack__meta { font-family: var(--mono); font-size: .8rem; color: #f6dcb5; margin-top: .5rem; }
 
-.custom { margin-top: 1.5rem; display: grid; gap: .6rem; background: var(--card); border-radius: var(--r); padding: clamp(1.2rem, 3vw, 2.2rem); box-shadow: 0 1px 0 var(--line); }
-@media (min-width: 900px) { .custom { grid-template-columns: 260px 1fr; align-items: baseline; } }
+.custom { margin-top: 1.5rem; display: grid; gap: 1rem; background: var(--card); border-radius: var(--r); padding: clamp(1.2rem, 3vw, 2.2rem); box-shadow: 0 1px 0 var(--line); }
+@media (min-width: 900px) { .custom { grid-template-columns: 260px 1fr; gap: 2rem; } }
 .custom h3 { font-family: var(--serif); font-size: 1.7rem; font-weight: 400; }
-.custom p { color: var(--ink-2); }
+.custom__lead { color: var(--ink-2); margin-top: .4rem; }
+.custom__list { margin: 0 0 .9rem; padding-left: 1.1rem; display: grid; gap: .4rem; color: var(--ink); }
+.custom__meta { font-family: var(--mono); font-size: .8rem; letter-spacing: .03em; color: var(--accent-2); }
+.custom__note { font-size: .85rem; color: var(--ink-2); margin-top: .6rem; }
 
 /* =============================================================
    7. CÓMO TRABAJO: banda de bosque a pantalla completa
@@ -632,13 +635,34 @@ dialog p { margin-bottom: .7rem; font-size: .95rem; }
     </article>
 
     <div class="custom">
-      <h3>Gestión diaria con IA</h3>
-      <p>Una pestaña nueva en tu panel admin: cada día la IA revisa tu agenda y tus chats de WhatsApp y te deja propuestas listas para repasar (recordatorios de seguimiento, avisos cuando se libera un hueco por cancelación, borradores de respuesta a clientes que llevan tiempo sin contestar). Tú apruebas, editas o descartas cada una; nada se envía ni se cambia sin tu confirmación. Solo disponible como ampliación de la web con reservas y/o el asistente de WhatsApp. Configuración: 150 € (IVA incluido) · Cuota: 35 €/mes · Plazo: 1-2 semanas.</p>
+      <div>
+        <h3>Gestión diaria con IA</h3>
+        <p class="custom__lead">Una pestaña nueva en tu panel admin: cada día la IA revisa tu agenda y tus chats de WhatsApp y te deja propuestas listas para repasar.</p>
+      </div>
+      <div>
+        <ul class="custom__list">
+          <li>Recordatorios de seguimiento a clientes.</li>
+          <li>Avisos cuando se libera un hueco por cancelación.</li>
+          <li>Borradores de respuesta a clientes que llevan tiempo sin contestar.</li>
+        </ul>
+        <p class="custom__meta">Configuración: 150 € (IVA incluido) · Cuota: 35 €/mes · Plazo: 1-2 semanas</p>
+        <p class="custom__note">Tú apruebas, editas o descartas cada propuesta: nada se envía ni se cambia sin tu confirmación. Solo disponible como ampliación de la web con reservas y/o el asistente de WhatsApp.</p>
+      </div>
     </div>
 
     <div class="custom">
-      <h3>Y también, a medida</h3>
-      <p>Panel de ventas y stock, tienda online completa, facturación automática, páginas para promociones, tarjeta de fidelización en el móvil, portal para tus clientes, apps a medida y mucho más. Esto tiene un coste aparte de los servicios anteriores, a valorar en la consulta inicial.</p>
+      <div>
+        <h3>Y también, a medida</h3>
+        <p class="custom__lead">Cosas pensadas a la medida exacta de tu negocio.</p>
+      </div>
+      <div>
+        <ul class="custom__list">
+          <li>Panel de ventas y stock, o tienda online completa.</li>
+          <li>Facturación automática y páginas para promociones.</li>
+          <li>Tarjeta de fidelización en el móvil, portal para tus clientes, apps a medida…</li>
+        </ul>
+        <p class="custom__note">Esto tiene un coste aparte de los servicios anteriores, a valorar en la consulta inicial.</p>
+      </div>
     </div>
   </div>
 </section>
