@@ -10,6 +10,8 @@ import { query } from './_lib/db.js';
 import { enviar, permitir, cuerpo, esJson, fallo, texto } from './_lib/http.js';
 import { calcularPedido, nuevoToken } from './_lib/facturacion.js';
 import { buscarOCrearCliente } from './_lib/clientes.js';
+import { notificar } from './_lib/integraciones.js';
+import { WEB } from './_lib/negocio.js';
 
 const MAX_PENDIENTES = 3; // pedidos sin pagar a la vez por cliente (frena el spam)
 
@@ -48,6 +50,7 @@ export default async function handler(req, res) {
        VALUES ($1, $2, $3, $4, $5, $6, $7, NULLIF($8, ''), 'web', $9) RETURNING id, total, mensual`,
       [clienteId, JSON.stringify(pedido.lineas), pedido.base, pedido.iva, pedido.total, pedido.mensual, JSON.stringify(f), texto(b.nota, 1000), token]
     );
+    await notificar('pedido.nuevo', { id: p.id, nombre: f.nombre, email: f.email, telefono: f.telefono, negocio: f.negocio, estado: 'pendiente de pago', importe: p.total / 100, detalle: pedido.lineas.map(l => l.concepto).join(' · '), enlace: `${WEB}/documento/?p=${p.id}&t=${token}` });
     enviar(res, 201, { ok: true, pedido: p.id, token, total: p.total, mensual: p.mensual, lineas: pedido.lineas });
   } catch (e) {
     fallo(res, e);

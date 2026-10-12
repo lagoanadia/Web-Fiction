@@ -293,7 +293,26 @@ const Agenda = (function agenda() {
   const fmtS = new Intl.DateTimeFormat('es-ES', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' });
   function fmtLong(iso) { return fmtL.format(new Date(iso + 'T12:00:00Z')); }
   function fmtShort(iso) { return fmtS.format(new Date(iso + 'T12:00:00Z')).replace(/\./g, ''); }
-  return { load, ready: () => loading, days, slots, reservar, fmtLong, fmtShort };
+  /** "AAAA-MM-DD" + "HH:MM" en hora de Madrid → milisegundos UTC (con horario de verano) */
+  function aUtc(iso, hora) {
+    const [y, m, d] = iso.split('-').map(Number), [h, mi] = hora.split(':').map(Number);
+    const supuesto = Date.UTC(y, m - 1, d, h, mi);
+    const [fv, hv] = madridKey(supuesto).split(' ');
+    const visto = Date.UTC(+fv.slice(0, 4), +fv.slice(5, 7) - 1, +fv.slice(8, 10), +hv.slice(0, 2), +hv.slice(3, 5));
+    return supuesto - (visto - supuesto);
+  }
+  /** Enlaces para guardar la cita en Google Calendar o descargarla (.ics: Apple, Outlook…) */
+  function enlacesCalendario(d) {
+    const ini = aUtc(d.fecha, d.hora), fin = ini + 30 * 60e3;
+    const f = ms => new Date(ms).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+    const titulo = 'Consulta con Lagoa · Estudio digital';
+    const detalle = `${d.modalidad}. Te escribimos por WhatsApp o email para confirmarla.`;
+    const google = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(titulo)}&dates=${f(ini)}/${f(fin)}&details=${encodeURIComponent(detalle)}`;
+    const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Lagoa//ES', 'BEGIN:VEVENT', `UID:${f(ini)}-${Math.random().toString(36).slice(2)}@lagoa`, `DTSTAMP:${f(Date.now())}`,
+      `DTSTART:${f(ini)}`, `DTEND:${f(fin)}`, `SUMMARY:${titulo}`, `DESCRIPTION:${detalle}`, 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+    return { google, ics: 'data:text/calendar;charset=utf-8,' + encodeURIComponent(ics) };
+  }
+  return { load, ready: () => loading, days, slots, reservar, fmtLong, fmtShort, enlacesCalendario };
 })();
 Agenda.load();
 
@@ -377,6 +396,11 @@ const Booking = (function booking() {
     if (r.estado === 'ok') {
       status.hidden = false; status.dataset.type = 'ok';
       status.textContent = `Hecho: ${r.when} (${d.modalidad}). Te confirmamos por WhatsApp o email.`;
+      const cal = Agenda.enlacesCalendario(d);
+      const acts = el('div', { class: 'actions' });
+      acts.append(el('a', { class: 'btn btn--sm', href: cal.google, target: '_blank', rel: 'noopener' }, 'Añadir a Google Calendar'),
+        el('a', { class: 'btn btn--ghost btn--sm', href: cal.ics, download: 'consulta-lagoa.ics' }, 'Apple / Outlook (.ics)'));
+      status.append(acts);
       form.reset(); state.fecha = state.hora = null; refresh();
       return;
     }
@@ -400,7 +424,16 @@ const Booking = (function booking() {
     const summary = `Hola Nadia,\n${Object.entries(data).map(([k, v]) => `${k}: ${v}`).join('\n')}`;
     const btn = $('button[type=submit]', form);
     btn.disabled = true; btn.textContent = 'Enviando…';
-    const ok = await sendToEmail(`Nuevo mensaje: ${data.Nombre} · ${data.Servicio}`, { ...data, _replyto: data.Email });
+    // 1) Se guarda en el panel (CRM). 2) Copia por email. Basta con que uno funcione.
+    let guardado = false, rechazo = '';
+    try {
+      const r = await fetch('/api/mensajes', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nombre: data.Nombre, negocio: f.get('negocio'), email: data.Email, telefono: f.get('telefono'), servicio: data.Servicio, mensaje: data.Mensaje, privacidad: true }) });
+      guardado = r.ok;
+      if ([400, 429].includes(r.status)) rechazo = (await r.json().catch(() => ({}))).error || 'Revisa los datos.';
+    } catch { /* sin servidor: queda el email */ }
+    if (rechazo) { btn.disabled = false; btn.textContent = 'Enviar mensaje'; showFail(status, rechazo); return; }
+    const porEmail = await sendToEmail(`Nuevo mensaje: ${data.Nombre} · ${data.Servicio}`, { ...data, _replyto: data.Email, Panel: `${location.origin}/admin` });
+    const ok = guardado || porEmail;
     btn.disabled = false; btn.textContent = 'Enviar mensaje';
     if (ok) { status.hidden = false; status.dataset.type = 'ok'; status.textContent = 'Recibido. Te respondemos en menos de 24 h laborables.'; form.reset(); }
     else showFail(status, 'No se ha podido enviar. Puedes mandarlo así:', summary);
@@ -678,7 +711,7 @@ $('#portfolio-load').addEventListener('click', () => {
   function buttons(list) {
     const box = el('div', { class: 'msg__actions' });
     list.forEach(([label, fn, cls]) => {
-      if (typeof fn === 'string') { box.append(el('a', { class: cls || '', href: fn, target: '_blank', rel: 'noopener' }, label)); return; }
+      if (typeof fn === 'string') { box.append(el('a', fn.startsWith('data:') ? { class: cls || '', href: fn, download: 'consulta-lagoa.ics' } : { class: cls || '', href: fn, target: '_blank', rel: 'noopener' }, label)); return; }
       const b = el('button', { type: 'button' }, label);
       b.addEventListener('click', () => { if (busy) return; $$('button', box).forEach(x => (x.disabled = true)); fn(label); });
       box.append(b);
@@ -765,7 +798,13 @@ $('#portfolio-load').addEventListener('click', () => {
     const T = L[lang];
     const d = { ...flow.datos, negocio: '', email: '', nota: 'Reservada desde el asistente de la web' };
     const r = await Agenda.reservar(d);
-    if (r.estado === 'ok') { flow = null; bubble('bot', T.f.done(r.when)); Booking.refresh(); return; }
+    if (r.estado === 'ok') {
+      flow = null;
+      const cal = Agenda.enlacesCalendario(d);
+      bubble('bot', T.f.done(r.when), buttons([['Google Calendar', cal.google], ['Apple / Outlook', cal.ics]]));
+      Booking.refresh();
+      return;
+    }
     if (r.ocupada) { bubble('bot', r.mensaje); askDay(); return; }
     flow = null;
     bubble('bot', r.mensaje, buttons([waBtn(), [T.b.go, () => goTo('#contacto')]]));

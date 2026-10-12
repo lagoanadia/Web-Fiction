@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/api/admin/login", "destination": "/api/admin/sesion?accion=login" },
+    { "source": "/api/admin/logout", "destination": "/api/admin/sesion?accion=logout" }
+  ]
+}

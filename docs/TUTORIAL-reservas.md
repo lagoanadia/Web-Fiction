@@ -2810,3 +2810,31 @@ The visitor's private link now also shows the definitive invoice.
 > ⚠️ Check with your accountant (gestoría) that the invoice data and numbering fit your tax situation, and whether you must use a VeriFactu-compliant invoicing system from the date it becomes mandatory for you. This module keeps invoices immutable and correlative, but it is not a certified VeriFactu system.
 
 **Tests:** `node tools/crm-test.mjs` (see the header of the file for how to start the server).
+
+---
+
+## 15. Part 9 — One inbox, and connecting Google Calendar, Notion and anything else
+
+**Bandeja (panel → first tab).** Everything that comes in, in one list: contact-form messages, WhatsApp chats waiting for you, consultation bookings and orders. "Sin atender" shows only what needs action (unread message, chat waiting, booking to confirm, order to collect), with buttons to answer, confirm, open the chat or the client's card. Endpoint: `GET /api/admin/crm?vista=bandeja`. Contact-form messages are stored by `POST /api/mensajes` (and still emailed as a copy).
+
+**Google Calendar / Apple / Outlook.** `GET /api/calendario?t=<CALENDARIO_TOKEN>` is an iCalendar feed with every active booking. In Google Calendar: *Other calendars → + → From URL* and paste `https://lagoa-webs.vercel.app/api/calendario?t=YOUR_TOKEN`. Google refreshes subscribed calendars every few hours; the Bandeja is the real-time view. Visitors also get "Añadir a Google Calendar / Apple / Outlook" buttons after booking.
+
+**Notion.** Every event (new booking, booking status, contact message, new order, order status, WhatsApp chat asking for a person) creates a row in a Notion database:
+1. notion.so/my-integrations → *New integration* (internal) → copy the token.
+2. Create a database and *Share → Invite* that integration. Optional columns that get filled if they exist: `Tipo` (select), `Estado` (select), `Nombre` (text), `Email` (email), `Teléfono` (phone), `Negocio` (text), `Fecha` (date), `Importe` (number), `Detalle` (text), `Enlace` (URL). The title column can have any name.
+3. Copy the database id from its URL.
+
+**Anything else (Google Sheets, HubSpot, Airtable, Trello, Slack, Gmail…).** Set a webhook URL from Make, Zapier or n8n: every event is POSTed as JSON `{ evento, titulo, fecha, datos }`. With `INTEGRACION_SECRETO`, each request carries `X-Lagoa-Firma: sha256=<HMAC-SHA256 of the body>` so the automation can verify it really comes from your site.
+
+| Variable | Needed for |
+|---|---|
+| `CALENDARIO_TOKEN` | Calendar feed (any random text, 16+ characters; whoever has the link sees names and phones) |
+| `NOTION_TOKEN`, `NOTION_DATABASE_ID` | Notion |
+| `INTEGRACION_WEBHOOK_URL` | Make / Zapier / n8n (several URLs separated by commas) |
+| `INTEGRACION_SECRETO` | Optional signature for the webhook |
+
+Integrations never break the site: if Notion or the webhook fails or takes more than 4 s, the error is logged and the booking/message/order is saved anyway.
+
+> **Vercel Hobby limit:** at most 12 serverless functions per project, and this site uses exactly 12 (login/logout/session were merged into `api/admin/sesion.js`; the old URLs keep working through `vercel.json`). A new endpoint must be merged into an existing one or requires Vercel Pro.
+
+**Tests:** `node tools/integraciones-test.mjs` (fake Notion + webhook receiver; see the file header).

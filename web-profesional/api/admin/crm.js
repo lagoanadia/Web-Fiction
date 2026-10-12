@@ -1,10 +1,12 @@
 /* =============================================================
    /api/admin/crm  (solo con sesión)
-   GET                       → resumen, pedidos recientes y clientes
+   GET                       → resumen, pedidos recientes, clientes y mensajes
    GET   ?cliente=<id>       → ficha: datos, pedidos, facturas y citas
+   GET   ?vista=bandeja      → TODO lo que entra (formulario, WhatsApp, citas y pedidos) en una lista
    POST  { cliente: {...} }  → cliente nuevo a mano
    POST  { cliente_id, servicios, mantenimiento, nota } → pedido a mano
    PATCH { cliente: id, ...campos }  → editar ficha / notas
+   PATCH { mensaje: id, leido }      → marcar un mensaje como leído / no leído
    PATCH { pedido: id, estado }      → cambiar estado del pedido.
          "pagado"   → emite la factura (numeración correlativa)
          "cancelado" con factura emitida → emite la rectificativa
@@ -12,6 +14,7 @@
 import { query, transaccion } from '../_lib/db.js';
 import { enviar, permitir, cuerpo, esJson, parametros, fallo, texto } from '../_lib/http.js';
 import { sesionActiva } from '../_lib/auth.js';
+import { notificar } from '../_lib/integraciones.js';
 import { calcularPedido, emitirFactura, emisorCompleto, nuevoToken, numeroFactura, ESTADOS_PEDIDO } from '../_lib/facturacion.js';
 
 const CAMPOS_CLIENTE = ['nombre', 'email', 'telefono', 'negocio', 'nif', 'direccion', 'notas'];
@@ -23,11 +26,14 @@ export default async function handler(req, res) {
   if (req.method !== 'GET' && !esJson(req)) return enviar(res, 415, { error: 'Formato no válido.' });
   try {
     if (req.method === 'GET') {
-      const id = Number(parametros(req).get('cliente'));
+      const p = parametros(req);
+      if (p.get('vista') === 'bandeja') return await bandeja(res);
+      const id = Number(p.get('cliente'));
       return Number.isInteger(id) && id > 0 ? await ficha(res, id) : await resumen(res);
     }
     const b = cuerpo(req) || {};
     if (req.method === 'POST') return b.cliente_id ? await pedidoManual(res, b) : await clienteNuevo(res, b.cliente || {});
+    if (b.mensaje) return await marcarMensaje(res, b);
     if (b.pedido) return await estadoPedido(res, b);
     if (b.cliente) return await editarCliente(res, b);
     enviar(res, 400, { error: 'Datos no válidos.' });
@@ -37,11 +43,42 @@ export default async function handler(req, res) {
   }
 }
 
+/* Bandeja única: una fila por cosa que ha entrado, la más reciente primero.
+   "pendiente" = necesita que hagas algo (mensaje sin leer, chat que te espera,
+   cita por confirmar, pedido por cobrar). */
+async function bandeja(res) {
+  const { rows } = await query(`
+    SELECT * FROM (
+      SELECT 'mensaje' AS canal, m.id::text AS ref, m.creado AS fecha, m.nombre, m.cliente_id,
+             coalesce('[' || m.servicio || '] ', '') || m.texto AS resumen, NOT m.leido AS pendiente, m.telefono, m.email, NULL::text AS dia
+        FROM mensajes m WHERE m.creado > now() - interval '120 days'
+      UNION ALL
+      SELECT 'whatsapp', w.telefono, coalesce(w.ultimo_entrante, w.actualizado), coalesce(w.nombre, '+' || w.telefono), NULL,
+             (SELECT texto FROM wa_mensajes x WHERE x.telefono = w.telefono AND x.autor = 'cliente' ORDER BY x.id DESC LIMIT 1),
+             (w.modo = 'humano' AND w.humano_hasta > now() AND w.sin_leer > 0), '+' || w.telefono, NULL, NULL
+        FROM wa_chats w WHERE coalesce(w.ultimo_entrante, w.actualizado) > now() - interval '120 days'
+      UNION ALL
+      SELECT 'cita', c.id::text, c.creada, c.nombre, NULL,
+             'Consulta ' || to_char(c.fecha, 'DD/MM') || ' ' || to_char(c.hora, 'HH24:MI') || ' · ' || c.modalidad || coalesce(' · ' || c.nota, ''),
+             (c.estado = 'pendiente' AND c.fecha >= (now() AT TIME ZONE 'Europe/Madrid')::date), c.telefono, c.email, to_char(c.fecha, 'YYYY-MM-DD')
+        FROM citas c WHERE c.creada > now() - interval '120 days' AND c.estado <> 'cancelada'
+      UNION ALL
+      SELECT 'pedido', p.id::text, p.creado, cl.nombre, cl.id,
+             'Pedido #' || p.id || ' · ' || replace(to_char(p.total / 100.0, 'FM9999990.00'), '.', ',') || ' € · ' ||
+               (SELECT string_agg(l->>'concepto', ', ') FROM jsonb_array_elements(p.lineas) l),
+             p.estado = 'pendiente_pago', cl.telefono, cl.email, NULL
+        FROM pedidos p JOIN clientes cl ON cl.id = p.cliente_id WHERE p.creado > now() - interval '120 days'
+    ) t ORDER BY pendiente DESC, fecha DESC NULLS LAST LIMIT 200`);
+  const pendientes = rows.filter(r => r.pendiente).reduce((a, r) => ({ ...a, [r.canal]: (a[r.canal] || 0) + 1 }), {});
+  enviar(res, 200, { items: rows, pendientes, total: rows.filter(r => r.pendiente).length });
+}
+
 async function resumen(res) {
   const anio = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Madrid', year: 'numeric' }).format(new Date());
-  const [kpi, pedidos, clientes] = await Promise.all([
+  const [kpi, pedidos, clientes, mensajes] = await Promise.all([
     query(`SELECT
         (SELECT count(*)::int FROM clientes) AS clientes,
+        (SELECT count(*)::int FROM mensajes WHERE NOT leido) AS sin_leer,
         (SELECT count(*)::int FROM pedidos WHERE estado = 'pendiente_pago') AS pendientes,
         (SELECT coalesce(sum(total), 0)::int FROM pedidos WHERE estado = 'pendiente_pago') AS por_cobrar,
         (SELECT coalesce(sum(total), 0)::int FROM facturas WHERE serie LIKE '%' || $1) AS facturado,
@@ -54,15 +91,18 @@ async function resumen(res) {
               coalesce(sum(p.total) FILTER (WHERE p.estado IN ('pagado', 'en_curso', 'entregado')), 0)::int AS pagado,
               (SELECT count(*)::int FROM citas ct WHERE (c.email IS NOT NULL AND lower(ct.email) = c.email)
                  OR (length(c.tel9) = 9 AND right(regexp_replace(ct.telefono, '[^0-9]', '', 'g'), 9) = c.tel9)) AS citas,
-              greatest(c.creado, max(p.creado)) AS actividad
+              (SELECT count(*)::int FROM mensajes m WHERE m.cliente_id = c.id) AS mensajes,
+              greatest(c.creado, max(p.creado), (SELECT max(m.creado) FROM mensajes m WHERE m.cliente_id = c.id)) AS actividad
              FROM clientes c LEFT JOIN pedidos p ON p.cliente_id = c.id
-            GROUP BY c.id ORDER BY actividad DESC NULLS LAST LIMIT 500`)
+            GROUP BY c.id ORDER BY actividad DESC NULLS LAST LIMIT 500`),
+    query(`SELECT id, cliente_id, nombre, email, telefono, negocio, servicio, texto, leido, creado FROM mensajes ORDER BY id DESC LIMIT 200`)
   ]);
   enviar(res, 200, {
     resumen: { ...kpi.rows[0], anio },
     facturacionLista: emisorCompleto(),
     pedidos: pedidos.rows.map(p => ({ ...p, facturas: (p.facturas || []).map(f => ({ ...f, codigo: numeroFactura(f) })) })),
-    clientes: clientes.rows
+    clientes: clientes.rows,
+    mensajes: mensajes.rows
   });
 }
 
@@ -70,16 +110,17 @@ async function ficha(res, id) {
   const c = await query('SELECT * FROM clientes WHERE id = $1', [id]);
   if (!c.rows.length) return enviar(res, 404, { error: 'No existe ese cliente.' });
   const cli = c.rows[0];
-  const [pedidos, facturas, citas] = await Promise.all([
+  const [pedidos, facturas, citas, mensajes] = await Promise.all([
     query(`SELECT id, total, mensual, estado, origen, token, lineas, nota, creado FROM pedidos WHERE cliente_id = $1 ORDER BY id DESC`, [id]),
     query(`SELECT f.id, f.serie, f.numero, f.tipo, to_char(f.fecha, 'YYYY-MM-DD') AS fecha, f.total, f.pedido_id, p.token
              FROM facturas f JOIN pedidos p ON p.id = f.pedido_id WHERE p.cliente_id = $1 ORDER BY f.id DESC`, [id]),
     query(`SELECT id, to_char(fecha, 'YYYY-MM-DD') AS fecha, to_char(hora, 'HH24:MI') AS hora, modalidad, estado, origen
              FROM citas WHERE ($1::text IS NOT NULL AND lower(email) = $1)
                 OR (length($2::text) = 9 AND right(regexp_replace(telefono, '[^0-9]', '', 'g'), 9) = $2::text)
-            ORDER BY fecha DESC, hora DESC LIMIT 50`, [cli.email, cli.tel9 || ''])
+            ORDER BY fecha DESC, hora DESC LIMIT 50`, [cli.email, cli.tel9 || '']),
+    query(`SELECT id, servicio, texto, leido, creado FROM mensajes WHERE cliente_id = $1 ORDER BY id DESC LIMIT 50`, [id])
   ]);
-  enviar(res, 200, { cliente: cli, pedidos: pedidos.rows, facturas: facturas.rows.map(f => ({ ...f, codigo: numeroFactura(f) })), citas: citas.rows });
+  enviar(res, 200, { cliente: cli, pedidos: pedidos.rows, facturas: facturas.rows.map(f => ({ ...f, codigo: numeroFactura(f) })), citas: citas.rows, mensajes: mensajes.rows });
 }
 
 function leerCampos(b) {
@@ -128,6 +169,14 @@ async function pedidoManual(res, b) {
   enviar(res, 201, { pedido: ped });
 }
 
+async function marcarMensaje(res, b) {
+  const id = Number(b.mensaje);
+  if (!Number.isInteger(id) || typeof b.leido !== 'boolean') return enviar(res, 400, { error: 'Datos no válidos.' });
+  const { rows } = await query('UPDATE mensajes SET leido = $2 WHERE id = $1 RETURNING id, leido', [id, b.leido]);
+  if (!rows.length) return enviar(res, 404, { error: 'No existe ese mensaje.' });
+  enviar(res, 200, { mensaje: rows[0] });
+}
+
 async function estadoPedido(res, b) {
   const id = Number(b.pedido);
   if (!Number.isInteger(id) || !ESTADOS_PEDIDO.includes(b.estado)) return enviar(res, 400, { error: 'Datos no válidos.' });
@@ -151,5 +200,7 @@ async function estadoPedido(res, b) {
   });
   if (!r) return enviar(res, 404, { error: 'No existe ese pedido.' });
   if (r.error) return enviar(res, 409, { error: r.error });
+  const { rows: [c] } = await query(`SELECT c.nombre, c.email, c.telefono, c.negocio, p.total FROM pedidos p JOIN clientes c ON c.id = p.cliente_id WHERE p.id = $1`, [id]);
+  await notificar('pedido.estado', { id, nombre: c.nombre, email: c.email, telefono: c.telefono, negocio: c.negocio, estado: b.estado.replace('_', ' '), importe: c.total / 100, detalle: r.factura ? `Factura ${r.factura.codigo}` : '' });
   enviar(res, 200, r);
 }

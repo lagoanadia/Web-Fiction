@@ -5,6 +5,7 @@
 import { query } from './db.js';
 import { hoyMadrid } from './horario.js';
 import { buscarOCrearCliente } from './clientes.js';
+import { notificar } from './integraciones.js';
 
 export const MODALIDADES = ['Videollamada', 'Llamada de teléfono', 'En persona'];
 export const MAX_CITAS_POR_TELEFONO = 2; // citas futuras activas a la vez (frena reservas en masa)
@@ -51,6 +52,7 @@ export async function guardarCita(d, origen = 'web') {
     );
     // La persona entra en el CRM (si falla, la cita ya está guardada igualmente)
     await buscarOCrearCliente(d, origen).catch(e => console.error('CRM:', e.message));
+    await notificar('cita.nueva', { id: cita.id, nombre: d.nombre, email: d.email, telefono: d.telefono, negocio: d.negocio, fecha: d.fecha, hora: d.hora, estado: 'pendiente', canal: origen, detalle: [d.modalidad, d.nota].filter(Boolean).join(' · ') });
     return { estado: 201, id: cita.id };
   } catch (e) {
     // 23505 = la regla "una cita por hora" de la base de datos ha saltado

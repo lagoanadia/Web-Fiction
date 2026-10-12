@@ -153,6 +153,20 @@ dialog form { display: grid; gap: .8rem; }
 .ped { background: var(--card); border-radius: 16px; padding: .8rem 1rem; margin: .5rem 0; box-shadow: 0 1px 0 var(--line); border-left: 4px solid var(--pend); }
 .ped--pagado, .ped--en_curso, .ped--entregado { border-left-color: var(--ok); }
 .ped--cancelado { border-left-color: var(--line); opacity: .65; }
+.msj { border-left-color: var(--accent); }
+.msj--leido { border-left-color: var(--line); }
+.inbox { display: grid; grid-template-columns: auto 1fr auto; gap: .2rem .8rem; align-items: start; background: var(--card); border-radius: 14px; padding: .75rem .9rem; margin-bottom: .45rem; box-shadow: 0 1px 0 var(--line); border-left: 4px solid var(--line); }
+.inbox--pendiente { border-left-color: var(--pend); }
+.inbox__canal { font-size: .72rem; font-weight: 700; padding: .2rem .55rem; border-radius: 999px; background: var(--paper-2); white-space: nowrap; }
+.inbox__canal--whatsapp { background: #dff3e6; color: #1b7a46; }
+.inbox__canal--mensaje { background: #e3e8ff; color: #1f3dff; }
+.inbox__canal--cita { background: var(--pend-bg); color: var(--pend); }
+.inbox__canal--pedido { background: #efe3ff; color: #6b2fbf; }
+.inbox__main { min-width: 0; }
+.inbox__main b { display: block; }
+.inbox__main p { margin: .1rem 0 0; font-size: .9rem; color: var(--ink-2); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.inbox__time { font-size: .75rem; color: var(--ink-2); white-space: nowrap; }
+.inbox__actions { grid-column: 2 / -1; display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .35rem; }
 .ped__top { display: flex; flex-wrap: wrap; gap: .3rem .8rem; align-items: baseline; }
 .ped__top b { font-size: 1.05rem; }
 .ped__total { margin-left: auto; font-weight: 700; font-variant-numeric: tabular-nums; }
@@ -202,10 +216,26 @@ dialog form { display: grid; gap: .8rem; }
 
 <!-- AGENDA -->
 <nav class="wrap tabs" id="pestanas" role="tablist" aria-label="Secciones" hidden>
-  <button class="tab" role="tab" id="tab-agenda" aria-selected="true" aria-controls="vista-agenda" type="button">Agenda</button>
+  <button class="tab" role="tab" id="tab-bandeja" aria-selected="true" aria-controls="vista-bandeja" type="button">Bandeja<span class="badge" id="bandeja-badge" hidden></span></button>
+  <button class="tab" role="tab" id="tab-agenda" aria-selected="false" aria-controls="vista-agenda" type="button">Agenda</button>
   <button class="tab" role="tab" id="tab-wa" aria-selected="false" aria-controls="vista-wa" type="button">WhatsApp<span class="badge" id="wa-badge" hidden></span></button>
   <button class="tab" role="tab" id="tab-crm" aria-selected="false" aria-controls="vista-crm" type="button">Clientes<span class="badge" id="crm-badge" hidden></span></button>
 </nav>
+
+<!-- BANDEJA ÚNICA: todo lo que entra, en un solo sitio -->
+<main class="wrap" id="vista-bandeja" hidden>
+  <div class="toolbar"><h2>Todo lo que te ha llegado</h2></div>
+  <div class="kpis" id="bandeja-kpis"></div>
+  <div class="subtabs" role="group" aria-label="Filtrar">
+    <button class="tab" type="button" data-filtro="pendiente" aria-selected="true">Sin atender</button>
+    <button class="tab" type="button" data-filtro="todo" aria-selected="false">Todo</button>
+    <label for="bandeja-canal" class="visually-hidden">Canal</label>
+    <select id="bandeja-canal" style="width:auto;border-radius:999px;padding:.4rem .8rem">
+      <option value="">Todos los canales</option><option value="whatsapp">WhatsApp</option><option value="mensaje">Formulario</option><option value="cita">Citas</option><option value="pedido">Pedidos</option>
+    </select>
+  </div>
+  <div id="bandeja-items" aria-live="polite"><p class="loading">Cargando…</p></div>
+</main>
 
 <main class="wrap" id="vista-agenda" hidden>
   <div class="toolbar">
@@ -249,7 +279,8 @@ dialog form { display: grid; gap: .8rem; }
     <p class="notice" id="crm-aviso" hidden></p>
     <div class="kpis" id="crm-kpis"></div>
     <div class="subtabs" role="group" aria-label="Ver">
-      <button class="tab" type="button" data-sub="pedidos" aria-selected="true">Pedidos</button>
+      <button class="tab" type="button" data-sub="mensajes" aria-selected="true">Mensajes<span class="badge" id="msg-badge" hidden></span></button>
+      <button class="tab" type="button" data-sub="pedidos" aria-selected="false">Pedidos</button>
       <button class="tab" type="button" data-sub="clientes" aria-selected="false">Clientes</button>
       <label for="crm-buscar" class="visually-hidden">Buscar</label>
       <input type="search" id="crm-buscar" placeholder="Buscar por nombre, negocio, email o teléfono">
@@ -341,7 +372,7 @@ let datos = null;
 
 function mostrarLogin() {
   $('#vista-login').hidden = false;
-  $('#vista-agenda').hidden = $('#vista-wa').hidden = $('#vista-crm').hidden = $('#pestanas').hidden = true;
+  $('#vista-bandeja').hidden = $('#vista-agenda').hidden = $('#vista-wa').hidden = $('#vista-crm').hidden = $('#pestanas').hidden = true;
   $('#btn-nueva').hidden = $('#btn-salir').hidden = true;
   setTimeout(() => $('#password').focus(), 50);
 }
@@ -358,7 +389,7 @@ $('#form-login').addEventListener('submit', async e => {
   const err = $('#login-error'); err.hidden = true;
   const btn = $('button[type=submit]', e.target); btn.disabled = true;
   try {
-    const r = await fetch('/api/admin/login', {
+    const r = await fetch('/api/admin/sesion?accion=login', {
       method: 'POST', credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ password: $('#password').value })
@@ -375,7 +406,7 @@ $('#form-login').addEventListener('submit', async e => {
 });
 
 $('#btn-salir').addEventListener('click', async () => {
-  await fetch('/api/admin/logout', { method: 'POST', credentials: 'same-origin' }).catch(() => {});
+  await fetch('/api/admin/sesion?accion=logout', { method: 'POST', credentials: 'same-origin' }).catch(() => {});
   mostrarLogin();
 });
 
@@ -594,18 +625,20 @@ $('#form-cita').addEventListener('submit', async e => {
 });
 
 /* ---------- Pestañas ---------- */
-let pestana = 'agenda';
+let pestana = 'bandeja';
 function verPestana(cual) {
   pestana = cual;
-  for (const t of ['agenda', 'wa', 'crm']) {
+  for (const t of ['bandeja', 'agenda', 'wa', 'crm']) {
     $(`#tab-${t}`).setAttribute('aria-selected', String(cual === t));
     $(`#vista-${t}`).hidden = cual !== t;
   }
   $('#btn-nueva').hidden = cual !== 'agenda';
-  if (cual === 'agenda') { cargar(); cargarChats(); } // cargarChats: para el número de mensajes esperando
+  if (cual === 'bandeja') cargarBandeja();
+  else if (cual === 'agenda') { cargar(); cargarChats(); cargarCrm(); } // para los avisos de WhatsApp y de mensajes
   else if (cual === 'wa') { chatAbierto ? abrirChat(chatAbierto) : cargarChats(); }
   else { fichaAbierta ? abrirFicha(fichaAbierta) : cargarCrm(); }
 }
+$('#tab-bandeja').addEventListener('click', () => verPestana('bandeja'));
 $('#tab-agenda').addEventListener('click', () => verPestana('agenda'));
 $('#tab-wa').addEventListener('click', () => verPestana('wa'));
 $('#tab-crm').addEventListener('click', () => verPestana('crm'));
@@ -723,7 +756,7 @@ async function accionWa(boton, fn, textoOk) {
 /* =============================================================
    CLIENTES (CRM): pedidos, facturas y fichas
    ============================================================= */
-let crm = null, sub = 'pedidos', fichaAbierta = null;
+let crm = null, sub = 'mensajes', fichaAbierta = null;
 const euro = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' });
 const dinero = c => euro.format((c || 0) / 100);
 const ESTADOS_PED = { pendiente_pago: 'Pendiente de pago', pagado: 'Pagado', en_curso: 'En curso', entregado: 'Entregado', cancelado: 'Anulado' };
@@ -735,9 +768,15 @@ async function cargarCrm() {
   try { crm = await api('/api/admin/crm'); }
   catch (ex) { $('#crm-items').replaceChildren(el('p', { class: 'msg msg--error' }, ex.message)); return; }
   const r = crm.resumen;
+  // Aviso en la pestaña: mensajes sin leer + pedidos pendientes de pago
   const badge = $('#crm-badge');
-  badge.hidden = !r.pendientes; badge.textContent = r.pendientes;
+  const avisos = r.sin_leer + r.pendientes;
+  badge.hidden = !avisos; badge.textContent = avisos;
   badge.style.background = 'var(--pend)';
+  $('#tab-crm').setAttribute('aria-label', avisos ? `Clientes, ${r.sin_leer} mensajes sin leer y ${r.pendientes} pedidos por cobrar` : 'Clientes');
+  const mb = $('#msg-badge');
+  mb.hidden = !r.sin_leer; mb.textContent = r.sin_leer;
+  if (pestana !== 'crm' || fichaAbierta) return;
   const k = $('#crm-kpis');
   k.replaceChildren();
   [['Clientes', r.clientes], ['Por cobrar', dinero(r.por_cobrar)], [`Facturado ${r.anio}`, dinero(r.facturado)], ['Mantenimientos', `${dinero(r.mensual)}/mes`]].forEach(([t, v]) => {
@@ -758,7 +797,11 @@ function pintarCrm() {
   if (!crm) return;
   const cont = $('#crm-items');
   cont.replaceChildren();
-  if (sub === 'pedidos') {
+  if (sub === 'mensajes') {
+    const lista = crm.mensajes.filter(m => coincide(`${m.nombre} ${m.negocio || ''} ${m.email || ''} ${m.telefono || ''} ${m.texto}`));
+    if (!lista.length) cont.append(el('p', { class: 'day__closed' }, crm.mensajes.length ? 'Ningún mensaje coincide.' : 'Aún no hay mensajes. Llegarán aquí desde “Enviar mensaje” en la web.'));
+    lista.forEach(m => cont.append(tarjetaMensaje(m, true)));
+  } else if (sub === 'pedidos') {
     const lista = crm.pedidos.filter(p => coincide(`${p.nombre} ${p.negocio || ''} ${p.id}`));
     if (!lista.length) cont.append(el('p', { class: 'day__closed' }, crm.pedidos.length ? 'Ningún pedido coincide.' : 'Aún no hay pedidos. Llegarán desde “Contratar” en la web, o créalos desde la ficha de un cliente.'));
     lista.forEach(p => cont.append(tarjetaPedido(p, true)));
@@ -770,11 +813,39 @@ function pintarCrm() {
       const etapa = c.pedidos ? `${c.pedidos} pedido${c.pedidos > 1 ? 's' : ''}` : 'Interesado (sin pedidos)';
       b.append(el('b', {}, c.nombre), el('span', { class: 'num' }, c.pagado ? dinero(c.pagado) : ''),
         el('small', {}, [c.negocio, c.telefono, c.email].filter(Boolean).join(' · ') || '—'),
-        el('small', { class: 'num' }, `${etapa}${c.citas ? ` · ${c.citas} cita${c.citas > 1 ? 's' : ''}` : ''}`));
+        el('small', { class: 'num' }, `${etapa}${c.citas ? ` · ${c.citas} cita${c.citas > 1 ? 's' : ''}` : ''}${c.mensajes ? ` · ${c.mensajes} mensaje${c.mensajes > 1 ? 's' : ''}` : ''}`));
       b.addEventListener('click', () => abrirFicha(c.id));
       cont.append(b);
     });
   }
+}
+
+function tarjetaMensaje(m, conCliente) {
+  const card = el('article', { class: `ped msj${m.leido ? ' msj--leido' : ''}` });
+  const top = el('div', { class: 'ped__top' });
+  if (!m.leido) top.append(el('span', { class: 'chip chip--pendiente' }, 'Nuevo'));
+  if (conCliente && m.cliente_id) {
+    const n = el('button', { type: 'button', class: 'linkcli' }, m.nombre);
+    n.addEventListener('click', () => abrirFicha(m.cliente_id));
+    top.append(n);
+  } else if (conCliente) top.append(el('b', {}, m.nombre));
+  if (m.servicio && m.servicio !== 'Sin decidir') top.append(el('small', { class: 'chip' }, m.servicio));
+  top.append(el('small', { class: 'ped__total', style: 'font-weight:500;color:var(--ink-2)' }, cuando(m.creado)));
+  card.append(top);
+  if (conCliente) card.append(el('p', { class: 'ped__lines' }, [m.negocio, m.email, m.telefono].filter(Boolean).join(' · ')));
+  card.append(el('p', { class: 'cita__note' }, m.texto));
+  const acc = el('div', { class: 'ped__actions', style: 'margin-top:.6rem' });
+  if (m.email) acc.append(el('a', { class: 'btn btn--sm', href: `mailto:${m.email}?subject=${encodeURIComponent('Re: tu mensaje a Lagoa')}&body=${encodeURIComponent(`Hola, ${m.nombre}:\n\n\n\n— Tu mensaje:\n${m.texto}`)}` }, 'Responder por email'));
+  if (m.telefono) acc.append(el('a', { class: 'btn btn--wa btn--sm', href: `https://wa.me/${telefonoWa(m.telefono)}?text=${encodeURIComponent(`Hola, ${m.nombre}. Te escribo de Lagoa por tu mensaje en la web.`)}`, target: '_blank', rel: 'noopener' }, 'WhatsApp'));
+  const b = el('button', { class: 'btn btn--ghost btn--sm', type: 'button' }, m.leido ? 'Marcar como no leído' : 'Marcar como leído');
+  b.addEventListener('click', async () => {
+    b.disabled = true;
+    try { await api('/api/admin/crm', { method: 'PATCH', body: { mensaje: m.id, leido: !m.leido } }); fichaAbierta ? await abrirFicha(fichaAbierta) : await cargarCrm(); }
+    catch (ex) { aviso(ex.message, true); b.disabled = false; }
+  });
+  acc.append(b);
+  card.append(acc);
+  return card;
 }
 
 function tarjetaPedido(p, conCliente) {
@@ -899,6 +970,14 @@ async function abrirFicha(id) {
   det.append(fp);
   peds.append(det);
 
+  // Mensajes
+  if (d.mensajes.length) {
+    const ms = el('section', { class: 'panel-box full' });
+    ms.append(el('h3', {}, `Mensajes (${d.mensajes.length})`));
+    d.mensajes.forEach(m => ms.append(tarjetaMensaje({ ...m, nombre: c.nombre, email: c.email, telefono: c.telefono }, false)));
+    grid.append(ms);
+  }
+
   // Facturas
   const facs = el('section', { class: 'panel-box' });
   facs.append(el('h3', {}, `Facturas (${d.facturas.length})`));
@@ -919,7 +998,8 @@ async function abrirFicha(id) {
   d.citas.forEach(x => { const li = el('li'); li.append(el('span', {}, `${x.fecha} · ${x.hora}`), el('span', { class: `chip chip--${x.estado}` }, x.estado)); uc.append(li); });
   cts.append(uc);
 
-  grid.append(datos, notas, peds, facs, cts);
+  grid.prepend(datos, notas);
+  grid.append(peds, facs, cts);
   f.append(grid);
 }
 function cerrarFicha() {
@@ -935,6 +1015,77 @@ $('#crm-nuevo').addEventListener('click', async () => {
   try { const r = await api('/api/admin/crm', { method: 'POST', body: { cliente: { nombre } } }); aviso('Cliente creado'); abrirFicha(r.cliente.id); }
   catch (ex) { aviso(ex.message, true); }
 });
+
+
+/* =============================================================
+   BANDEJA ÚNICA: formulario, WhatsApp, citas y pedidos juntos
+   ============================================================= */
+let bandeja = null, filtro = 'pendiente';
+const CANALES = { whatsapp: 'WhatsApp', mensaje: 'Formulario', cita: 'Cita', pedido: 'Pedido' };
+const QUE_FALTA = { whatsapp: 'Te espera', mensaje: 'Sin leer', cita: 'Por confirmar', pedido: 'Por cobrar' };
+
+async function cargarBandeja() {
+  try { bandeja = await api('/api/admin/crm?vista=bandeja'); }
+  catch (ex) { if (pestana === 'bandeja') $('#bandeja-items').replaceChildren(el('p', { class: 'msg msg--error' }, ex.message)); return; }
+  const b = $('#bandeja-badge');
+  b.hidden = !bandeja.total; b.textContent = bandeja.total; b.style.background = 'var(--pend)';
+  $('#tab-bandeja').setAttribute('aria-label', bandeja.total ? `Bandeja, ${bandeja.total} sin atender` : 'Bandeja');
+  if (pestana === 'bandeja') pintarBandeja();
+}
+
+function pintarBandeja() {
+  const k = $('#bandeja-kpis');
+  k.replaceChildren();
+  Object.entries(CANALES).forEach(([c, t]) => {
+    const n = bandeja.pendientes[c] || 0;
+    const d = el('button', { type: 'button', class: 'kpi', style: 'text-align:left;border:0;cursor:pointer' });
+    d.append(el('small', {}, `${t} · ${QUE_FALTA[c].toLowerCase()}`), el('b', {}, String(n)));
+    d.addEventListener('click', () => { $('#bandeja-canal').value = c; filtro = 'pendiente'; marcarFiltro(); pintarBandeja(); });
+    k.append(d);
+  });
+  const canal = $('#bandeja-canal').value;
+  const lista = bandeja.items.filter(i => (filtro === 'todo' || i.pendiente) && (!canal || i.canal === canal));
+  const cont = $('#bandeja-items');
+  cont.replaceChildren();
+  if (!lista.length) cont.append(el('p', { class: 'day__closed' }, filtro === 'pendiente' ? 'Todo atendido. 🎉' : 'Aún no ha llegado nada.'));
+  lista.forEach(i => cont.append(filaBandeja(i)));
+}
+
+function filaBandeja(i) {
+  const row = el('article', { class: `inbox${i.pendiente ? ' inbox--pendiente' : ''}` });
+  const main = el('div', { class: 'inbox__main' });
+  const nombre = el('b', {}, i.nombre || '—');
+  if (i.pendiente) nombre.append(el('span', { class: 'chip chip--pendiente', style: 'margin-left:.4rem' }, QUE_FALTA[i.canal]));
+  main.append(nombre, el('p', {}, i.resumen || ''));
+  row.append(el('span', { class: `inbox__canal inbox__canal--${i.canal}` }, CANALES[i.canal]), main, el('span', { class: 'inbox__time' }, i.fecha ? cuando(i.fecha) : ''));
+  const acc = el('div', { class: 'inbox__actions' });
+  const boton = (texto, fn, cls = 'btn btn--ghost btn--sm') => { const b = el('button', { type: 'button', class: cls }, texto); b.addEventListener('click', () => fn(b)); acc.append(b); };
+  if (i.canal === 'whatsapp') boton('Abrir chat', () => { verPestana('wa'); abrirChat(i.ref); }, 'btn btn--wa btn--sm');
+  if (i.canal === 'mensaje') {
+    if (i.email) acc.append(el('a', { class: 'btn btn--sm', href: `mailto:${i.email}?subject=${encodeURIComponent('Re: tu mensaje a Lagoa')}` }, 'Responder'));
+    boton(i.pendiente ? 'Marcar atendido' : 'Marcar sin leer', async b => {
+      b.disabled = true;
+      try { await api('/api/admin/crm', { method: 'PATCH', body: { mensaje: Number(i.ref), leido: i.pendiente } }); await cargarBandeja(); }
+      catch (ex) { aviso(ex.message, true); b.disabled = false; }
+    });
+  }
+  if (i.canal === 'cita') {
+    if (i.pendiente) boton('Confirmar', async b => {
+      b.disabled = true;
+      try { await api('/api/admin/citas', { method: 'PATCH', body: { id: Number(i.ref), estado: 'confirmada' } }); aviso('Cita confirmada'); await cargarBandeja(); }
+      catch (ex) { aviso(ex.message, true); b.disabled = false; }
+    }, 'btn btn--ok btn--sm');
+    boton('Ver en la agenda', () => { if (i.dia) semana = lunesDe(i.dia); verPestana('agenda'); });
+  }
+  if ((i.canal === 'pedido' || i.canal === 'mensaje') && i.cliente_id) boton('Ficha del cliente', () => { verPestana('crm'); abrirFicha(i.cliente_id); });
+  if (i.telefono && i.canal !== 'whatsapp') acc.append(el('a', { class: 'btn btn--wa btn--sm', href: `https://wa.me/${telefonoWa(i.telefono)}`, target: '_blank', rel: 'noopener' }, 'WhatsApp'));
+  row.append(acc);
+  return row;
+}
+
+function marcarFiltro() { $$('[data-filtro]').forEach(x => x.setAttribute('aria-selected', String(x.dataset.filtro === filtro))); }
+$$('[data-filtro]').forEach(b => b.addEventListener('click', () => { filtro = b.dataset.filtro; marcarFiltro(); pintarBandeja(); }));
+$('#bandeja-canal').addEventListener('change', () => bandeja && pintarBandeja());
 
 /* ---------- Al abrir el panel y cada minuto ---------- */
 (async function inicio() {
@@ -955,6 +1106,8 @@ $('#crm-nuevo').addEventListener('click', async () => {
 })();
 setInterval(() => { if (!document.hidden && !$('#vista-agenda').hidden && !dlg.open) cargar(); }, 60000);
 setInterval(() => { if (!document.hidden && !$('#pestanas').hidden) refrescarWa(); }, 15000);
+setInterval(() => { if (!document.hidden && !$('#pestanas').hidden && !fichaAbierta) cargarCrm(); }, 60000);
+setInterval(() => { if (!document.hidden && !$('#pestanas').hidden) cargarBandeja(); }, 30000);
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) return;
   if (!$('#vista-agenda').hidden) cargar();

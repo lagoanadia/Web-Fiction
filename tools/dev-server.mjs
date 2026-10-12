@@ -21,8 +21,15 @@ const TYPES = {
   '.txt': 'text/plain', '.xml': 'application/xml', '.json': 'application/json'
 };
 
+// Like Vercel: simple "rewrites" from vercel.json (exact paths only)
+const REWRITES = (() => {
+  try { return JSON.parse(fs.readFileSync(path.join(ROOT, 'vercel.json'), 'utf8')).rewrites || []; } catch { return []; }
+})();
+
 http.createServer(async (req, res) => {
-  const url = new URL(req.url, 'http://localhost');
+  let url = new URL(req.url, 'http://localhost');
+  const rw = REWRITES.find(r => r.source === url.pathname);
+  if (rw) { url = new URL(rw.destination, 'http://localhost'); req.url = url.pathname + url.search; }
 
   // /api/... → run the matching function file (files and folders starting with _ are private)
   if (url.pathname.startsWith('/api/')) {

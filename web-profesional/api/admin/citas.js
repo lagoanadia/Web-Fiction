@@ -7,6 +7,7 @@
 import { query } from '../_lib/db.js';
 import { enviar, permitir, cuerpo, esJson, parametros, fallo, texto } from '../_lib/http.js';
 import { sesionActiva } from '../_lib/auth.js';
+import { notificar } from '../_lib/integraciones.js';
 import { HORARIO, esFecha, esHora, hoyMadrid, sumarDias } from '../_lib/horario.js';
 
 const ESTADOS = ['pendiente', 'confirmada', 'cancelada'];
@@ -79,5 +80,7 @@ async function cambiarEstado(req, res) {
   if (!Number.isInteger(id) || !ESTADOS.includes(estado)) return enviar(res, 400, { error: 'Datos no válidos.' });
   const { rows } = await query(`UPDATE citas SET estado = $2 WHERE id = $1 RETURNING ${CAMPOS}`, [id, estado]);
   if (!rows.length) return enviar(res, 404, { error: 'No existe esa cita.' });
-  enviar(res, 200, { cita: rows[0] });
+  const c = rows[0];
+  await notificar('cita.estado', { id: c.id, nombre: c.nombre, email: c.email, telefono: c.telefono, negocio: c.negocio, fecha: c.fecha, hora: c.hora, estado: c.estado, detalle: c.modalidad });
+  enviar(res, 200, { cita: c });
 }

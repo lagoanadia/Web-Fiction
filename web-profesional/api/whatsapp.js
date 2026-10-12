@@ -9,6 +9,7 @@ import { query } from './_lib/db.js';
 import { cuerpoCrudo, parametros } from './_lib/http.js';
 import { whatsappConfigurado, firmaValida, enviarWhatsApp } from './_lib/whatsapp.js';
 import { responder, temaDe, pareceGallego, saludo } from './_lib/bot.js';
+import { notificar } from './_lib/integraciones.js';
 
 // Para comprobar la firma hace falta el cuerpo EXACTO que envió Meta,
 // así que le pedimos a Vercel que no lo convierta a JSON.
@@ -119,4 +120,6 @@ async function atender(m, nombrePerfil) {
      WHERE telefono = $1`,
     [telefono, r.paso, JSON.stringify(r.datos || {}), r.idioma, r.humano ? 'humano' : 'bot', HORAS_HUMANO]
   );
+  // El cliente pide hablar con una persona: aviso a Notion / Make / Zapier
+  if (r.humano) await notificar('whatsapp.atencion', { nombre: chat.nombre || '+' + telefono, telefono: '+' + telefono, estado: 'te espera', canal: 'whatsapp', detalle: entrada.texto || '', enlace: `https://wa.me/${telefono}` });
 }

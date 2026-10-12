@@ -3,7 +3,7 @@
 // 1. Start Postgres and the dev server with, besides DATABASE_URL and ADMIN_PASSWORD:
 //      FACTURA_NIF=12345678Z FACTURA_DIRECCION="Rúa Exemplo 1, 15001 A Coruña"
 // 2. Empty the tables:
-//      psql "$DATABASE_URL" -c "TRUNCATE facturas, pedidos, clientes, citas, bloqueos RESTART IDENTITY CASCADE;"
+//      psql "$DATABASE_URL" -c "TRUNCATE mensajes, facturas, pedidos, clientes, citas, bloqueos RESTART IDENTITY CASCADE;"
 // 3. Run:  ADMIN_PASSWORD=… node tools/crm-test.mjs
 // Every line must start with OK. Never run this against a real client's database.
 // =============================================================
@@ -106,6 +106,27 @@ r = await call('/api/admin/crm', { method: 'POST', auth: true, body: { cliente_i
 ok(r.s === 201 && r.d.pedido.origen === 'panel' && r.d.pedido.total === 12000, 'pedido a mano desde el panel');
 r = await call('/api/admin/crm', { method: 'PATCH', auth: true, body: { cliente: cid, email: 'otro' } });
 ok(r.s === 400, 'email no válido al editar → 400');
+
+// --- Mensajes del formulario de contacto ---
+r = await call('/api/mensajes', { method: 'POST', body: { nombre: 'Uxía', email: 'UXIA@example.com', telefono: '600111222', servicio: 'Tienda online pequeña', mensaje: '¿Hacéis tiendas con recogida?', privacidad: true } });
+ok(r.s === 201, 'mensaje de contacto → 201');
+r = await call('/api/mensajes', { method: 'POST', body: { nombre: 'X', email: 'x@y.es', mensaje: '', privacidad: true } });
+ok(r.s === 400, 'mensaje vacío → 400');
+r = await call('/api/mensajes', { method: 'POST', body: { nombre: 'Bot', email: 'b@b.es', mensaje: 'spam', privacidad: true, _honey: 'x' } });
+ok(r.s === 201, 'robot (campo trampa) → finge éxito');
+r = await call('/api/admin/crm', { auth: true });
+ok(r.d.mensajes.length === 1 && r.d.resumen.sin_leer === 1, 'el mensaje está en el panel, sin leer (el del robot no)');
+ok(r.d.mensajes[0].cliente_id === cid, 'el mensaje se une a la ficha del cliente que ya existía (mismo email)');
+const mid = r.d.mensajes[0].id;
+r = await call('/api/admin/crm', { method: 'PATCH', auth: true, body: { mensaje: mid, leido: true } });
+ok(r.s === 200 && r.d.mensaje.leido === true, 'marcar como leído');
+r = await call(`/api/admin/crm?cliente=${cid}`, { auth: true });
+ok(r.d.mensajes.length === 1, 'la ficha muestra el mensaje');
+r = await call('/api/mensajes', { method: 'POST', body: { nombre: 'Nueva', email: 'nueva@ejemplo.es', mensaje: 'Hola', privacidad: true } });
+r = await call('/api/admin/crm', { auth: true });
+ok(r.d.clientes.some(c => c.nombre === 'Nueva'), 'un mensaje de alguien nuevo crea su ficha');
+for (let i = 0; i < 6; i++) r = await call('/api/mensajes', { method: 'POST', body: { nombre: 'Spam', email: 'spam@ejemplo.es', mensaje: 'x' + i, privacidad: true } });
+ok(r.s === 429, 'sexto mensaje en una hora del mismo email → 429');
 
 console.log(fails ? `\n${fails} FAIL` : '\nTodo OK');
 process.exit(fails ? 1 : 0);

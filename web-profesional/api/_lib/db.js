@@ -123,6 +123,21 @@ const ESQUEMA = `
     UNIQUE (serie, numero)
   );
   CREATE UNIQUE INDEX IF NOT EXISTS facturas_una_por_tipo ON facturas (pedido_id, tipo);
+
+  -- Mensajes del formulario de contacto: llegan al panel (y por email como copia)
+  CREATE TABLE IF NOT EXISTS mensajes (
+    id         SERIAL PRIMARY KEY,
+    cliente_id INT REFERENCES clientes(id),
+    nombre     TEXT NOT NULL,
+    email      TEXT,
+    telefono   TEXT,
+    negocio    TEXT,
+    servicio   TEXT,
+    texto      TEXT NOT NULL,
+    leido      BOOLEAN NOT NULL DEFAULT false,
+    creado     TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS mensajes_cliente ON mensajes (cliente_id);
 `;
 
 let pool = null;
