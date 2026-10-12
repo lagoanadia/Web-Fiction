@@ -22,7 +22,7 @@ const CONFIG = {
   antelacionHoras: 12
 };
 // Deben coincidir con MODALIDADES de api/_lib/citas.js
-const MODALIDADES = ['Videollamada', 'Llamada de teléfono', 'En persona (solo A Coruña ciudad)'];
+const MODALIDADES = ['Videollamada', 'Llamada de teléfono'];
 
 /* Precios FINALES con IVA. Una sola fuente para calculadora y asistente. */
 const SERVICES = [
@@ -234,7 +234,7 @@ tabs.forEach((t, i) => {
    AGENDA compartida por el formulario y el asistente.
    Usa la API real (/api/disponibilidad, /api/reservas); si no
    responde, usa el horario de CONFIG y la reserva va por email.
-   Todas las horas son de A Coruña (Europe/Madrid), estés donde estés.
+   Todas las horas son de España peninsular (Europe/Madrid), estés donde estés.
    ============================================================= */
 const Agenda = (function agenda() {
   let horario = CONFIG.horario, diasVista = CONFIG.diasVista, antelacion = CONFIG.antelacionHoras;
@@ -522,7 +522,7 @@ $('#portfolio-load').addEventListener('click', () => {
         pago: () => 'Las condiciones de pago te las explica Nadia en persona. ¿Te paso con ella?',
         demo: () => 'Arriba tienes demos que funcionan: una tienda con carrito y panel de pedidos, un WhatsApp que reserva y una ficha de Google antes/después.',
         portfolio: () => 'Tienes sus proyectos publicados en la sección Portfolio.',
-        zona: () => 'Trabaja sobre todo en A Coruña. Si estás en otra zona, escríbele y lo veis.',
+        zona: () => 'Trabajamos con negocios de toda España, en remoto: la consulta es por videollamada o teléfono.',
         idiomas: () => 'Nadia te atiende en galego, castellano, English, Deutsch y français.',
         propiedad: () => 'Todo queda a tu nombre y te enseña a gestionarlo.',
         wordpress: () => 'Nada de WordPress ni plugins: código a medida, ligero y sin actualizaciones pendientes. Por eso esta web carga al instante.',
@@ -533,7 +533,7 @@ $('#portfolio-load').addEventListener('click', () => {
       },
       f: {
         mod: 'Genial. La consulta es gratis (20 min). ¿Cómo la prefieres?',
-        mods: ['Videollamada', 'Teléfono', 'En persona (A Coruña)'],
+        mods: ['Videollamada', 'Teléfono'],
         day: '¿Qué día? (hora de España)',
         hour: d => `Horas libres el ${d}:`,
         none: 'Ahora mismo no quedan huecos. Escríbele a Nadia y buscáis uno.',

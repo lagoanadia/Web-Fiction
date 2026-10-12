@@ -473,12 +473,12 @@
       before: {
         cat: 'Tienda', reviews: '(3 · sin responder)', pos: '7.º',
         photos: [['Borrosa', '#9aa0a6'], ['', '#dadce0'], ['', '#e8eaed'], ['', '#f1f3f4']],
-        rows: [['bad', '🕒 Horario sin añadir'], ['bad', '📝 Sin descripción'], ['', '📍 Rúa Exemplo, 3 · A Coruña'], ['bad', '💬 3 reseñas sin respuesta']]
+        rows: [['bad', '🕒 Horario sin añadir'], ['bad', '📝 Sin descripción'], ['', '📍 Rúa Exemplo, 3'], ['bad', '💬 3 reseñas sin respuesta']]
       },
       after: {
         cat: 'Frutería · Verdura de temporada · Reparto', reviews: '(3 · todas respondidas)', pos: '2.º',
         photos: [['Fachada', '#c96f2c'], ['Fruta', '#d0492f'], ['Verdura', '#4f8a3a'], ['Equipo', '#5e5a7a']],
-        rows: [['good', '🕒 Abierto · cierra a las 14:00'], ['good', '📝 Frutería de barrio con fruta fresca y reparto a domicilio'], ['', '📍 Rúa Exemplo, 3 · A Coruña'], ['good', '💬 “Moitas grazas, Antía…” — respuesta del propietario']]
+        rows: [['good', '🕒 Abierto · cierra a las 14:00'], ['good', '📝 Frutería de barrio con fruta fresca y reparto a domicilio'], ['', '📍 Rúa Exemplo, 3'], ['good', '💬 “Moitas grazas, Antía…” — respuesta del propietario']]
       }
     };
     const CHECKS = ['Categoría correcta', 'Horario completo', 'Descripción con palabras clave', 'Fotos que venden', 'Reseñas respondidas'];

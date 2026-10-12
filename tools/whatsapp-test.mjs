@@ -112,7 +112,7 @@ try {
 
   // ---------- Booking ----------
   c = await cliente(A, boton('tema:reservar'));
-  ok(ids(c.r[0]).join() === 'mod:0,mod:1,mod:2', 'Reservar → elegir modalidad (3 botones)');
+  ok(ids(c.r[0]).join() === 'mod:0,mod:1', 'Reservar → elegir modalidad (2 botones)');
   c = await cliente(A, boton('mod:0', 'Videollamada'));
   const dias = ids(c.r[0]);
   ok(dias.length > 0 && dias.length <= 10 && dias.every(d => /^dia:\d{4}-\d{2}-\d{2}$/.test(d)), `lista de días libres (${dias.length})`);

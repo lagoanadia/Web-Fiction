@@ -30,19 +30,19 @@ const T = {
       nadia: ['Hablar con Nadia', 'Te responde ella en persona']
     },
     b: { menu: 'Menú', reservar: 'Reservar consulta', nadia: 'Hablar con Nadia', confirmar: 'Confirmar', cambiar: 'Cambiar hora', cancelar: 'Cancelar', saltar: 'Saltar', si: 'Sí, cancelarla', no: 'No', soy: n => `Soy ${n}`, dias: 'Ver días', horas: 'Ver horas', otroDia: '« Otro día', libres: n => `${n} ${n === 1 ? 'hora libre' : 'horas libres'}`, anular: f => `Cancelar ${f}` },
-    servicios: () => `Ayudo a negocios en crecimiento de A Coruña a estar en internet sin complicaciones:\n\n${SERVICIOS.map(s => `• *${s.es}*: ${eur(s.precio)}`).join('\n')}\n• *${PACK.es}*: ${eur(PACK.precio)}\n\nTambién cosas a medida: panel de ventas y stock, facturas automáticas, tarjeta de fidelización y mucho más.`,
+    servicios: () => `Ayudamos a negocios en crecimiento a estar en internet sin complicaciones:\n\n${SERVICIOS.map(s => `• *${s.es}*: ${eur(s.precio)}`).join('\n')}\n• *${PACK.es}*: ${eur(PACK.precio)}\n\nTambién cosas a medida: panel de ventas y stock, facturas automáticas, tarjeta de fidelización y mucho más.`,
     precios: () => `Tarifas fijas de lanzamiento, pago único, *IVA incluido*:\n\n${SERVICIOS.map(s => `• ${s.es}: ${eur(s.precio)}`).join('\n')}\n• ${PACK.es}: ${eur(PACK.precio)}\n\nEl mantenimiento mensual es opcional (escribe *mantenimiento* para verlo).`,
     plazos: () => `Plazos orientativos:\n\n${[...SERVICIOS, PACK].map(s => `• ${s.es}: ${s.plazo.es}`).join('\n')}\n\nEmpiezan a contar cuando Nadia tiene tus textos y fotos.`,
     mantenimiento: () => `El mantenimiento es *opcional* y se puede cancelar cuando quieras (IVA incluido):\n\n${[...SERVICIOS.filter(s => s.mes), PACK].map(s => `• ${s.es}: ${eur(s.mes)}/mes`).join('\n')}\n\nIncluye copias de seguridad, revisión y parches en caso de error, cambios pequeños ilimitados y soporte por WhatsApp o email.`,
-    zona: () => 'Nadia trabaja con negocios de A Coruña. Si el tuyo está en otra zona, escríbele y valorará tu caso.',
+    zona: () => 'Trabajamos con negocios de toda España, en remoto: la consulta es por videollamada o llamada.',
     iva: () => 'Todos los precios ya incluyen el IVA (21 %).',
     pago: () => 'Las condiciones de pago las explica Nadia personalmente. Toca *Hablar con Nadia* y te responderá ella.',
     gracias: () => '¡Gracias a ti! Si necesitas algo más, aquí estoy.',
     noEntiendo: 'No estoy seguro de haberte entendido. Puedes elegir una opción del menú o hablar directamente con Nadia.',
     soloTexto: 'Por ahora solo puedo leer mensajes de texto. Si quieres enviar audios o fotos, toca *Hablar con Nadia*.',
     nadia: 'Perfecto. He avisado a Nadia y te responderá *personalmente por aquí* en cuanto pueda (normalmente el mismo día).\n\nMientras tanto el asistente queda en pausa. Si quieres volver a usarlo, escribe *menú*.',
-    modalidad: '¡Genial! La consulta rápida es *gratis y sin compromiso* (unos 20 minutos) para ver tu negocio y lo que más tiempo te quita.\n\n¿Cómo la prefieres? (En persona solo en A Coruña ciudad.)',
-    modos: ['Videollamada', 'Llamada', 'En persona'],
+    modalidad: '¡Genial! La consulta rápida es *gratis y sin compromiso* (unos 20 minutos) para ver tu negocio y lo que más tiempo te quita.\n\n¿Cómo la prefieres?',
+    modos: ['Videollamada', 'Llamada'],
     elegirDia: '¿Qué día te viene bien? Toca *Ver días*.',
     elegirHora: f => `Horas libres el *${f}* (hora de España). Toca *Ver horas*.`,
     sinHuecos: 'Ahora mismo no quedan horas libres en las próximas dos semanas. Escribe a Nadia y buscaréis un hueco.',
@@ -79,19 +79,19 @@ const T = {
       nadia: ['Falar con Nadia', 'Respóndeche ela en persoa']
     },
     b: { menu: 'Menú', reservar: 'Reservar consulta', nadia: 'Falar con Nadia', confirmar: 'Confirmar', cambiar: 'Cambiar hora', cancelar: 'Cancelar', saltar: 'Saltar', si: 'Si, cancelala', no: 'Non', soy: n => `Son ${n}`, dias: 'Ver días', horas: 'Ver horas', otroDia: '« Outro día', libres: n => `${n} ${n === 1 ? 'hora libre' : 'horas libres'}`, anular: f => `Cancelar ${f}` },
-    servicios: () => `Axudo a negocios en crecemento da Coruña a estar en internet sen complicacións:\n\n${SERVICIOS.map(s => `• *${s.gl}*: ${eur(s.precio)}`).join('\n')}\n• *${PACK.gl}*: ${eur(PACK.precio)}\n\nTamén cousas a medida: panel de vendas e stock, facturas automáticas, tarxeta de fidelización e moito máis.`,
+    servicios: () => `Axudamos a negocios en crecemento a estar en internet sen complicacións:\n\n${SERVICIOS.map(s => `• *${s.gl}*: ${eur(s.precio)}`).join('\n')}\n• *${PACK.gl}*: ${eur(PACK.precio)}\n\nTamén cousas a medida: panel de vendas e stock, facturas automáticas, tarxeta de fidelización e moito máis.`,
     precios: () => `Tarifas fixas de lanzamento, pagamento único, *IVE incluído*:\n\n${SERVICIOS.map(s => `• ${s.gl}: ${eur(s.precio)}`).join('\n')}\n• ${PACK.gl}: ${eur(PACK.precio)}\n\nO mantemento mensual é opcional (escribe *mantemento* para velo).`,
     plazos: () => `Prazos orientativos:\n\n${[...SERVICIOS, PACK].map(s => `• ${s.gl}: ${s.plazo.gl}`).join('\n')}\n\nComezan a contar cando Nadia ten os teus textos e fotos.`,
     mantenimiento: () => `O mantemento é *opcional* e pódese cancelar cando queiras (IVE incluído):\n\n${[...SERVICIOS.filter(s => s.mes), PACK].map(s => `• ${s.gl}: ${eur(s.mes)}/mes`).join('\n')}\n\nInclúe copias de seguridade, revisión e parches en caso de erro, cambios pequenos ilimitados e soporte por WhatsApp ou email.`,
-    zona: () => 'Nadia traballa con negocios da Coruña. Se o teu está noutra zona, escríbelle e valorará o teu caso.',
+    zona: () => 'Traballamos con negocios de toda España, en remoto: a consulta é por videochamada ou chamada.',
     iva: () => 'Todos os prezos xa inclúen o IVE (21 %).',
     pago: () => 'As condicións de pagamento explícaas Nadia persoalmente. Toca *Falar con Nadia* e responderache ela.',
     gracias: () => 'Grazas a ti! Se precisas algo máis, aquí estou.',
     noEntiendo: 'Non estou seguro de entenderte. Podes escoller unha opción do menú ou falar directamente con Nadia.',
     soloTexto: 'Polo de agora só podo ler mensaxes de texto. Se queres enviar audios ou fotos, toca *Falar con Nadia*.',
     nadia: 'Perfecto. Aviseille a Nadia e responderache *persoalmente por aquí* en canto poida (normalmente o mesmo día).\n\nMentres tanto o asistente queda en pausa. Se queres volver usalo, escribe *menú*.',
-    modalidad: 'Xenial! A consulta rápida é *de balde e sen compromiso* (uns 20 minutos) para ver o teu negocio e o que máis tempo che quita.\n\nComo a prefires? (En persoa só na cidade da Coruña.)',
-    modos: ['Videochamada', 'Chamada', 'En persoa'],
+    modalidad: 'Xenial! A consulta rápida é *de balde e sen compromiso* (uns 20 minutos) para ver o teu negocio e o que máis tempo che quita.\n\nComo a prefires?',
+    modos: ['Videochamada', 'Chamada'],
     elegirDia: 'Que día che vén ben? Toca *Ver días*.',
     elegirHora: f => `Horas libres o *${f}* (hora de España). Toca *Ver horas*.`,
     sinHuecos: 'Agora mesmo non quedan horas libres nas próximas dúas semanas. Escríbelle a Nadia e buscaredes un oco.',
@@ -280,7 +280,7 @@ export async function responder(chat, entrada) {
   switch (chat.paso) {
     case 'modalidad': {
       const m = id.match(/^mod:(\d)$/);
-      if (!m) return fin({ mensajes: [{ texto: L.usaBotones, botones: L.modos.map((x, i) => btn(`mod:${i}`, x)) }], paso: 'modalidad', datos });
+      if (!m || Number(m[1]) >= L.modos.length) return fin({ mensajes: [{ texto: L.usaBotones, botones: L.modos.map((x, i) => btn(`mod:${i}`, x)) }], paso: 'modalidad', datos });
       datos.modalidad = MODALIDADES[Number(m[1])];
       return fin(await preguntarDia(L, datos));
     }

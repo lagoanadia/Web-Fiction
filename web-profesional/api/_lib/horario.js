@@ -14,7 +14,7 @@ export const HORARIO = {
 };
 export const DIAS_VISTA = 14;        // cuántos días por delante se pueden reservar
 export const ANTELACION_HORAS = 12;  // antelación mínima
-export const ZONA = 'Europe/Madrid'; // las horas son siempre hora de A Coruña
+export const ZONA = 'Europe/Madrid'; // las horas son siempre hora peninsular española
 
 const RE_FECHA = /^\d{4}-\d{2}-\d{2}$/;
 const RE_HORA = /^([01]\d|2[0-3]):[0-5]\d$/;

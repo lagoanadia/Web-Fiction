@@ -5,7 +5,7 @@
 import { query } from './db.js';
 import { hoyMadrid } from './horario.js';
 
-export const MODALIDADES = ['Videollamada', 'Llamada de teléfono', 'En persona (solo A Coruña ciudad)'];
+export const MODALIDADES = ['Videollamada', 'Llamada de teléfono', 'En persona'];
 export const MAX_CITAS_POR_TELEFONO = 2; // citas futuras activas a la vez (frena reservas en masa)
 
 /** Mismo número aunque se escriba distinto (+34 600…, 600-…): se comparan los 9 últimos dígitos */
