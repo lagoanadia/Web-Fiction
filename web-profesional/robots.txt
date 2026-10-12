@@ -2,5 +2,6 @@ User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /api
+Disallow: /documento
 
 Sitemap: https://lagoa-webs.vercel.app/sitemap.xml
