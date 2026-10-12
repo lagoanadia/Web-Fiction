@@ -437,6 +437,7 @@ const Calc = (function calculator() {
     $('#calc-time').textContent = lines.length ? `Plazo: ${lines.map(s => `${s.short} ${s.weeks}`).join(' · ')}` : '';
     summaryText = lines.length ? `Hola Nadia, me interesa este presupuesto:\n${lines.map(s => `• ${s.name}: ${eur(s.price)}`).join('\n')}\nTotal: ${eur(base)} (IVA incluido)${showMonthly ? `\nMantenimiento: ${eur(monthly)}/mes` : ''}` : '';
     $('#calc-send').disabled = !lines.length;
+    $('#calc-buy').disabled = !lines.length;
     const wa = $('#calc-wa');
     wa.href = lines.length ? waLink(summaryText) : `https://wa.me/${CONFIG.whatsapp}`;
     wa.target = '_blank'; wa.rel = 'noopener';
@@ -464,7 +465,79 @@ const Calc = (function calculator() {
     $('#m-nombre').focus({ preventScroll: true });
   });
   compute();
-  return { toggle };
+  const selection = () => ({ ids: $$('input:checked', box).map(i => i.value), maint: maint.checked });
+  return { toggle, selection, summary: () => summaryText };
+})();
+
+/* =============================================================
+   CONTRATAR: pedido real → /api/pedidos (precios del servidor),
+   ficha en el CRM y factura proforma con enlace privado.
+   Sin servidor (web estática), el pedido llega por email.
+   ============================================================= */
+(function checkout() {
+  const dlg = $('#checkout');
+  const form = $('#form-pedido');
+  const status = $('#co-status');
+  function lineas() {
+    const { ids, maint } = Calc.selection();
+    const chosen = ids.map(svc);
+    const items = ids.includes('web') && ids.includes('wa') ? [PACK, ...chosen.filter(s => s.id !== 'web' && s.id !== 'wa')] : chosen;
+    return { ids, maint, items, total: items.reduce((a, s) => a + s.price, 0), monthly: maint ? items.reduce((a, s) => a + s.monthly, 0) : 0 };
+  }
+  function open() {
+    const l = lineas();
+    if (!l.items.length) return;
+    const box = $('#co-lines');
+    box.replaceChildren();
+    l.items.forEach(s => { const d = el('div'); d.append(el('span', {}, s.name), el('span', {}, eur(s.price))); box.append(d); });
+    const t = el('div', { class: 't' }); t.append(el('span', {}, 'Total (IVA incluido)'), el('span', {}, eur(l.total))); box.append(t);
+    if (l.monthly) { const m = el('div'); m.append(el('small', {}, 'Mantenimiento opcional, aparte'), el('small', {}, `${eur(l.monthly)}/mes`)); box.append(m); }
+    $('#co-form-view').hidden = false; $('#co-done-view').hidden = true; status.hidden = true;
+    dlg.showModal();
+    $('#p-nombre').focus();
+  }
+  $('#calc-buy').addEventListener('click', open);
+  dlg.addEventListener('click', e => { if (e.target === dlg || e.target.closest('[data-co-close]')) dlg.close(); });
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    if (!validate(form)) return;
+    const f = new FormData(form);
+    if (f.get('_honey')) return;
+    const l = lineas();
+    const cliente = Object.fromEntries(['nombre', 'nif', 'email', 'telefono', 'negocio', 'direccion'].map(k => [k, String(f.get(k) || '').trim()]));
+    const btn = $('#co-submit');
+    btn.disabled = true; btn.textContent = 'Generando tu pedido…';
+    let r = null, d = {};
+    try {
+      r = await fetch('/api/pedidos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ servicios: l.ids, mantenimiento: l.maint, cliente, nota: f.get('nota'), privacidad: true }) });
+      d = await r.json().catch(() => ({}));
+    } catch { r = null; }
+    btn.disabled = false; btn.textContent = 'Confirmar pedido';
+    const resumen = `${l.items.map(s => `• ${s.name}: ${eur(s.price)}`).join('\n')}\nTotal: ${eur(l.total)} (IVA incluido)${l.monthly ? `\nMantenimiento: ${eur(l.monthly)}/mes` : ''}`;
+    const datos = { Cliente: cliente.nombre, 'NIF/CIF': cliente.nif || '—', Email: cliente.email, Teléfono: cliente.telefono, Negocio: cliente.negocio || '—', Dirección: cliente.direccion || '—', Pedido: resumen, Nota: f.get('nota') || '—' };
+
+    if (r && r.ok && d.pedido) {
+      const url = `${location.origin}/documento/?p=${d.pedido}&t=${d.token}`;
+      sendToEmail(`Nuevo pedido nº ${d.pedido}: ${cliente.nombre} · ${eur(d.total / 100)}`, { ...datos, Documento: url, Panel: `${location.origin}/admin`, _replyto: cliente.email });
+      $('#co-done-num').textContent = `Pedido nº ${d.pedido} · ${eur(d.total / 100)} IVA incluido`;
+      $('#co-doc').href = url;
+      $('#co-doc').hidden = false;
+      $('#co-form-view').hidden = true; $('#co-done-view').hidden = false;
+      $('#co-doc').focus();
+      form.reset();
+      return;
+    }
+    if (r && [400, 429].includes(r.status)) { showFail(status, d.error || 'Revisa los datos.'); return; }
+    // Sin servidor: el pedido llega igualmente por email
+    const ok = await sendToEmail(`Nuevo pedido (web): ${cliente.nombre} · ${eur(l.total)}`, { ...datos, _replyto: cliente.email });
+    if (ok) {
+      $('#co-done-num').textContent = `Pedido enviado · ${eur(l.total)} IVA incluido. Te mandamos la factura proforma por email.`;
+      $('#co-doc').hidden = true;
+      $('#co-form-view').hidden = true; $('#co-done-view').hidden = false;
+      form.reset();
+    } else showFail(status, 'No se ha podido enviar. Puedes mandarlo así:', `Hola, quiero contratar:\n${resumen}\n\n${cliente.nombre} · ${cliente.email} · ${cliente.telefono}`);
+  });
 })();
 
 /* --------------- Enlaces "Probar demo" de las tarjetas --------------- */
@@ -525,6 +598,7 @@ $('#portfolio-load').addEventListener('click', () => {
         zona: () => 'Trabajamos con negocios de toda España, en remoto: la consulta es por videollamada o teléfono.',
         idiomas: () => 'Nadia te atiende en galego, castellano, English, Deutsch y français.',
         propiedad: () => 'Todo queda a tu nombre y te enseña a gestionarlo.',
+        contratar: () => 'Puedes contratar online: marca los servicios en “Contrata online”, pulsa “Contratar ahora” y recibes al momento tu factura proforma. No se cobra nada hasta que hablamos.',
         wordpress: () => 'Nada de WordPress ni plugins: código a medida, ligero y sin actualizaciones pendientes. Por eso esta web carga al instante.',
         hola: () => '¡Hola! ¿Qué quieres saber? Precios, plazos, demos… o reservo tu consulta.',
         gracias: () => '¡A ti! Si quieres, reservo tu consulta gratis en un momento.',
@@ -570,6 +644,7 @@ $('#portfolio-load').addEventListener('click', () => {
     zona: ['zona', 'donde', 'onde', 'coruna', 'ciudad', 'cidade', 'galicia', 'fuera'],
     idiomas: ['idioma', 'gallego', 'galego', 'ingles', 'english', 'aleman', 'frances'],
     propiedad: ['mio', 'meu', 'propiedad', 'propiedade', 'a mi nombre', 'ao meu nome', 'dueno', 'dono'],
+    contratar: ['contratar', 'comprar', 'contrato', 'quiero empezar', 'como pago', 'factura proforma', 'pedido online'],
     wordpress: ['wordpress', 'wix', 'plugin', 'plantilla', 'squarespace', 'shopify'],
     hola: ['hola', 'ola', 'buenas', 'boas', 'buenos dias', 'bos dias', 'hey'],
     gracias: ['gracias', 'grazas', 'genial', 'perfecto']
@@ -636,6 +711,7 @@ $('#portfolio-load').addEventListener('click', () => {
     if (topic === 'demo') acts.push(['Tienda', () => goTo('#demo', () => window.Lab?.open('shop'))], ['WhatsApp', () => goTo('#demo', () => window.Lab?.open('wa'))], ['Google', () => goTo('#demo', () => window.Lab?.open('maps'))]);
     if (topic === 'precios' || topic === 'servicios') acts.push([T.b.calc, () => goTo('#presupuesto')]);
     if (topic === 'portfolio') acts.push(['Portfolio', () => goTo('#trabajos')]);
+    if (topic === 'contratar') acts.push(['Contratar', () => goTo('#presupuesto')]);
     if (['hola', 'gracias', 'precios', 'plazos', 'servicios', 'wordpress'].includes(topic)) acts.push([T.b.book, () => startBooking()]);
     if (['humano', 'fallback', 'pago', 'zona', 'medida'].includes(topic)) acts.push(waBtn());
     bubble('bot', T.a[topic](), acts.length ? buttons(acts) : null);

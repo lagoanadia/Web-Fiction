@@ -63,6 +63,66 @@ const ESQUEMA = `
     creado    TIMESTAMPTZ NOT NULL DEFAULT now()
   );
   CREATE INDEX IF NOT EXISTS wa_mensajes_chat ON wa_mensajes (telefono, creado);
+
+  -- CRM: una ficha por cliente (o persona interesada). Se crea sola cuando
+  -- alguien reserva una consulta o hace un pedido, y se puede editar en el panel.
+  CREATE TABLE IF NOT EXISTS clientes (
+    id         SERIAL PRIMARY KEY,
+    nombre     TEXT NOT NULL,
+    email      TEXT,
+    telefono   TEXT,
+    tel9       TEXT GENERATED ALWAYS AS (right(regexp_replace(coalesce(telefono, ''), '[^0-9]', '', 'g'), 9)) STORED,
+    negocio    TEXT,
+    nif        TEXT,
+    direccion  TEXT,
+    notas      TEXT,
+    origen     TEXT NOT NULL DEFAULT 'web',
+    creado     TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE UNIQUE INDEX IF NOT EXISTS clientes_email ON clientes (lower(email)) WHERE email IS NOT NULL;
+  CREATE INDEX IF NOT EXISTS clientes_tel9 ON clientes (tel9);
+
+  -- Pedidos de servicios. Los importes van en CÉNTIMOS (enteros: sin errores de redondeo)
+  -- y los calcula siempre el servidor. "facturacion" guarda los datos fiscales tal
+  -- como los escribió el cliente en ese pedido.
+  CREATE TABLE IF NOT EXISTS pedidos (
+    id           SERIAL PRIMARY KEY,
+    cliente_id   INT NOT NULL REFERENCES clientes(id),
+    lineas       JSONB NOT NULL,
+    base         INT NOT NULL,
+    iva          INT NOT NULL,
+    total        INT NOT NULL,
+    mensual      INT NOT NULL DEFAULT 0,
+    facturacion  JSONB NOT NULL DEFAULT '{}',
+    nota         TEXT,
+    estado       TEXT NOT NULL DEFAULT 'pendiente_pago'
+                 CHECK (estado IN ('pendiente_pago', 'pagado', 'en_curso', 'entregado', 'cancelado')),
+    origen       TEXT NOT NULL DEFAULT 'web',
+    token        TEXT NOT NULL,           -- enlace privado para que el cliente vea sus documentos
+    creado       TIMESTAMPTZ NOT NULL DEFAULT now()
+  );
+  CREATE INDEX IF NOT EXISTS pedidos_cliente ON pedidos (cliente_id);
+
+  -- Facturas: numeración correlativa por año y serie (F = ordinaria, R = rectificativa).
+  -- Se guarda una copia de emisor, cliente y líneas: una factura emitida no cambia nunca.
+  CREATE TABLE IF NOT EXISTS facturas (
+    id         SERIAL PRIMARY KEY,
+    serie      TEXT NOT NULL,
+    numero     INT  NOT NULL,
+    tipo       TEXT NOT NULL DEFAULT 'ordinaria' CHECK (tipo IN ('ordinaria', 'rectificativa')),
+    rectifica  INT REFERENCES facturas(id),
+    pedido_id  INT NOT NULL REFERENCES pedidos(id),
+    fecha      DATE NOT NULL,
+    emisor     JSONB NOT NULL,
+    cliente    JSONB NOT NULL,
+    lineas     JSONB NOT NULL,
+    base       INT NOT NULL,
+    iva        INT NOT NULL,
+    total      INT NOT NULL,
+    creada     TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE (serie, numero)
+  );
+  CREATE UNIQUE INDEX IF NOT EXISTS facturas_una_por_tipo ON facturas (pedido_id, tipo);
 `;
 
 let pool = null;
@@ -97,4 +157,22 @@ function asegurarEsquema() {
 export async function query(texto, parametros = []) {
   await asegurarEsquema();
   return getPool().query(texto, parametros);
+}
+
+/** Ejecuta varias consultas como una sola operación: o se guardan todas o ninguna.
+    fn recibe una función q(texto, parametros) igual que query(). */
+export async function transaccion(fn) {
+  await asegurarEsquema();
+  const cliente = await getPool().connect();
+  try {
+    await cliente.query('BEGIN');
+    const r = await fn((t, p = []) => cliente.query(t, p));
+    await cliente.query('COMMIT');
+    return r;
+  } catch (e) {
+    await cliente.query('ROLLBACK').catch(() => {});
+    throw e;
+  } finally {
+    cliente.release();
+  }
 }

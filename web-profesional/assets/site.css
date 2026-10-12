@@ -592,3 +592,24 @@ textarea { resize: vertical; min-height: 64px; }
 .chat__form { display: flex; gap: .45rem; padding: .6rem .7rem .8rem; }
 .chat__form input { flex: 1; min-width: 0; border-radius: 999px; padding: .6rem .95rem; }
 .chat__form button { flex: none; width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--accent); color: #fff; cursor: pointer; font-size: 1rem; }
+
+/* ------------------------------ Contratar ------------------------------ */
+.modal--wide { width: min(640px, calc(100% - 32px)); }
+.calc__trust { color: var(--ink-2); font-size: .6rem; margin-top: .7rem; }
+.co__lines { display: grid; gap: .25rem; padding: .8rem 1rem; border-radius: 10px; background: var(--bg-2); margin-bottom: 1rem; font-size: .9rem; }
+.co__lines div { display: flex; justify-content: space-between; gap: 1rem; }
+.co__lines .t { font-weight: 600; border-top: 1px solid var(--line-strong); padding-top: .35rem; margin-top: .2rem; }
+.co__lines small { color: var(--ink-2); }
+.co__hint { text-align: center; }
+.co__big { font-size: 1.1rem; color: var(--ink) !important; }
+.co__next { list-style: none; margin: 1rem 0 1.2rem; padding: 0; display: grid; gap: .5rem; counter-reset: s; }
+.co__next li { display: grid; grid-template-columns: 7.5rem 1fr; gap: .6rem; font-size: .92rem; padding: .55rem .7rem; border: 1px solid var(--line); border-radius: 10px; }
+.co__next b { font-family: var(--mono); font-weight: 500; font-size: .66rem; text-transform: uppercase; color: var(--accent-ink); padding-top: .15rem; }
+
+/* Factura de la demo */
+.modal--doc { width: min(880px, calc(100% - 24px)); padding: 1rem; background: var(--bg-2); }
+.modal--doc .doc { margin-top: .8rem; font-size: 13px; }
+.owner__tabs { justify-self: start; align-self: flex-start; }
+.order__doc { grid-column: 1 / -1; justify-self: start; margin-top: .3rem; border: 1px solid var(--line-strong); background: transparent; color: var(--ink); border-radius: 999px; padding: .15rem .6rem; font-size: .72rem; font-weight: 600; cursor: pointer; }
+.client { display: grid; grid-template-columns: 1fr auto; gap: .1rem .6rem; padding: .6rem .7rem; border: 1px solid var(--line); border-radius: 10px; font-size: .82rem; }
+.client small { color: var(--ink-2); grid-column: 1 / -1; }

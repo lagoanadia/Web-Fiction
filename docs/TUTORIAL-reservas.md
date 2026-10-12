@@ -2773,3 +2773,40 @@ If you've verified the webhook, subscribed to `messages`, and clicking the dashb
 ---
 
 *Built for Lagoa · Estudio digital (A Coruña). Code: `web-profesional/` in this repository. Tests: `tools/api-test.mjs` and `tools/whatsapp-test.mjs`.*
+
+---
+
+## 14. Part 8 — Online orders, invoices and CRM
+
+Lagoa's own site now sells its services online. The same pieces can be reused for a client's shop.
+
+**How an order travels**
+
+```
+Visitor marks services → "Contratar ahora" → POST /api/pedidos
+  · the server recalculates the price with api/_lib/negocio.js (the browser's numbers are ignored)
+  · creates or completes the client's card in the CRM (by email or phone; never overwrites data)
+  · saves the order "pendiente_pago" with a private random link
+Visitor sees the pro-forma invoice at /documento/?p=<order>&t=<token> (print / save as PDF)
+Owner opens /admin → "Clientes": marks the order "Pagado"
+  · the server issues the definitive invoice F<year>-0001, F<year>-0002… (correlative, inside a
+    transaction with a lock, so two invoices can never get the same number)
+  · cancelling an invoiced order issues a corrective invoice R<year>-0001 with negative amounts
+The visitor's private link now also shows the definitive invoice.
+```
+
+**Files:** `api/pedidos.js` (public), `api/documento.js` (public, needs the token), `api/admin/crm.js` (panel), `api/_lib/facturacion.js` (amounts in cents, VAT, numbering), `api/_lib/clientes.js` (CRM cards), `documento/index.html` + `assets/documento.js` + `assets/documento.css` (the invoice sheet). New tables `clientes`, `pedidos`, `facturas` are created automatically in `api/_lib/db.js`. Consultation bookings also create a CRM card, so leads appear before they buy.
+
+**Environment variables (Vercel → Settings → Environment Variables):**
+
+| Variable | Example | Needed for |
+|---|---|---|
+| `FACTURA_NIF` | `12345678Z` | Issuing definitive invoices (the panel refuses without it) |
+| `FACTURA_DIRECCION` | `Rúa …, 15001 A Coruña` | Issuing definitive invoices |
+| `FACTURA_NOMBRE` | `Nadia Lagoa Vilela` | Name on invoices (has a default) |
+| `FACTURA_EMAIL` | `…@gmail.com` | Email on invoices (has a default) |
+| `FACTURA_IBAN` | `ES00 …` | Optional: payment instructions on the pro-forma |
+
+> ⚠️ Check with your accountant (gestoría) that the invoice data and numbering fit your tax situation, and whether you must use a VeriFactu-compliant invoicing system from the date it becomes mandatory for you. This module keeps invoices immutable and correlative, but it is not a certified VeriFactu system.
+
+**Tests:** `node tools/crm-test.mjs` (see the header of the file for how to start the server).

@@ -5,24 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Panel · Lagoa</title>
 <meta name="robots" content="noindex, nofollow">
-<meta name="theme-color" content="#161513">
+<meta name="theme-color" content="#eef0f4">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* =============================================================
    Panel de agenda de Lagoa (privado)
    Mismos colores y letras que la web pública.
    ============================================================= */
 :root {
-  --paper: #f4f0e8; --paper-2: #e9e3d6; --card: #fbf9f4; --line: #d8d0c0;
-  --ink: #161513; --ink-2: #5f5a52;
-  --accent: #556b2f;          /* verde oliva */
+  --paper: #eef0f4; --paper-2: #e3e6ee; --card: #ffffff; --line: #d5d9e3;
+  --ink: #0b0d12; --ink-2: #4a5161;
+  --accent: #1f3dff;          /* azul cobalto, como la web */
   --pend: #9a6a12; --pend-bg: #f6ead2;
   --ok: #2f6b3a; --ok-bg: #e3efe3;
   --bad: #a3261a; --bad-bg: #f6e4e0;
-  --sans: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --serif: "Cormorant Garamond", Georgia, serif;
+  --sans: "Inter Tight", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --serif: "Instrument Serif", Georgia, serif;
 }
 *, *::before, *::after { box-sizing: border-box; }
 body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
@@ -34,7 +34,7 @@ a { color: var(--accent); }
 .wrap { max-width: 860px; margin: 0 auto; padding: 0 16px; }
 
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; min-height: 40px; padding: .5rem 1rem; border-radius: 999px; border: 0; background: var(--ink); color: var(--paper); font-weight: 600; font-size: .9rem; cursor: pointer; text-decoration: none; white-space: nowrap; }
-.btn:hover { background: #2c2a26; }
+.btn:hover { background: #262a35; }
 .btn--ghost { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--line); }
 .btn--ghost:hover { background: var(--paper-2); }
 .btn--ok { background: var(--ok); color: #fff; }
@@ -44,7 +44,7 @@ a { color: var(--accent); }
 .btn[disabled] { opacity: .5; cursor: progress; }
 
 /* Cabecera */
-.top { position: sticky; top: 0; z-index: 10; background: rgba(244,240,232,.95); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+.top { position: sticky; top: 0; z-index: 10; background: rgba(238,240,244,.92); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
 .top .wrap { display: flex; align-items: center; gap: .6rem; height: 60px; }
 .brand { font-family: var(--serif); font-style: italic; font-size: 1.6rem; margin-right: auto; }
 .brand small { font-family: var(--sans); font-style: normal; font-size: .75rem; color: var(--ink-2); margin-left: .4rem; letter-spacing: .08em; text-transform: uppercase; }
@@ -142,6 +142,38 @@ dialog form { display: grid; gap: .8rem; }
 .reply { display: grid; gap: .5rem; margin: .7rem 0 2rem; }
 .reply textarea { resize: vertical; min-height: 70px; }
 .reply__actions { display: flex; justify-content: flex-end; gap: .5rem; flex-wrap: wrap; }
+
+/* CRM: clientes, pedidos y facturas */
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: .5rem; margin: .4rem 0 1rem; }
+.kpi { background: var(--card); border-radius: 14px; padding: .7rem .9rem; box-shadow: 0 1px 0 var(--line); }
+.kpi small { display: block; font-size: .75rem; color: var(--ink-2); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.kpi b { font-size: 1.45rem; font-variant-numeric: tabular-nums; }
+.subtabs { display: flex; gap: .3rem; flex-wrap: wrap; align-items: center; margin-bottom: .6rem; }
+.subtabs input[type=search] { flex: 1 1 180px; width: auto; padding: .45rem .8rem; border-radius: 999px; }
+.ped { background: var(--card); border-radius: 16px; padding: .8rem 1rem; margin: .5rem 0; box-shadow: 0 1px 0 var(--line); border-left: 4px solid var(--pend); }
+.ped--pagado, .ped--en_curso, .ped--entregado { border-left-color: var(--ok); }
+.ped--cancelado { border-left-color: var(--line); opacity: .65; }
+.ped__top { display: flex; flex-wrap: wrap; gap: .3rem .8rem; align-items: baseline; }
+.ped__top b { font-size: 1.05rem; }
+.ped__total { margin-left: auto; font-weight: 700; font-variant-numeric: tabular-nums; }
+.ped__lines { font-size: .88rem; color: var(--ink-2); margin: .3rem 0 .5rem; }
+.ped__actions { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; }
+.ped__actions select { width: auto; padding: .35rem .6rem; border-radius: 999px; font-size: .85rem; }
+.linkcli { border: 0; background: none; padding: 0; font-weight: 700; color: var(--accent); cursor: pointer; text-decoration: underline; text-underline-offset: .2em; }
+.cli { width: 100%; text-align: left; display: grid; grid-template-columns: 1fr auto; gap: .1rem .8rem; border: 0; background: var(--card); border-radius: 14px; padding: .75rem .9rem; margin-bottom: .45rem; cursor: pointer; box-shadow: 0 1px 0 var(--line); }
+.cli:hover { background: #fff; }
+.cli small { color: var(--ink-2); font-size: .82rem; }
+.cli .num { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+.ficha { display: grid; gap: 1rem; margin-bottom: 2rem; }
+@media (min-width: 760px) { .ficha { grid-template-columns: 1fr 1fr; } .ficha > .full { grid-column: 1 / -1; } }
+.panel-box { background: var(--card); border-radius: 16px; padding: 1rem; box-shadow: 0 1px 0 var(--line); }
+.panel-box h3 { margin: 0 0 .6rem; font-size: 1rem; }
+.panel-box form { display: grid; gap: .6rem; }
+.mini-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .35rem; font-size: .9rem; }
+.mini-list li { display: flex; justify-content: space-between; gap: .6rem; border-bottom: 1px dashed var(--line); padding: .3rem 0; }
+.checks { display: grid; gap: .35rem; }
+.checks label { display: flex; gap: .5rem; align-items: center; font-weight: 500; }
+.checks input { width: auto; }
 </style>
 </head>
 <body>
@@ -172,6 +204,7 @@ dialog form { display: grid; gap: .8rem; }
 <nav class="wrap tabs" id="pestanas" role="tablist" aria-label="Secciones" hidden>
   <button class="tab" role="tab" id="tab-agenda" aria-selected="true" aria-controls="vista-agenda" type="button">Agenda</button>
   <button class="tab" role="tab" id="tab-wa" aria-selected="false" aria-controls="vista-wa" type="button">WhatsApp<span class="badge" id="wa-badge" hidden></span></button>
+  <button class="tab" role="tab" id="tab-crm" aria-selected="false" aria-controls="vista-crm" type="button">Clientes<span class="badge" id="crm-badge" hidden></span></button>
 </nav>
 
 <main class="wrap" id="vista-agenda" hidden>
@@ -209,6 +242,23 @@ dialog form { display: grid; gap: .8rem; }
   </section>
 </main>
 
+<!-- CLIENTES (CRM) -->
+<main class="wrap" id="vista-crm" hidden>
+  <section id="crm-lista">
+    <div class="toolbar"><h2>Clientes y pedidos</h2><button class="btn btn--sm" type="button" id="crm-nuevo">+ Cliente</button></div>
+    <p class="notice" id="crm-aviso" hidden></p>
+    <div class="kpis" id="crm-kpis"></div>
+    <div class="subtabs" role="group" aria-label="Ver">
+      <button class="tab" type="button" data-sub="pedidos" aria-selected="true">Pedidos</button>
+      <button class="tab" type="button" data-sub="clientes" aria-selected="false">Clientes</button>
+      <label for="crm-buscar" class="visually-hidden">Buscar</label>
+      <input type="search" id="crm-buscar" placeholder="Buscar por nombre, negocio, email o teléfono">
+    </div>
+    <div id="crm-items" aria-live="polite"><p class="loading">Cargando…</p></div>
+  </section>
+  <section id="crm-ficha" hidden></section>
+</main>
+
 <!-- NUEVA CITA -->
 <dialog id="dlg-cita" aria-labelledby="dlg-titulo">
   <h2 id="dlg-titulo">Nueva cita</h2>
@@ -244,6 +294,7 @@ dialog form { display: grid; gap: .8rem; }
 <script>
 'use strict';
 const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 const el = (tag, attrs = {}, text) => {
   const n = document.createElement(tag);
   for (const [k, v] of Object.entries(attrs)) k === 'class' ? (n.className = v) : n.setAttribute(k, v);
@@ -290,7 +341,7 @@ let datos = null;
 
 function mostrarLogin() {
   $('#vista-login').hidden = false;
-  $('#vista-agenda').hidden = $('#vista-wa').hidden = $('#pestanas').hidden = true;
+  $('#vista-agenda').hidden = $('#vista-wa').hidden = $('#vista-crm').hidden = $('#pestanas').hidden = true;
   $('#btn-nueva').hidden = $('#btn-salir').hidden = true;
   setTimeout(() => $('#password').focus(), 50);
 }
@@ -546,16 +597,18 @@ $('#form-cita').addEventListener('submit', async e => {
 let pestana = 'agenda';
 function verPestana(cual) {
   pestana = cual;
-  $('#tab-agenda').setAttribute('aria-selected', String(cual === 'agenda'));
-  $('#tab-wa').setAttribute('aria-selected', String(cual === 'wa'));
-  $('#vista-agenda').hidden = cual !== 'agenda';
-  $('#vista-wa').hidden = cual !== 'wa';
+  for (const t of ['agenda', 'wa', 'crm']) {
+    $(`#tab-${t}`).setAttribute('aria-selected', String(cual === t));
+    $(`#vista-${t}`).hidden = cual !== t;
+  }
   $('#btn-nueva').hidden = cual !== 'agenda';
-  if (cual === 'agenda') cargar(); else { chatAbierto ? abrirChat(chatAbierto) : cargarChats(); }
-  if (cual === 'agenda') cargarChats(); // para el número de mensajes esperando
+  if (cual === 'agenda') { cargar(); cargarChats(); } // cargarChats: para el número de mensajes esperando
+  else if (cual === 'wa') { chatAbierto ? abrirChat(chatAbierto) : cargarChats(); }
+  else { fichaAbierta ? abrirFicha(fichaAbierta) : cargarCrm(); }
 }
 $('#tab-agenda').addEventListener('click', () => verPestana('agenda'));
 $('#tab-wa').addEventListener('click', () => verPestana('wa'));
+$('#tab-crm').addEventListener('click', () => verPestana('crm'));
 
 /* ---------- WhatsApp ---------- */
 let chatAbierto = null;
@@ -665,6 +718,223 @@ async function accionWa(boton, fn, textoOk) {
   catch (ex) { aviso(ex.message, true); }
   finally { boton.disabled = false; }
 }
+
+
+/* =============================================================
+   CLIENTES (CRM): pedidos, facturas y fichas
+   ============================================================= */
+let crm = null, sub = 'pedidos', fichaAbierta = null;
+const euro = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' });
+const dinero = c => euro.format((c || 0) / 100);
+const ESTADOS_PED = { pendiente_pago: 'Pendiente de pago', pagado: 'Pagado', en_curso: 'En curso', entregado: 'Entregado', cancelado: 'Anulado' };
+const SERVICIOS_PANEL = [['web', 'Web con galería y reservas'], ['wa', 'Asistente de WhatsApp'], ['shop', 'Tienda online pequeña'], ['seo', 'Google Maps y SEO local']];
+const docUrl = p => `/documento/?p=${p.id}&t=${p.token}`;
+const fechaCorta = iso => new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(iso));
+
+async function cargarCrm() {
+  try { crm = await api('/api/admin/crm'); }
+  catch (ex) { $('#crm-items').replaceChildren(el('p', { class: 'msg msg--error' }, ex.message)); return; }
+  const r = crm.resumen;
+  const badge = $('#crm-badge');
+  badge.hidden = !r.pendientes; badge.textContent = r.pendientes;
+  badge.style.background = 'var(--pend)';
+  const k = $('#crm-kpis');
+  k.replaceChildren();
+  [['Clientes', r.clientes], ['Por cobrar', dinero(r.por_cobrar)], [`Facturado ${r.anio}`, dinero(r.facturado)], ['Mantenimientos', `${dinero(r.mensual)}/mes`]].forEach(([t, v]) => {
+    const d = el('div', { class: 'kpi' }); d.append(el('small', {}, t), el('b', {}, String(v))); k.append(d);
+  });
+  const av = $('#crm-aviso');
+  av.hidden = crm.facturacionLista;
+  av.textContent = 'Para emitir facturas faltan tus datos fiscales: añade FACTURA_NIF y FACTURA_DIRECCION en Vercel (y FACTURA_IBAN si quieres que salga en la proforma).';
+  pintarCrm();
+}
+
+function coincide(texto) {
+  const q = $('#crm-buscar').value.trim().toLowerCase();
+  return !q || texto.toLowerCase().includes(q);
+}
+
+function pintarCrm() {
+  if (!crm) return;
+  const cont = $('#crm-items');
+  cont.replaceChildren();
+  if (sub === 'pedidos') {
+    const lista = crm.pedidos.filter(p => coincide(`${p.nombre} ${p.negocio || ''} ${p.id}`));
+    if (!lista.length) cont.append(el('p', { class: 'day__closed' }, crm.pedidos.length ? 'Ningún pedido coincide.' : 'Aún no hay pedidos. Llegarán desde “Contratar” en la web, o créalos desde la ficha de un cliente.'));
+    lista.forEach(p => cont.append(tarjetaPedido(p, true)));
+  } else {
+    const lista = crm.clientes.filter(c => coincide(`${c.nombre} ${c.negocio || ''} ${c.email || ''} ${c.telefono || ''}`));
+    if (!lista.length) cont.append(el('p', { class: 'day__closed' }, 'Ningún cliente coincide.'));
+    lista.forEach(c => {
+      const b = el('button', { type: 'button', class: 'cli' });
+      const etapa = c.pedidos ? `${c.pedidos} pedido${c.pedidos > 1 ? 's' : ''}` : 'Interesado (sin pedidos)';
+      b.append(el('b', {}, c.nombre), el('span', { class: 'num' }, c.pagado ? dinero(c.pagado) : ''),
+        el('small', {}, [c.negocio, c.telefono, c.email].filter(Boolean).join(' · ') || '—'),
+        el('small', { class: 'num' }, `${etapa}${c.citas ? ` · ${c.citas} cita${c.citas > 1 ? 's' : ''}` : ''}`));
+      b.addEventListener('click', () => abrirFicha(c.id));
+      cont.append(b);
+    });
+  }
+}
+
+function tarjetaPedido(p, conCliente) {
+  const card = el('article', { class: `ped ped--${p.estado}` });
+  const top = el('div', { class: 'ped__top' });
+  top.append(el('span', {}, `#${p.id}`));
+  if (conCliente) {
+    const n = el('button', { type: 'button', class: 'linkcli' }, p.nombre);
+    n.addEventListener('click', () => abrirFicha(p.cliente_id));
+    top.append(n);
+  }
+  top.append(el('small', { class: 'chip' }, fechaCorta(p.creado)));
+  if (p.origen === 'panel') top.append(el('small', { class: 'chip' }, 'A mano'));
+  top.append(el('span', { class: 'ped__total' }, dinero(p.total)));
+  card.append(top);
+  card.append(el('p', { class: 'ped__lines' }, p.lineas.map(l => l.concepto).join(' · ') + (p.mensual ? ` · mantenimiento ${dinero(p.mensual)}/mes` : '')));
+  const acc = el('div', { class: 'ped__actions' });
+  const sel = el('select', { 'aria-label': `Estado del pedido ${p.id}` });
+  Object.entries(ESTADOS_PED).forEach(([v, t]) => { const o = el('option', { value: v }, t); o.selected = v === p.estado; sel.append(o); });
+  sel.addEventListener('change', async () => {
+    const nuevo = sel.value;
+    const yaFacturado = (p.facturas || []).some(f => f.tipo === 'ordinaria');
+    if (['pagado', 'en_curso', 'entregado'].includes(nuevo) && !yaFacturado && !confirm(`Se emitirá la factura definitiva del pedido #${p.id} (${dinero(p.total)}). ¿Seguro?`)) { sel.value = p.estado; return; }
+    if (nuevo === 'cancelado' && yaFacturado && !confirm('Este pedido ya tiene factura: se emitirá una factura rectificativa que la anula. ¿Seguro?')) { sel.value = p.estado; return; }
+    sel.disabled = true;
+    try {
+      const r = await api('/api/admin/crm', { method: 'PATCH', body: { pedido: p.id, estado: nuevo } });
+      aviso(r.factura && !(p.facturas || []).some(f => f.codigo === r.factura.codigo) ? `Factura ${r.factura.codigo} emitida` : 'Estado guardado');
+      fichaAbierta ? await abrirFicha(fichaAbierta) : await cargarCrm();
+    } catch (ex) { aviso(ex.message, true); sel.value = p.estado; sel.disabled = false; }
+  });
+  acc.append(sel, el('a', { class: 'btn btn--ghost btn--sm', href: docUrl(p), target: '_blank', rel: 'noopener' }, (p.facturas || []).length ? 'Proforma y facturas' : 'Proforma'));
+  (p.facturas || []).forEach(f => acc.append(el('span', { class: `chip ${f.tipo === 'rectificativa' ? 'chip--cancelada' : 'chip--confirmada'}` }, f.codigo)));
+  card.append(acc);
+  return card;
+}
+
+$$('[data-sub]').forEach(b => b.addEventListener('click', () => {
+  sub = b.dataset.sub;
+  $$('[data-sub]').forEach(x => x.setAttribute('aria-selected', String(x === b)));
+  pintarCrm();
+}));
+$('#crm-buscar').addEventListener('input', pintarCrm);
+
+async function abrirFicha(id) {
+  fichaAbierta = id;
+  let d;
+  try { d = await api(`/api/admin/crm?cliente=${id}`); }
+  catch (ex) { aviso(ex.message, true); return; }
+  if (fichaAbierta !== id) return;
+  $('#crm-lista').hidden = true;
+  const f = $('#crm-ficha');
+  f.hidden = false;
+  f.replaceChildren();
+  const c = d.cliente;
+  const head = el('div', { class: 'conv__head' });
+  const volver = el('button', { class: 'btn btn--ghost btn--sm', type: 'button', 'aria-label': 'Volver a la lista' }, '←');
+  volver.addEventListener('click', cerrarFicha);
+  const h2 = el('h2', {}, c.nombre);
+  h2.append(el('small', {}, `Cliente desde ${fechaCorta(c.creado)} · ${d.pedidos.length ? 'con pedidos' : 'interesado'}`));
+  head.append(volver, h2);
+  if (c.telefono) head.append(el('a', { class: 'btn btn--wa btn--sm', href: `https://wa.me/${telefonoWa(c.telefono)}`, target: '_blank', rel: 'noopener' }, 'WhatsApp'));
+  if (c.email) head.append(el('a', { class: 'btn btn--ghost btn--sm', href: `mailto:${c.email}` }, 'Email'));
+  f.append(head);
+
+  const grid = el('div', { class: 'ficha' });
+
+  // Datos editables
+  const datos = el('section', { class: 'panel-box' });
+  datos.append(el('h3', {}, 'Datos'));
+  const form = el('form');
+  [['nombre', 'Nombre / razón social'], ['negocio', 'Negocio'], ['email', 'Email'], ['telefono', 'Teléfono'], ['nif', 'NIF / CIF'], ['direccion', 'Dirección fiscal']].forEach(([k, t]) => {
+    const w = el('div', { class: 'field' });
+    w.append(el('label', { for: `f-${k}` }, t), el('input', { id: `f-${k}`, name: k, type: k === 'email' ? 'email' : 'text', value: c[k] || '' }));
+    form.append(w);
+  });
+  const g = el('button', { class: 'btn btn--sm', type: 'submit' }, 'Guardar datos');
+  form.append(g);
+  form.addEventListener('submit', async e => {
+    e.preventDefault(); g.disabled = true;
+    try { await api('/api/admin/crm', { method: 'PATCH', body: { cliente: id, ...Object.fromEntries(new FormData(form)) } }); aviso('Datos guardados'); await abrirFicha(id); }
+    catch (ex) { aviso(ex.message, true); g.disabled = false; }
+  });
+  datos.append(form);
+
+  // Notas
+  const notas = el('section', { class: 'panel-box' });
+  notas.append(el('h3', {}, 'Notas'));
+  const fn = el('form');
+  const ta = el('textarea', { rows: '6', 'aria-label': 'Notas del cliente', placeholder: 'Lo que hablasteis, preferencias, próximos pasos…' });
+  ta.value = c.notas || '';
+  const gn = el('button', { class: 'btn btn--sm', type: 'submit' }, 'Guardar notas');
+  fn.append(ta, gn);
+  fn.addEventListener('submit', async e => {
+    e.preventDefault(); gn.disabled = true;
+    try { await api('/api/admin/crm', { method: 'PATCH', body: { cliente: id, notas: ta.value } }); aviso('Notas guardadas'); }
+    catch (ex) { aviso(ex.message, true); }
+    gn.disabled = false;
+  });
+  notas.append(fn);
+
+  // Pedidos + nuevo pedido
+  const peds = el('section', { class: 'panel-box full' });
+  peds.append(el('h3', {}, `Pedidos (${d.pedidos.length})`));
+  d.pedidos.forEach(p => peds.append(tarjetaPedido({ ...p, facturas: d.facturas.filter(x => x.pedido_id === p.id) }, false)));
+  const det = el('details');
+  det.append(el('summary', { class: 'btn btn--ghost btn--sm', style: 'display:inline-flex' }, '+ Nuevo pedido'));
+  const fp = el('form', { style: 'margin-top:.6rem' });
+  const checks = el('div', { class: 'checks' });
+  SERVICIOS_PANEL.forEach(([v, t]) => { const l = el('label'); l.append(el('input', { type: 'checkbox', name: 'servicios', value: v }), document.createTextNode(t)); checks.append(l); });
+  const lm = el('label'); lm.append(el('input', { type: 'checkbox', name: 'mantenimiento' }), document.createTextNode('Con mantenimiento mensual')); checks.append(lm);
+  const nota = el('input', { name: 'nota', type: 'text', placeholder: 'Nota (opcional)', 'aria-label': 'Nota del pedido' });
+  const bp = el('button', { class: 'btn btn--sm', type: 'submit' }, 'Crear pedido');
+  fp.append(checks, nota, bp);
+  fp.addEventListener('submit', async e => {
+    e.preventDefault();
+    const fd = new FormData(fp);
+    bp.disabled = true;
+    try { await api('/api/admin/crm', { method: 'POST', body: { cliente_id: id, servicios: fd.getAll('servicios'), mantenimiento: fd.has('mantenimiento'), nota: fd.get('nota') } }); aviso('Pedido creado'); await abrirFicha(id); }
+    catch (ex) { aviso(ex.message, true); bp.disabled = false; }
+  });
+  det.append(fp);
+  peds.append(det);
+
+  // Facturas
+  const facs = el('section', { class: 'panel-box' });
+  facs.append(el('h3', {}, `Facturas (${d.facturas.length})`));
+  const ul = el('ul', { class: 'mini-list' });
+  if (!d.facturas.length) ul.append(el('li', {}, 'Se emiten al marcar un pedido como pagado.'));
+  d.facturas.forEach(x => {
+    const li = el('li');
+    li.append(el('a', { href: `/documento/?p=${x.pedido_id}&t=${x.token}`, target: '_blank', rel: 'noopener' }, `${x.codigo}${x.tipo === 'rectificativa' ? ' (rectificativa)' : ''}`), el('span', {}, `${dinero(x.total)} · ${x.fecha}`));
+    ul.append(li);
+  });
+  facs.append(ul);
+
+  // Citas
+  const cts = el('section', { class: 'panel-box' });
+  cts.append(el('h3', {}, `Citas (${d.citas.length})`));
+  const uc = el('ul', { class: 'mini-list' });
+  if (!d.citas.length) uc.append(el('li', {}, 'Sin consultas reservadas.'));
+  d.citas.forEach(x => { const li = el('li'); li.append(el('span', {}, `${x.fecha} · ${x.hora}`), el('span', { class: `chip chip--${x.estado}` }, x.estado)); uc.append(li); });
+  cts.append(uc);
+
+  grid.append(datos, notas, peds, facs, cts);
+  f.append(grid);
+}
+function cerrarFicha() {
+  fichaAbierta = null;
+  $('#crm-ficha').hidden = true;
+  $('#crm-lista').hidden = false;
+  cargarCrm();
+}
+
+$('#crm-nuevo').addEventListener('click', async () => {
+  const nombre = prompt('Nombre o razón social del cliente nuevo:');
+  if (!nombre || !nombre.trim()) return;
+  try { const r = await api('/api/admin/crm', { method: 'POST', body: { cliente: { nombre } } }); aviso('Cliente creado'); abrirFicha(r.cliente.id); }
+  catch (ex) { aviso(ex.message, true); }
+});
 
 /* ---------- Al abrir el panel y cada minuto ---------- */
 (async function inicio() {

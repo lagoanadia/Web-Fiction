@@ -63,7 +63,8 @@
     let sold = store.get(K.sold, {});           // unidades vendidas por producto (para el stock)
     let cat = 'Todo';
     let step = 'cart';
-    const form = { delivery: 'pickup', name: '', tel: '', addr: '', slot: 'Mañana 9:00–11:00', pay: 'Bizum' };
+    const form = { delivery: 'pickup', name: '', tel: '', nif: '', addr: '', slot: 'Mañana 9:00–11:00', pay: 'Bizum' };
+    let ownView = 'orders';
 
     const grid = $('#shop-grid'), body = $('#shop-body'), drawer = $('#shop-drawer'), scrim = $('#shop-scrim');
     const openBtn = $('#shop-open'), count = $('#shop-count'), toastEl = $('#shop-toast');
@@ -198,7 +199,7 @@
     }
     function renderData() {
       body.append(stepsBar(1));
-      body.append(field('Nombre', 'name', 'text', 'Ej.: Uxía'), field('Teléfono', 'tel', 'tel', '600 123 456'));
+      body.append(field('Nombre', 'name', 'text', 'Ej.: Uxía'), field('Teléfono', 'tel', 'tel', '600 123 456'), field('NIF (opcional, para la factura)', 'nif', 'text', '12345678Z'));
       if (form.delivery === 'ship') body.append(field('Dirección', 'addr', 'text', 'Rúa, número, piso'));
       else {
         const w = el('label', { style: 'display:grid;gap:.25rem;font-weight:600;font-size:.78rem' }, 'Hora de recogida');
@@ -218,7 +219,7 @@
         const bad = [];
         if (form.name.trim().length < 2) bad.push(0);
         if (!/^\+?[\d\s().-]{9,}$/.test(form.tel)) bad.push(1);
-        if (form.delivery === 'ship' && form.addr.trim().length < 5) bad.push(2);
+        if (form.delivery === 'ship' && form.addr.trim().length < 5) bad.push(3); // nombre, teléfono, NIF, dirección
         inputs.forEach((i, k) => i.toggleAttribute('aria-invalid', bad.includes(k)));
         if (bad.length) { err.textContent = 'Revisa los campos marcados.'; inputs[bad[0]].focus(); return; }
         step = 'pay'; render();
@@ -256,7 +257,10 @@
         const order = {
           n, total: t.total, pay: form.pay, name: form.name.trim(), state: 0, time: new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
           how: form.delivery === 'ship' ? 'Envío' : `Recogida ${form.slot.replace('Mañana ', '')}`,
-          items: cart.map(c => `${c.qty}× ${P(c.id).name}${P(c.id).variants.length > 1 ? ` (${P(c.id).variants[c.v][0]})` : ''}`)
+          items: cart.map(c => `${c.qty}× ${P(c.id).name}${P(c.id).variants.length > 1 ? ` (${P(c.id).variants[c.v][0]})` : ''}`),
+          tel: form.tel.trim(), nif: form.nif.trim().toUpperCase(), addr: form.addr.trim(), fecha: new Date().toISOString().slice(0, 10),
+          lines: [...cart.map(c => ({ concepto: `${P(c.id).name}${P(c.id).variants.length > 1 ? ` · ${P(c.id).variants[c.v][0]}` : ''}`, cantidad: c.qty, total: Math.round(lineTotal(c) * 100) })),
+            ...(t.ship ? [{ concepto: 'Envío a domicilio', cantidad: 1, total: Math.round(t.ship * 100) }] : [])]
         };
         cart.forEach(c => { sold[c.id] = (sold[c.id] || 0) + c.qty; });
         orders.unshift(order); cart = []; step = 'cart';
@@ -265,9 +269,11 @@
         const done = el('div', { class: 'done', role: 'status' });
         done.innerHTML = '<svg viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="26" fill="#2f7d4f"/><path d="M17 29l7 7 15-16" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
         done.append(el('h5', {}, '¡Pedido recibido!'), el('p', {}, `Nº ${n} · ${eur(order.total)} con ${order.pay}`), el('p', { class: 'sim' }, `${order.how}. Te avisamos por WhatsApp cuando esté listo.`));
+        const inv = el('button', { type: 'button', class: 'sbtn sbtn--ghost' }, 'Ver mi factura');
+        inv.addEventListener('click', () => showInvoice(order));
         const again = el('button', { type: 'button', class: 'sbtn' }, 'Seguir comprando');
         again.addEventListener('click', closeCart);
-        done.append(again, el('p', { class: 'sim' }, '→ Mira “Tu panel”: el pedido ya te ha llegado.'));
+        done.append(again, inv, el('p', { class: 'sim' }, '→ Mira “Tu panel”: el pedido y el cliente ya te han llegado.'));
         body.append(done);
         again.focus();
       }, reduceMotion ? 200 : 1300);
@@ -275,16 +281,43 @@
 
     /* Panel del dueño */
     const STATES = ['Nuevo', 'Preparando', 'Listo'];
+    /* Factura de la demo: se genera sola con cada pedido */
+    const SHOP_ISSUER = { nombre: 'Forno do Cantón S.L. (ejemplo)', nif: 'B00000000', direccion: 'Rúa Exemplo, 12', email: 'ola@fornodocanton.gal' };
+    function showInvoice(o) {
+      const dlg = $('#demo-doc');
+      const lineas = (o.lines || []).map(l => { const base = Math.round(l.total / 1.21); return { ...l, base, iva: l.total - base }; });
+      const sum = k => lineas.reduce((a, l) => a + l[k], 0);
+      window.Documento.render($('#demo-doc-body'), {
+        marca: 'FORNO DO CANTÓN', titulo: 'Factura', codigo: `FC${(o.fecha || '2026').slice(0, 4)}-${String(o.n).padStart(4, '0')}`, fecha: o.fecha,
+        estado: { clase: 'ok', texto: `Pagada con ${o.pay}` }, emisor: SHOP_ISSUER,
+        cliente: { nombre: o.name, nif: o.nif, telefono: o.tel, direccion: o.addr },
+        lineas, base: sum('base'), iva: sum('iva'), total: sum('total'),
+        notas: [`Pedido nº ${o.n} · ${o.how}.`, 'Ejemplo de la demo: negocio ficticio, ningún dato sale de tu navegador.']
+      });
+      if (!dlg.open) dlg.showModal();
+      $('[data-close-doc]', dlg).focus();
+    }
+    $('#demo-doc').addEventListener('click', e => { if (e.target.id === 'demo-doc' || e.target.closest('[data-close-doc]')) $('#demo-doc').close(); });
+
     function renderOrders(flashFirst) {
       const ol = $('#shop-orders');
       ol.replaceChildren();
       if (!orders.length) ol.append(el('li', { class: 'owner__empty' }, 'Haz un pedido en la tienda y aparecerá aquí al instante.'));
-      orders.forEach((o, i) => {
-        const li = el('li');
-        const b = el('button', { type: 'button', class: `order${flashFirst && i === 0 ? ' is-new' : ''}`, 'aria-label': `Pedido ${o.n}, ${STATES[o.state]}. Pulsa para avanzar el estado` });
-        b.append(el('b', {}, `#${o.n} · ${o.name} · ${eur(o.total)}`), el('span', { class: 'state', 'data-s': String(o.state) }, STATES[o.state]), el('small', {}, `${o.time} · ${o.pay} · ${o.how} — ${o.items.join(', ')}`));
-        b.addEventListener('click', () => { o.state = (o.state + 1) % 3; save(); renderOrders(); });
-        li.append(b); ol.append(li);
+      if (ownView === 'clients') {
+        // CRM de la demo: una ficha por teléfono, con su historial
+        const byTel = new Map();
+        orders.forEach(o => { const k = (o.tel || o.name).replace(/\D/g, '').slice(-9) || o.name; const c = byTel.get(k) || { name: o.name, tel: o.tel, n: 0, total: 0, last: o.time }; c.n++; c.total += o.total; byTel.set(k, c); });
+        byTel.forEach(c => { const li = el('li', { class: 'client' }); li.append(el('b', {}, c.name), el('span', {}, eur(c.total)), el('small', {}, `${c.tel || '—'} · ${c.n} pedido${c.n > 1 ? 's' : ''} · último a las ${c.last}`)); ol.append(li); });
+      } else orders.forEach((o, i) => {
+        const li = el('li', { class: `order${flashFirst && i === 0 ? ' is-new' : ''}` });
+        const st = el('button', { type: 'button', class: 'state', 'data-s': String(o.state), 'aria-label': `Estado: ${STATES[o.state]}. Pulsa para avanzar` }, STATES[o.state]);
+        st.style.border = '0'; st.style.cursor = 'pointer';
+        st.addEventListener('click', () => { o.state = (o.state + 1) % 3; save(); renderOrders(); });
+        const inv = el('button', { type: 'button', class: 'order__doc' }, o.lines ? 'Ver factura' : 'Factura no disponible');
+        inv.disabled = !o.lines;
+        inv.addEventListener('click', () => showInvoice(o));
+        li.append(el('b', {}, `#${o.n} · ${o.name} · ${eur(o.total)}`), st, el('small', {}, `${o.time} · ${o.pay} · ${o.how} — ${o.items.join(', ')}`), inv);
+        ol.append(li);
       });
       $('#kpi-orders').textContent = orders.length;
       $('#kpi-sales').textContent = eur(orders.reduce((a, o) => a + o.total, 0));
@@ -304,6 +337,11 @@
     $('#shop-close').addEventListener('click', closeCart);
     scrim.addEventListener('click', closeCart);
     drawer.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); closeCart(); } });
+    $$('[data-own]').forEach(b => b.addEventListener('click', () => {
+      ownView = b.dataset.own;
+      $$('[data-own]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+      renderOrders();
+    }));
     $('#shop-reset').addEventListener('click', () => { cart = []; orders = []; sold = {}; save(); update(); toast('Demo reiniciada'); });
     update();
   })();
