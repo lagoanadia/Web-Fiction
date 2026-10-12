@@ -332,7 +332,7 @@ const Booking = (function booking() {
   function renderDays() {
     daysBox.replaceChildren();
     const days = Agenda.days();
-    if (!days.length) { daysBox.append(el('p', { class: 'muted small' }, 'No quedan horas libres estos días. Escríbeme por WhatsApp y buscamos hueco.')); return; }
+    if (!days.length) { daysBox.append(el('p', { class: 'muted small' }, 'No quedan horas libres estos días. Escríbenos por WhatsApp y buscamos hueco.')); return; }
     days.forEach(({ fecha }) => {
       const [wd, ...rest] = Agenda.fmtShort(fecha).replace(',', '').split(' ');
       const b = el('button', { type: 'button', class: 'choice', 'aria-pressed': String(state.fecha === fecha), 'aria-label': Agenda.fmtLong(fecha) });
@@ -376,7 +376,7 @@ const Booking = (function booking() {
     btn.disabled = false; btn.textContent = 'Solicitar cita';
     if (r.estado === 'ok') {
       status.hidden = false; status.dataset.type = 'ok';
-      status.textContent = `Hecho: ${r.when} (${d.modalidad}). Te confirmo por WhatsApp o email.`;
+      status.textContent = `Hecho: ${r.when} (${d.modalidad}). Te confirmamos por WhatsApp o email.`;
       form.reset(); state.fecha = state.hora = null; refresh();
       return;
     }
@@ -402,7 +402,7 @@ const Booking = (function booking() {
     btn.disabled = true; btn.textContent = 'Enviando…';
     const ok = await sendToEmail(`Nuevo mensaje: ${data.Nombre} · ${data.Servicio}`, { ...data, _replyto: data.Email });
     btn.disabled = false; btn.textContent = 'Enviar mensaje';
-    if (ok) { status.hidden = false; status.dataset.type = 'ok'; status.textContent = 'Recibido. Te respondo en menos de 24 h laborables.'; form.reset(); }
+    if (ok) { status.hidden = false; status.dataset.type = 'ok'; status.textContent = 'Recibido. Te respondemos en menos de 24 h laborables.'; form.reset(); }
     else showFail(status, 'No se ha podido enviar. Puedes mandarlo así:', summary);
   });
 })();
@@ -508,15 +508,15 @@ $('#portfolio-load').addEventListener('click', () => {
       b: { info: 'Detalles', demo: 'Probar demo', calc: 'Calcular', book: 'Reservar aquí', wa: 'WhatsApp con Nadia', cancel: 'Cancelar', ok: 'Confirmar', other: 'Otro día', add: 'Añadir al presupuesto', go: 'Ir al formulario' },
       a: {
         precios: () => `Precio cerrado, IVA incluido:\n${SERVICES.map(s => `• ${s.short}: ${eur(s.price)}`).join('\n')}\n• Pack Web + WhatsApp: ${eur(PACK.price)} (ahorras ${eur(PACK_SAVING)})`,
-        servicios: () => 'Hago 4 cosas: web con reservas, asistente de WhatsApp, tienda online y Google Maps. Y extras: IA para tu gestión diaria o algo a medida.',
-        plazos: () => 'Google Maps 1 semana · WhatsApp 2-3 · Web 3-4 · Tienda 4-6 · Pack 5-7 semanas. Cuentan desde que tengo tus textos y fotos.',
+        servicios: () => 'Hacemos 4 cosas: web con reservas, asistente de WhatsApp, tienda online y Google Maps. Y extras: IA para tu gestión diaria o algo a medida.',
+        plazos: () => 'Google Maps 1 semana · WhatsApp 2-3 · Web 3-4 · Tienda 4-6 · Pack 5-7 semanas. Cuentan desde que tenemos tus textos y fotos.',
         web: () => `Web con reservas: ${eur(svc('web').price)}. Tus clientes eligen servicio, día y hora; tú lo gestionas desde el móvil. La reserva de esta web es exactamente eso.`,
         wa: () => `Asistente de WhatsApp: ${eur(svc('wa').price)}. Responde al momento, apunta citas y te pasa la conversación si duda.`,
         shop: () => `Tienda online: ${eur(svc('shop').price)}. Catálogo, carrito, Bizum o tarjeta y aviso de cada pedido.`,
         seo: () => `Google Maps y SEO local: ${eur(svc('seo').price)}, en 1 semana. Ficha completa, fotos y reseñas respondidas.`,
         pack: () => `Pack Web + WhatsApp: ${eur(PACK.price)} en vez de 480 €. Comparten agenda: cero dobles reservas.`,
         ia: () => 'Gestión diaria con IA: 150 € + 35 €/mes. Cada día te propone recordatorios y respuestas; tú apruebas.',
-        medida: () => 'También hago cosas a medida: stock, facturas, fidelización, apps… Se valora en la consulta gratis.',
+        medida: () => 'También hacemos cosas a medida: stock, facturas, fidelización, apps… Se valora en la consulta gratis.',
         mantenimiento: () => `Mantenimiento opcional y cancelable: web ${eur(15)}, WhatsApp/tienda ${eur(19)}, pack ${eur(29)} al mes. Copias, seguridad y cambios pequeños ilimitados.`,
         iva: () => 'Todos los precios ya incluyen el IVA (21 %).',
         pago: () => 'Las condiciones de pago te las explica Nadia en persona. ¿Te paso con ella?',
