@@ -315,7 +315,7 @@
      ============================================================= */
   (function whatsapp() {
     const logEl = $('#wa-log'), quick = $('#wa-quick'), input = $('#wa-input');
-    const fmtDay = { es: new Intl.DateTimeFormat('es-ES', { weekday: 'long', day: 'numeric' }), gl: new Intl.DateTimeFormat('gl-ES', { weekday: 'long', day: 'numeric' }) };
+    const fmtDay = { es: new Intl.DateTimeFormat('es-ES', { weekday: 'long', day: 'numeric' }) };
     const T = {
       es: {
         sys: 'Mensajes automáticos de Mar de Fondo · ejemplo',
@@ -335,26 +335,6 @@
         hand: 'Esa no la sé con seguridad 🤔 Te paso con una persona del equipo: te responde por aquí en cuanto pueda.',
         hola: '¡Hola! ¿Cita, precios u horario?',
         gracias: '¡A ti! 🌙',
-        ph: 'Escribe como un cliente…'
-      },
-      gl: {
-        sys: 'Mensaxes automáticas de Mar de Fondo · exemplo',
-        hello: 'Ola! 👋 Son o asistente de Mar de Fondo. Dígoche horario e prezos ou búscoche cita ao momento.',
-        quick: [['cita', 'Quero cita'], ['precios', 'Prezos'], ['horario', 'Horario'], ['cambiar', 'Cambiar a miña cita'], ['perro', 'Podo ir co meu can?']],
-        horario: 'Martes a venres 9:30–19:30 · Sábados 9:00–14:00. Domingo e luns, pechado.',
-        precios: 'Corte muller 22 € · Corte home 14 € · Peiteado 15 € · Cor desde 35 €. Búscoche oco?',
-        which: 'Xenial! Que che facemos?',
-        services: ['Corte muller', 'Corte home', 'Peiteado', 'Cor'],
-        slots: s => `Para ${s.toLowerCase()} teño libre:`,
-        ok: (s, h) => `Reservado ✅ ${s}, ${h}.\nMándoche un recordatorio o día antes. Se non podes vir, escribe «cambiar».`,
-        none: 'Non tes ningunha cita agora mesmo. Búscoche unha?',
-        mine: (s, h) => `Tes: ${s}, ${h}. Que facemos?`,
-        cancel: 'Anular', move: 'Outra hora', keep: 'Deixala',
-        cancelled: 'Feito, cita anulada e o oco queda libre. Ata pronto!',
-        kept: 'Perfecto, esperámoste 🙂',
-        hand: 'Esa non a sei con seguridade 🤔 Pásote cunha persoa do equipo: respóndeche por aquí en canto poida.',
-        hola: 'Ola! Cita, prezos ou horario?',
-        gracias: 'Grazas a ti! 🌙',
         ph: 'Escribe como un cliente…'
       }
     };
@@ -430,7 +410,7 @@
       },
       book: (s, h) => {
         if (mine) agenda = agenda.filter(a => a !== mine);
-        mine = { who: lang === 'gl' ? 'Ti (cliente)' : 'Tú (cliente)', what: s, when: h.when, at: h.at, src: 'WhatsApp', fresh: true };
+        mine = { who: 'Tú (cliente)', what: s, when: h.when, at: h.at, src: 'WhatsApp', fresh: true };
         agenda.push(mine);
         renderAgenda();
         msg('in', L().ok(s, h.when));
@@ -480,12 +460,6 @@
       input.value = '';
       say(text, act[topic(text)]);
     });
-    $$('[data-walang]').forEach(b => b.addEventListener('click', () => {
-      if (busy || b.dataset.walang === lang) return;
-      lang = b.dataset.walang;
-      $$('[data-walang]').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
-      reset();
-    }));
     $('#wa-reset').addEventListener('click', reset);
     reset();
   })();

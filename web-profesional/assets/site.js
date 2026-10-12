@@ -496,7 +496,7 @@ $('#portfolio-load').addEventListener('click', () => {
   let flow = null; // reserva en marcha: { paso, datos }
   const history = [];
   let saved = [];
-  try { const s = JSON.parse(sessionStorage.getItem(SAVE) || 'null'); if (s) { saved = s.msgs || []; lang = s.lang || 'es'; } } catch { /* */ }
+  try { const s = JSON.parse(sessionStorage.getItem(SAVE) || 'null'); if (s) saved = s.msgs || []; } catch { /* */ }
   const persist = () => { try { sessionStorage.setItem(SAVE, JSON.stringify({ lang, msgs: saved.slice(-40) })); } catch { /* */ } };
 
   const L = {
@@ -511,7 +511,7 @@ $('#portfolio-load').addEventListener('click', () => {
         servicios: () => 'Hago 4 cosas: web con reservas, asistente de WhatsApp, tienda online y Google Maps. Y extras: IA para tu gestión diaria o algo a medida.',
         plazos: () => 'Google Maps 1 semana · WhatsApp 2-3 · Web 3-4 · Tienda 4-6 · Pack 5-7 semanas. Cuentan desde que tengo tus textos y fotos.',
         web: () => `Web con reservas: ${eur(svc('web').price)}. Tus clientes eligen servicio, día y hora; tú lo gestionas desde el móvil. La reserva de esta web es exactamente eso.`,
-        wa: () => `Asistente de WhatsApp: ${eur(svc('wa').price)}. Responde al momento, apunta citas y te pasa la conversación si duda. En galego y castellano.`,
+        wa: () => `Asistente de WhatsApp: ${eur(svc('wa').price)}. Responde al momento, apunta citas y te pasa la conversación si duda.`,
         shop: () => `Tienda online: ${eur(svc('shop').price)}. Catálogo, carrito, Bizum o tarjeta y aviso de cada pedido.`,
         seo: () => `Google Maps y SEO local: ${eur(svc('seo').price)}, en 1 semana. Ficha completa, fotos y reseñas respondidas.`,
         pack: () => `Pack Web + WhatsApp: ${eur(PACK.price)} en vez de 480 €. Comparten agenda: cero dobles reservas.`,
@@ -544,52 +544,6 @@ $('#portfolio-load').addEventListener('click', () => {
         done: w => `¡Listo! Solicitud guardada para el ${w}. Nadia te confirma por WhatsApp o email.`,
         cancelled: 'Vale, no he guardado nada.',
         sending: 'Guardando…'
-      }
-    },
-    gl: {
-      sub: 'responde ao momento · tamén reserva',
-      ph: 'Escribe a túa pregunta', phName: 'O teu nome', phTel: 'O teu teléfono ou WhatsApp',
-      hello: 'Ola 👋 Son o asistente de Lagoa. Dígoche prezos e prazos nun segundo, e podo reservarche a consulta de balde aquí mesmo.',
-      quick: [['precios', 'Prezos'], ['reservar', 'Reservar consulta'], ['demo', 'Ver demos'], ['plazos', 'Prazos'], ['humano', 'Falar con Nadia']],
-      b: { info: 'Detalles', demo: 'Probar demo', calc: 'Calcular', book: 'Reservar aquí', wa: 'WhatsApp con Nadia', cancel: 'Cancelar', ok: 'Confirmar', other: 'Outro día', add: 'Engadir ao orzamento', go: 'Ir ao formulario' },
-      a: {
-        precios: () => `Prezo pechado, IVE incluído:\n${SERVICES.map(s => `• ${s.short === 'Tienda' ? 'Tenda' : s.short}: ${eur(s.price)}`).join('\n')}\n• Pack Web + WhatsApp: ${eur(PACK.price)} (aforras ${eur(PACK_SAVING)})`,
-        servicios: () => 'Fago 4 cousas: web con reservas, asistente de WhatsApp, tenda online e Google Maps. E extras: IA para a xestión diaria ou algo a medida.',
-        plazos: () => 'Google Maps 1 semana · WhatsApp 2-3 · Web 3-4 · Tenda 4-6 · Pack 5-7 semanas. Contan desde que teño os teus textos e fotos.',
-        web: () => `Web con reservas: ${eur(svc('web').price)}. Os teus clientes escollen servizo, día e hora; ti xestionas todo desde o móbil.`,
-        wa: () => `Asistente de WhatsApp: ${eur(svc('wa').price)}. Responde ao momento, apunta citas e pásache a conversa se dubida. En galego e castelán.`,
-        shop: () => `Tenda online: ${eur(svc('shop').price)}. Catálogo, carriño, Bizum ou tarxeta e aviso de cada pedido.`,
-        seo: () => `Google Maps e SEO local: ${eur(svc('seo').price)}, nunha semana. Ficha completa, fotos e recensións respondidas.`,
-        pack: () => `Pack Web + WhatsApp: ${eur(PACK.price)} en vez de 480 €. Comparten axenda: cero reservas dobres.`,
-        ia: () => 'Xestión diaria con IA: 150 € + 35 €/mes. Cada día proponche recordatorios e respostas; ti aprobas.',
-        medida: () => 'Tamén fago cousas a medida: stock, facturas, fidelización, apps… Valórase na consulta de balde.',
-        mantenimiento: () => `Mantemento opcional e cancelable: web ${eur(15)}, WhatsApp/tenda ${eur(19)}, pack ${eur(29)} ao mes.`,
-        iva: () => 'Todos os prezos xa inclúen o IVE (21 %).',
-        pago: () => 'As condicións de pagamento explícachas Nadia en persoa. Pásote con ela?',
-        demo: () => 'Arriba tes demos que funcionan: unha tenda con carriño e panel de pedidos, un WhatsApp que reserva e unha ficha de Google antes/despois.',
-        portfolio: () => 'Tes os seus proxectos publicados na sección Portfolio.',
-        zona: () => 'Traballa sobre todo na Coruña. Se estás noutra zona, escríbelle.',
-        idiomas: () => 'Nadia atende en galego, castelán, English, Deutsch e français.',
-        propiedad: () => 'Todo queda ao teu nome e ensínache a xestionalo.',
-        wordpress: () => 'Nada de WordPress nin plugins: código a medida, lixeiro e sen actualizacións pendentes.',
-        hola: () => 'Ola! Que queres saber? Prezos, prazos, demos… ou resérvoche a consulta.',
-        gracias: () => 'Grazas a ti! Se queres, resérvoche a consulta nun momento.',
-        humano: () => 'Claro. Preme e ábrese WhatsApp co que falamos.',
-        fallback: () => 'Esa mellor respóndecha Nadia. Ábroche WhatsApp coa túa pregunta xa escrita.'
-      },
-      f: {
-        mod: 'Xenial. A consulta é de balde (20 min). Como a prefires?',
-        mods: ['Videochamada', 'Teléfono', 'En persoa (A Coruña)'],
-        day: 'Que día? (hora de España)',
-        hour: d => `Horas libres o ${d}:`,
-        none: 'Agora mesmo non quedan ocos. Escríbelle a Nadia e buscades un.',
-        name: 'A nome de quen?',
-        tel: 'Un teléfono ou WhatsApp para confirmarche?',
-        telBad: 'Ese teléfono non parece válido. Proba outra vez (ex.: 600 123 456).',
-        sum: d => `Revisa:\n📅 ${d.when}\n💬 ${d.modalidad}\n👤 ${d.nombre} · ${d.telefono}\n\nAo confirmar aceptas a política de privacidade.`,
-        done: w => `Listo! Solicitude gardada para o ${w}. Nadia confírmache por WhatsApp ou email.`,
-        cancelled: 'Vale, non gardei nada.',
-        sending: 'Gardando…'
       }
     }
   };
@@ -635,7 +589,6 @@ $('#portfolio-load').addEventListener('click', () => {
     }
     return best || 'fallback';
   }
-  const looksGalician = t => /\b(ola|boas|grazas|queria|teno|canto|prezo|cando|onde|xa|moito)\b/.test(norm(t));
 
   /* -------- Pintar mensajes -------- */
   function bubble(who, text, actions) {
@@ -658,7 +611,7 @@ $('#portfolio-load').addEventListener('click', () => {
     return box;
   }
   function waBtn() {
-    const text = [lang === 'gl' ? 'Ola, Nadia. Escríboche desde a túa web.' : 'Hola, Nadia. Te escribo desde tu web.', ...history.slice(-6).map(q => `— ${q}`)].join('\n');
+    const text = ['Hola, Nadia. Te escribo desde tu web.', ...history.slice(-6).map(q => `— ${q}`)].join('\n');
     return [L[lang].b.wa, waLink(text), 'wa'];
   }
   function reply(fn) {
@@ -751,7 +704,6 @@ $('#portfolio-load').addEventListener('click', () => {
   function ask(text, forced) {
     text = text.trim();
     if (busy || !text) return false;
-    if (!started && !forced && looksGalician(text) && lang !== 'gl') setLang('gl', false);
     history.push(text);
     bubble('user', text);
     const t = forced || topicFor(text);
@@ -778,7 +730,6 @@ $('#portfolio-load').addEventListener('click', () => {
   }
   function setLang(next, greet = true) {
     lang = next;
-    $$('.chat__lang button, .chat .seg button').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.lang === lang)));
     $('#chat-sub').textContent = L[lang].sub;
     $('label[for="chat-input"]').textContent = L[lang].ph;
     setPlaceholder(); renderQuick(); persist();
@@ -807,6 +758,5 @@ $('#portfolio-load').addEventListener('click', () => {
   $('#chat-close').addEventListener('click', () => close());
   panel.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
   $('#chat-form').addEventListener('submit', e => { e.preventDefault(); if (ask(input.value)) input.value = ''; });
-  $$('.chat .seg button').forEach(b => b.addEventListener('click', () => { if (!busy && b.dataset.lang !== lang) setLang(b.dataset.lang); }));
   window.LagoaChat = { open, ask };
 })();
