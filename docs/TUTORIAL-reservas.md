@@ -155,6 +155,8 @@ tools/ (at the repository root, never published)
 
 ## 4. Part 1 — The public website
 
+> **Update (October 2026):** Lagoa's own public site was redesigned. The page is now split into `index.html` (content), `assets/site.css` (design system, light/dark "Cambiar realidad" theme), `assets/site.js` (booking, calculator, assistant that also books inside the chat) and `assets/lab.js` (live demos: shop with cart and owner panel, WhatsApp bot, Google Maps before/after). It no longer uses photos. The booking API contract (`/api/disponibilidad`, `/api/reservas`) is unchanged, so everything below still applies to client sites; only the code excerpts of Lagoa's own page differ.
+
 `index.html` is a single file with three parts: `<head>` (SEO), `<style>` (design) and `<script>` (behaviour). One file is easier to copy, has no build step and loads fast.
 
 ### 4.1 The `<head>`: SEO and sharing
