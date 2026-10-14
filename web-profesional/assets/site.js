@@ -720,7 +720,7 @@ $('#portfolio-load').addEventListener('click', () => {
   }
   function waBtn() {
     const text = ['Hola, Nadia. Te escribo desde tu web.', ...history.slice(-6).map(q => `— ${q}`)].join('\n');
-    return [L[lang].b.wa, waLink(text), 'wa'];
+    return [L[lang].b.wa, waLink(text), 'wa-link'];
   }
   function reply(fn) {
     busy = true;
