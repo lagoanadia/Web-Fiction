@@ -1,29 +1,32 @@
 /* =============================================================
    Pedidos y facturas
-   - Los importes se calculan SIEMPRE aquí, con la lista de precios
-     del servidor (negocio.js): lo que mande el navegador no cuenta.
-   - Todo en céntimos. Los precios ya llevan el IVA (21 %).
+   - Sin precios fijos: cada presupuesto lo escribe Nadia en el panel
+     (concepto + importe con IVA) después de la llamada con el cliente.
+   - Todo en céntimos. Los importes que se escriben llevan el IVA (21 %).
    - Datos del emisor en variables de entorno (Vercel):
        FACTURA_NOMBRE, FACTURA_NIF, FACTURA_DIRECCION,
        FACTURA_EMAIL, FACTURA_IBAN (opcional, para el pago)
    ============================================================= */
 import crypto from 'node:crypto';
-import { SERVICIOS, PACK } from './negocio.js';
 
 export const IVA = 0.21;
 export const ESTADOS_PEDIDO = ['pendiente_pago', 'pagado', 'en_curso', 'entregado', 'cancelado'];
 
-/** Ids de servicio → líneas del pedido. Web + WhatsApp se convierten en el pack. */
-export function calcularPedido(ids, conMantenimiento) {
-  const elegidos = [...new Set((Array.isArray(ids) ? ids : []).filter(id => SERVICIOS.some(s => s.id === id)))];
-  if (!elegidos.length) return null;
-  let items = elegidos.map(id => SERVICIOS.find(s => s.id === id));
-  if (elegidos.includes('web') && elegidos.includes('wa')) {
-    items = [{ id: 'pack', es: PACK.es, precio: PACK.precio, mes: PACK.mes }, ...items.filter(s => s.id !== 'web' && s.id !== 'wa')];
-  }
-  const lineas = items.map(s => linea(s.es, s.precio * 100, s.id));
-  const mensual = conMantenimiento ? items.reduce((a, s) => a + (s.mes || 0) * 100, 0) : 0;
-  return { lineas, mensual, ...sumar(lineas) };
+/**
+ * Presupuesto a partir de las líneas que escribe Nadia en el panel.
+ * lineas: [{ concepto, importe }] con el importe en euros, IVA incluido.
+ * mensual: cuota de mantenimiento en euros/mes (opcional, se factura aparte).
+ * Devuelve null si no hay ninguna línea válida.
+ */
+export function presupuestoDesdeLineas(lineas, mensual = 0) {
+  if (!Array.isArray(lineas)) return null;
+  const validas = lineas.slice(0, 30)
+    .map(l => ({ concepto: String(l?.concepto || '').trim().slice(0, 200), cent: Math.round(Number(l?.importe) * 100) }))
+    .filter(l => l.concepto && Number.isFinite(l.cent) && l.cent > 0 && l.cent <= 100000000);
+  if (!validas.length) return null;
+  const lin = validas.map(l => linea(l.concepto, l.cent));
+  const m = Math.round(Number(mensual) * 100);
+  return { lineas: lin, mensual: Number.isFinite(m) && m > 0 && m <= 10000000 ? m : 0, ...sumar(lin) };
 }
 
 /** Una línea con su base e IVA, a partir del precio final (IVA incluido) */

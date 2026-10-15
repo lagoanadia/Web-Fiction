@@ -4,7 +4,7 @@
    GET   ?cliente=<id>       → ficha: datos, pedidos, facturas y citas
    GET   ?vista=bandeja      → TODO lo que entra (formulario, WhatsApp, citas y pedidos) en una lista
    POST  { cliente: {...} }  → cliente nuevo a mano
-   POST  { cliente_id, servicios, mantenimiento, nota } → pedido a mano
+   POST  { cliente_id, lineas: [{ concepto, importe }], mensual, nota } → presupuesto (importes en €, IVA incluido)
    PATCH { cliente: id, ...campos }  → editar ficha / notas
    PATCH { mensaje: id, leido }      → marcar un mensaje como leído / no leído
    PATCH { pedido: id, estado }      → cambiar estado del pedido.
@@ -15,7 +15,8 @@ import { query, transaccion } from '../_lib/db.js';
 import { enviar, permitir, cuerpo, esJson, parametros, fallo, texto } from '../_lib/http.js';
 import { sesionActiva } from '../_lib/auth.js';
 import { notificar } from '../_lib/integraciones.js';
-import { calcularPedido, emitirFactura, emisorCompleto, nuevoToken, numeroFactura, ESTADOS_PEDIDO } from '../_lib/facturacion.js';
+import { WEB } from '../_lib/negocio.js';
+import { presupuestoDesdeLineas, emitirFactura, emisorCompleto, nuevoToken, numeroFactura, ESTADOS_PEDIDO } from '../_lib/facturacion.js';
 
 const CAMPOS_CLIENTE = ['nombre', 'email', 'telefono', 'negocio', 'nif', 'direccion', 'notas'];
 const LIMITES = { nombre: 120, email: 160, telefono: 30, negocio: 120, nif: 20, direccion: 240, notas: 4000 };
@@ -64,7 +65,7 @@ async function bandeja(res) {
         FROM citas c WHERE c.creada > now() - interval '120 days' AND c.estado <> 'cancelada'
       UNION ALL
       SELECT 'pedido', p.id::text, p.creado, cl.nombre, cl.id,
-             'Pedido #' || p.id || ' · ' || replace(to_char(p.total / 100.0, 'FM9999990.00'), '.', ',') || ' € · ' ||
+             'Presupuesto #' || p.id || ' · ' || replace(to_char(p.total / 100.0, 'FM9999990.00'), '.', ',') || ' € · ' ||
                (SELECT string_agg(l->>'concepto', ', ') FROM jsonb_array_elements(p.lineas) l),
              p.estado = 'pendiente_pago', cl.telefono, cl.email, NULL
         FROM pedidos p JOIN clientes cl ON cl.id = p.cliente_id WHERE p.creado > now() - interval '120 days'
@@ -83,7 +84,7 @@ async function resumen(res) {
         (SELECT coalesce(sum(total), 0)::int FROM pedidos WHERE estado = 'pendiente_pago') AS por_cobrar,
         (SELECT coalesce(sum(total), 0)::int FROM facturas WHERE serie LIKE '%' || $1) AS facturado,
         (SELECT coalesce(sum(mensual), 0)::int FROM pedidos WHERE estado IN ('pagado', 'en_curso', 'entregado')) AS mensual`, [anio]),
-    query(`SELECT p.id, p.total, p.mensual, p.estado, p.origen, p.token, p.lineas, p.creado, c.id AS cliente_id, c.nombre, c.negocio,
+    query(`SELECT p.id, p.total, p.mensual, p.estado, p.origen, p.token, p.lineas, p.creado, c.id AS cliente_id, c.nombre, c.negocio, c.telefono, c.email,
               (SELECT json_agg(json_build_object('serie', f.serie, 'numero', f.numero, 'tipo', f.tipo) ORDER BY f.id) FROM facturas f WHERE f.pedido_id = p.id) AS facturas
              FROM pedidos p JOIN clientes c ON c.id = p.cliente_id ORDER BY p.id DESC LIMIT 100`),
     query(`SELECT c.id, c.nombre, c.negocio, c.email, c.telefono, c.creado,
@@ -158,14 +159,16 @@ async function editarCliente(res, b) {
 
 async function pedidoManual(res, b) {
   const clienteId = Number(b.cliente_id);
-  const p = calcularPedido(b.servicios, b.mantenimiento === true);
-  if (!Number.isInteger(clienteId) || !p) return enviar(res, 400, { error: 'Elige el cliente y al menos un servicio.' });
+  const p = presupuestoDesdeLineas(b.lineas, b.mensual);
+  if (!Number.isInteger(clienteId) || !p) return enviar(res, 400, { error: 'Añade al menos un concepto con su importe.' });
   const c = await query('SELECT nombre, email, telefono, negocio, nif, direccion FROM clientes WHERE id = $1', [clienteId]);
   if (!c.rows.length) return enviar(res, 404, { error: 'No existe ese cliente.' });
   const { rows: [ped] } = await query(
     `INSERT INTO pedidos (cliente_id, lineas, base, iva, total, mensual, facturacion, nota, origen, token)
      VALUES ($1, $2, $3, $4, $5, $6, $7, NULLIF($8, ''), 'panel', $9) RETURNING *`,
     [clienteId, JSON.stringify(p.lineas), p.base, p.iva, p.total, p.mensual, JSON.stringify(c.rows[0]), texto(b.nota, 1000), nuevoToken()]);
+  const cl = c.rows[0];
+  await notificar('pedido.nuevo', { id: ped.id, nombre: cl.nombre, email: cl.email, telefono: cl.telefono, negocio: cl.negocio, estado: 'presupuesto enviado', importe: ped.total / 100, detalle: p.lineas.map(l => l.concepto).join(' · '), enlace: `${WEB}/documento/?p=${ped.id}&t=${ped.token}` });
   enviar(res, 201, { pedido: ped });
 }
 
@@ -201,6 +204,6 @@ async function estadoPedido(res, b) {
   if (!r) return enviar(res, 404, { error: 'No existe ese pedido.' });
   if (r.error) return enviar(res, 409, { error: r.error });
   const { rows: [c] } = await query(`SELECT c.nombre, c.email, c.telefono, c.negocio, p.total FROM pedidos p JOIN clientes c ON c.id = p.cliente_id WHERE p.id = $1`, [id]);
-  await notificar('pedido.estado', { id, nombre: c.nombre, email: c.email, telefono: c.telefono, negocio: c.negocio, estado: b.estado.replace('_', ' '), importe: c.total / 100, detalle: r.factura ? `Factura ${r.factura.codigo}` : '' });
+  await notificar('pedido.estado', { id, nombre: c.nombre, email: c.email, telefono: c.telefono, negocio: c.negocio, estado: b.estado === 'pendiente_pago' ? 'presupuesto enviado' : b.estado.replace('_', ' '), importe: c.total / 100, detalle: r.factura ? `Factura ${r.factura.codigo}` : '' });
   enviar(res, 200, r);
 }

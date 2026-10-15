@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tu pedido · Lagoa</title>
+<title>Tu presupuesto · Lagoa</title>
 <meta name="robots" content="noindex, nofollow">
 <meta name="referrer" content="no-referrer">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -47,27 +47,27 @@
 
   const p = d.pedido;
   const ESTADO = {
-    pendiente_pago: { clase: 'pend', texto: 'Pendiente de pago' }, pagado: { clase: 'ok', texto: 'Pagado' },
+    pendiente_pago: { clase: 'pend', texto: 'Pendiente de aceptar' }, pagado: { clase: 'ok', texto: 'Pagado' },
     en_curso: { clase: 'ok', texto: 'Pagado · en desarrollo' }, entregado: { clase: 'ok', texto: 'Pagado · entregado' }, cancelado: { clase: 'bad', texto: 'Anulado' }
   };
   const mensual = p.mensual ? `Mantenimiento mensual elegido: ${Documento.money(p.mensual)}/mes (IVA incluido), se factura aparte cada mes y es cancelable.` : '';
   const pago = d.emisor.iban
-    ? `Forma de pago: transferencia a ${d.emisor.iban} indicando “Pedido ${p.id}”, o Bizum. Empezamos el proyecto al recibir el pago.`
+    ? `Forma de pago: transferencia a ${d.emisor.iban} indicando “Presupuesto ${p.id}”, o Bizum. Empezamos el proyecto al recibir el pago.`
     : 'Forma de pago: te escribimos en menos de 24 h con las instrucciones (transferencia o Bizum). Empezamos al recibir el pago.';
 
   const docs = [{
-    key: 'proforma', label: 'Proforma',
+    key: 'proforma', label: 'Presupuesto',
     data: {
-      titulo: 'Factura proforma', codigo: `P-${String(p.id).padStart(4, '0')}`, fecha: p.fecha, estado: ESTADO[p.estado],
+      titulo: 'Presupuesto', codigo: `P-${String(p.id).padStart(4, '0')}`, fecha: p.fecha, estado: ESTADO[p.estado],
       emisor: d.emisor, cliente: p.facturacion, lineas: p.lineas, base: p.base, iva: p.iva, total: p.total,
-      notas: ['Documento sin validez fiscal: la factura se emite al recibir el pago.', p.estado === 'pendiente_pago' ? pago : '', mensual]
+      notas: ['Presupuesto cerrado según lo acordado en la llamada. No es una factura: la factura se emite al recibir el pago.', p.estado === 'pendiente_pago' ? pago : '', mensual]
     }
   }, ...d.facturas.map(f => ({
     key: f.codigo, label: f.codigo,
     data: {
       titulo: f.tipo === 'rectificativa' ? 'Factura rectificativa' : 'Factura', codigo: f.codigo, fecha: f.fecha,
       emisor: f.emisor, cliente: f.cliente, lineas: f.lineas, base: f.base, iva: f.iva, total: f.total,
-      notas: [f.tipo === 'rectificativa' ? `Rectifica la factura ${f.rectificaCodigo} por anulación del pedido ${p.id}.` : `Pedido ${p.id}. Pagada.`, mensual]
+      notas: [f.tipo === 'rectificativa' ? `Rectifica la factura ${f.rectificaCodigo} por anulación del presupuesto ${p.id}.` : `Presupuesto ${p.id}. Pagada.`, mensual]
     }
   }))];
 

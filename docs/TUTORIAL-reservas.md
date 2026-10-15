@@ -2838,3 +2838,16 @@ Integrations never break the site: if Notion or the webhook fails or takes more 
 > **Vercel Hobby limit:** at most 12 serverless functions per project, and this site uses exactly 12 (login/logout/session were merged into `api/admin/sesion.js`; the old URLs keep working through `vercel.json`). A new endpoint must be merged into an existing one or requires Vercel Pro.
 
 **Tests:** `node tools/integraciones-test.mjs` (fake Notion + webhook receiver; see the file header).
+
+---
+
+## 16. Update — no fixed prices: everything goes through a quote call
+
+Since October 2026 Lagoa has no public price list. The flow is:
+
+1. **Web:** the visitor marks what they're interested in ("¿Qué te interesa?" chips, or "+ Me interesa" on each card) and books the free 20-minute call. The selection is copied into the booking note, so you arrive at the call prepared. The assistant and the WhatsApp bot answer price questions with "a medida, presupuesto tras una llamada" and offer to book it.
+2. **Call** → in the panel, open the client's card → **+ Nuevo presupuesto**: write each concept and its amount (VAT included), optional monthly maintenance and an internal note. API: `POST /api/admin/crm { cliente_id, lineas: [{ concepto, importe }], mensual, nota }`.
+3. **Send it** with the card's buttons (WhatsApp, email or copy link). The client sees it at `/documento/?p=…&t=…` titled *Presupuesto*.
+4. **Paid** → change the state to *Pagado*: the definitive invoice is issued as before (section 14).
+
+The public `POST /api/pedidos` endpoint was removed (amounts are never decided by the browser), which also leaves one free function under Vercel Hobby's limit of 12.

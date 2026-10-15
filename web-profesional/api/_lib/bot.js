@@ -12,17 +12,17 @@
 import { query } from './db.js';
 import { DIAS_VISTA, hoyMadrid, sumarDias, horasDelDia, huecoReservable } from './horario.js';
 import { MODALIDADES, MAX_CITAS_POR_TELEFONO, guardarCita, citasActivasDe, anularCitaDe } from './citas.js';
-import { SERVICIOS, PACK, PRIVACIDAD, eur } from './negocio.js';
+import { SERVICIOS, PACK, PRIVACIDAD } from './negocio.js';
 
 /* ---------- Textos (castellano y gallego) ---------- */
 const T = {
   es: {
-    hola: n => `¡Hola${n ? ', ' + n : ''}! Soy el asistente de *Lagoa · Estudio digital*. Te respondo al momento sobre servicios, tarifas y plazos, y puedo reservarte una consulta rápida sin compromiso con Nadia.`,
+    hola: n => `¡Hola${n ? ', ' + n : ''}! Soy el asistente de *Lagoa · Estudio digital*. Te respondo al momento sobre servicios y plazos, y puedo reservarte una consulta rápida sin compromiso con Nadia.`,
     menuTexto: '¿En qué puedo ayudarte? Toca *Ver opciones*.',
     menuBoton: 'Ver opciones',
     menu: {
       servicios: ['Servicios', 'Qué hago y para quién'],
-      precios: ['Tarifas', 'Precios cerrados, IVA incluido'],
+      precios: ['Precios', 'Presupuesto a medida'],
       plazos: ['Plazos', 'Cuánto se tarda'],
       mantenimiento: ['Mantenimiento', 'Cuotas mensuales opcionales'],
       reservar: ['Reservar consulta', 'Gratis y sin compromiso'],
@@ -30,12 +30,12 @@ const T = {
       nadia: ['Hablar con Nadia', 'Te responde ella en persona']
     },
     b: { menu: 'Menú', reservar: 'Reservar consulta', nadia: 'Hablar con Nadia', confirmar: 'Confirmar', cambiar: 'Cambiar hora', cancelar: 'Cancelar', saltar: 'Saltar', si: 'Sí, cancelarla', no: 'No', soy: n => `Soy ${n}`, dias: 'Ver días', horas: 'Ver horas', otroDia: '« Otro día', libres: n => `${n} ${n === 1 ? 'hora libre' : 'horas libres'}`, anular: f => `Cancelar ${f}` },
-    servicios: () => `Ayudamos a negocios en crecimiento a estar en internet sin complicaciones:\n\n${SERVICIOS.map(s => `• *${s.es}*: ${eur(s.precio)}`).join('\n')}\n• *${PACK.es}*: ${eur(PACK.precio)}\n\nTambién cosas a medida: panel de ventas y stock, facturas automáticas, tarjeta de fidelización y mucho más.`,
-    precios: () => `Tarifas fijas de lanzamiento, pago único, *IVA incluido*:\n\n${SERVICIOS.map(s => `• ${s.es}: ${eur(s.precio)}`).join('\n')}\n• ${PACK.es}: ${eur(PACK.precio)}\n\nEl mantenimiento mensual es opcional (escribe *mantenimiento* para verlo).`,
+    servicios: () => `Ayudamos a negocios en crecimiento a estar en internet sin complicaciones:\n\n${SERVICIOS.map(s => `• *${s.es}*`).join('\n')}\n\nTambién cosas a medida: panel de ventas y stock, facturas automáticas, tarjeta de fidelización y mucho más. Cada proyecto se presupuesta a medida tras una llamada gratis.`,
+    precios: () => 'Cada proyecto es a medida, así que no tenemos precios fijos. En una llamada gratis de 20 minutos vemos qué necesitas y te enviamos un presupuesto cerrado: lo que firmas es lo que pagas. Toca *Reservar consulta*.',
     plazos: () => `Plazos orientativos:\n\n${[...SERVICIOS, PACK].map(s => `• ${s.es}: ${s.plazo.es}`).join('\n')}\n\nEmpiezan a contar cuando Nadia tiene tus textos y fotos.`,
-    mantenimiento: () => `El mantenimiento es *opcional* y se puede cancelar cuando quieras (IVA incluido):\n\n${[...SERVICIOS.filter(s => s.mes), PACK].map(s => `• ${s.es}: ${eur(s.mes)}/mes`).join('\n')}\n\nIncluye copias de seguridad, revisión y parches en caso de error, cambios pequeños ilimitados y soporte por WhatsApp o email.`,
+    mantenimiento: () => 'El mantenimiento es *opcional* y se puede cancelar cuando quieras: copias de seguridad, revisión y parches en caso de error, cambios pequeños y soporte por WhatsApp o email. La cuota depende de tu proyecto y va en el presupuesto.',
     zona: () => 'Trabajamos con negocios de toda España, en remoto: la consulta es por videollamada o llamada.',
-    iva: () => 'Todos los precios ya incluyen el IVA (21 %).',
+    iva: () => 'El presupuesto lleva el IVA (21 %) desglosado.',
     pago: () => 'Las condiciones de pago las explica Nadia personalmente. Toca *Hablar con Nadia* y te responderá ella.',
     gracias: () => '¡Gracias a ti! Si necesitas algo más, aquí estoy.',
     noEntiendo: 'No estoy seguro de haberte entendido. Puedes elegir una opción del menú o hablar directamente con Nadia.',
@@ -66,12 +66,12 @@ const T = {
     fmtCorto: new Intl.DateTimeFormat('es-ES', { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' })
   },
   gl: {
-    hola: n => `Ola${n ? ', ' + n : ''}! Son o asistente de *Lagoa · Estudio dixital*. Respóndoche ao momento sobre servizos, tarifas e prazos, e podo reservarche unha consulta rápida sen compromiso con Nadia.`,
+    hola: n => `Ola${n ? ', ' + n : ''}! Son o asistente de *Lagoa · Estudio dixital*. Respóndoche ao momento sobre servizos e prazos, e podo reservarche unha consulta rápida sen compromiso con Nadia.`,
     menuTexto: 'En que podo axudarche? Toca *Ver opcións*.',
     menuBoton: 'Ver opcións',
     menu: {
       servicios: ['Servizos', 'Que fago e para quen'],
-      precios: ['Tarifas', 'Prezos pechados, IVE incluído'],
+      precios: ['Prezos', 'Orzamento a medida'],
       plazos: ['Prazos', 'Canto se tarda'],
       mantenimiento: ['Mantemento', 'Cotas mensuais opcionais'],
       reservar: ['Reservar consulta', 'De balde e sen compromiso'],
@@ -79,12 +79,12 @@ const T = {
       nadia: ['Falar con Nadia', 'Respóndeche ela en persoa']
     },
     b: { menu: 'Menú', reservar: 'Reservar consulta', nadia: 'Falar con Nadia', confirmar: 'Confirmar', cambiar: 'Cambiar hora', cancelar: 'Cancelar', saltar: 'Saltar', si: 'Si, cancelala', no: 'Non', soy: n => `Son ${n}`, dias: 'Ver días', horas: 'Ver horas', otroDia: '« Outro día', libres: n => `${n} ${n === 1 ? 'hora libre' : 'horas libres'}`, anular: f => `Cancelar ${f}` },
-    servicios: () => `Axudamos a negocios en crecemento a estar en internet sen complicacións:\n\n${SERVICIOS.map(s => `• *${s.gl}*: ${eur(s.precio)}`).join('\n')}\n• *${PACK.gl}*: ${eur(PACK.precio)}\n\nTamén cousas a medida: panel de vendas e stock, facturas automáticas, tarxeta de fidelización e moito máis.`,
-    precios: () => `Tarifas fixas de lanzamento, pagamento único, *IVE incluído*:\n\n${SERVICIOS.map(s => `• ${s.gl}: ${eur(s.precio)}`).join('\n')}\n• ${PACK.gl}: ${eur(PACK.precio)}\n\nO mantemento mensual é opcional (escribe *mantemento* para velo).`,
+    servicios: () => `Axudamos a negocios en crecemento a estar en internet sen complicacións:\n\n${SERVICIOS.map(s => `• *${s.gl}*`).join('\n')}\n\nTamén cousas a medida: panel de vendas e stock, facturas automáticas, tarxeta de fidelización e moito máis. Cada proxecto orzaméntase a medida tras unha chamada de balde.`,
+    precios: () => 'Cada proxecto é a medida, así que non temos prezos fixos. Nunha chamada de balde de 20 minutos vemos o que precisas e enviámosche un orzamento pechado: o que asinas é o que pagas. Toca *Reservar consulta*.',
     plazos: () => `Prazos orientativos:\n\n${[...SERVICIOS, PACK].map(s => `• ${s.gl}: ${s.plazo.gl}`).join('\n')}\n\nComezan a contar cando Nadia ten os teus textos e fotos.`,
-    mantenimiento: () => `O mantemento é *opcional* e pódese cancelar cando queiras (IVE incluído):\n\n${[...SERVICIOS.filter(s => s.mes), PACK].map(s => `• ${s.gl}: ${eur(s.mes)}/mes`).join('\n')}\n\nInclúe copias de seguridade, revisión e parches en caso de erro, cambios pequenos ilimitados e soporte por WhatsApp ou email.`,
+    mantenimiento: () => 'O mantemento é *opcional* e pódese cancelar cando queiras: copias de seguridade, revisión e parches en caso de erro, cambios pequenos e soporte por WhatsApp ou email. A cota depende do teu proxecto e vai no orzamento.',
     zona: () => 'Traballamos con negocios de toda España, en remoto: a consulta é por videochamada ou chamada.',
-    iva: () => 'Todos os prezos xa inclúen o IVE (21 %).',
+    iva: () => 'O orzamento leva o IVE (21 %) desagregado.',
     pago: () => 'As condicións de pagamento explícaas Nadia persoalmente. Toca *Falar con Nadia* e responderache ela.',
     gracias: () => 'Grazas a ti! Se precisas algo máis, aquí estou.',
     noEntiendo: 'Non estou seguro de entenderte. Podes escoller unha opción do menú ou falar directamente con Nadia.',

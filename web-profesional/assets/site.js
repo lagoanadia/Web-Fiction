@@ -24,17 +24,18 @@ const CONFIG = {
 // Deben coincidir con MODALIDADES de api/_lib/citas.js
 const MODALIDADES = ['Videollamada', 'Llamada de teléfono'];
 
-/* Precios FINALES con IVA. Una sola fuente para calculadora y asistente. */
+/* Servicios (sin precios: todo se presupuesta tras una llamada).
+   Los usan el selector "¿Qué te interesa?" y el asistente. */
 const SERVICES = [
-  { id: 'web', name: 'Web con galería y reservas', short: 'Web', price: 290, monthly: 15, weeks: '3-4 semanas' },
-  { id: 'wa', name: 'Asistente de WhatsApp', short: 'WhatsApp', price: 190, monthly: 19, weeks: '2-3 semanas' },
-  { id: 'shop', name: 'Tienda online pequeña', short: 'Tienda', price: 390, monthly: 19, weeks: '4-6 semanas' },
-  { id: 'seo', name: 'Google Maps y SEO local', short: 'Google Maps', price: 120, monthly: 0, weeks: '1 semana' }
+  { id: 'web', name: 'Web con reservas', weeks: '3-4 semanas' },
+  { id: 'wa', name: 'Asistente de WhatsApp', weeks: '2-3 semanas' },
+  { id: 'shop', name: 'Tienda online', weeks: '4-6 semanas' },
+  { id: 'seo', name: 'Google Maps y SEO local', weeks: '1 semana' },
+  { id: 'ia', name: 'Gestión diaria con IA', weeks: '1-2 semanas' },
+  { id: 'medida', name: 'Algo a medida', weeks: '' },
+  { id: 'maint', name: 'Mantenimiento', weeks: '' }
 ];
-const PACK = { id: 'pack', name: 'Pack Web + WhatsApp', short: 'Pack', price: 430, monthly: 29, weeks: '5-7 semanas' };
-const VAT = 0.21;
 const svc = id => SERVICES.find(s => s.id === id);
-const PACK_SAVING = svc('web').price + svc('wa').price - PACK.price;
 
 /* ----------------------------- Utilidades ----------------------------- */
 const $ = (s, r = document) => r.querySelector(s);
@@ -440,137 +441,46 @@ const Booking = (function booking() {
   });
 })();
 
-/* ------------------------ CALCULADORA ------------------------ */
-const Calc = (function calculator() {
+/* ------------- PRESUPUESTO: ¿qué te interesa? → reserva la llamada -------------
+   Lo que marque el cliente viaja en la nota de la reserva (y en el WhatsApp),
+   para llegar a la llamada sabiendo de qué va. */
+const Calc = (function interests() {
   const box = $('#calc-options');
-  const maint = $('#calc-maint');
   SERVICES.forEach(s => {
-    const label = el('label', { class: 'calc-opt' });
-    const input = el('input', { type: 'checkbox', value: s.id });
-    const text = el('span');
-    text.append(document.createTextNode(s.name), el('small', {}, s.weeks));
-    label.append(input, text, el('b', {}, eur(s.price)));
+    const label = el('label', { class: 'chipcheck' });
+    label.append(el('input', { type: 'checkbox', value: s.id }), el('span', {}, s.name));
     box.append(label);
   });
-  let summaryText = '';
-
-  function compute() {
+  const PREFIJO = 'Me interesa: ';
+  const elegidos = () => $$('input:checked', box).map(i => svc(i.value).name);
+  function sync() {
     const ids = $$('input:checked', box).map(i => i.value);
-    const chosen = ids.map(svc);
-    const lines = ids.includes('web') && ids.includes('wa') ? [PACK, ...chosen.filter(s => s.id !== 'web' && s.id !== 'wa')] : chosen;
-    const base = lines.reduce((a, s) => a + s.price, 0);
-    const monthly = lines.reduce((a, s) => a + s.monthly, 0);
-    const out = $('#calc-lines');
-    out.replaceChildren();
-    if (!lines.length) out.append(el('div', {}, 'Marca al menos un servicio (o pulsa “+ Presupuesto” en las tarjetas).'));
-    lines.forEach(s => { const d = el('div'); d.append(el('span', {}, s.name + (s === PACK ? ` · ahorras ${eur(PACK_SAVING)}` : '')), el('span', {}, eur(s.price))); out.append(d); });
-    $('#calc-total').textContent = eur(base);
-    const showMonthly = maint.checked && monthly > 0;
-    $('#calc-monthly').textContent = base ? `IVA incluido: ${eur(base - base / (1 + VAT))}${showMonthly ? ` · Mantenimiento ${eur(monthly)}/mes` : ''}` : '';
-    $('#calc-time').textContent = lines.length ? `Plazo: ${lines.map(s => `${s.short} ${s.weeks}`).join(' · ')}` : '';
-    summaryText = lines.length ? `Hola Nadia, me interesa este presupuesto:\n${lines.map(s => `• ${s.name}: ${eur(s.price)}`).join('\n')}\nTotal: ${eur(base)} (IVA incluido)${showMonthly ? `\nMantenimiento: ${eur(monthly)}/mes` : ''}` : '';
-    $('#calc-send').disabled = !lines.length;
-    $('#calc-buy').disabled = !lines.length;
-    const wa = $('#calc-wa');
-    wa.href = lines.length ? waLink(summaryText) : `https://wa.me/${CONFIG.whatsapp}`;
-    wa.target = '_blank'; wa.rel = 'noopener';
-    wa.setAttribute('aria-disabled', String(!lines.length));
-    // Sincroniza los botones "+ Presupuesto" de las tarjetas
     $$('[data-add]').forEach(b => { const on = ids.includes(b.dataset.add); b.setAttribute('aria-pressed', String(on)); b.closest('.card').classList.toggle('is-picked', on); });
+    const lista = elegidos();
+    const wa = $('#calc-wa');
+    wa.href = waLink(`Hola, quiero pedir presupuesto${lista.length ? ` para: ${lista.join(', ')}` : ''}. ¿Cuándo podemos hablar?`);
+    wa.target = '_blank'; wa.rel = 'noopener';
   }
   function toggle(id, on) {
     const input = $(`input[value="${id}"]`, box);
+    if (!input) return;
     input.checked = on ?? !input.checked;
-    compute();
+    sync();
   }
-  box.addEventListener('change', compute);
-  maint.addEventListener('change', compute);
-  $('#calc-wa').addEventListener('click', e => { if (!summaryText) e.preventDefault(); });
+  box.addEventListener('change', sync);
   $$('[data-add]').forEach(b => b.addEventListener('click', () => toggle(b.dataset.add)));
-  $('#calc-send').addEventListener('click', () => {
-    selectTab($('#tab-mensaje'));
-    $('#m-mensaje').value = summaryText;
-    const chosen = $$('input:checked', box).map(i => i.value);
-    const sel = $('#m-servicio');
-    if (chosen.includes('web') && chosen.includes('wa')) sel.value = PACK.name;
-    else if (chosen.length === 1) sel.value = svc(chosen[0]).name;
-    $('#contacto').scrollIntoView();
-    $('#m-nombre').focus({ preventScroll: true });
-  });
-  compute();
-  const selection = () => ({ ids: $$('input:checked', box).map(i => i.value), maint: maint.checked });
-  return { toggle, selection, summary: () => summaryText };
-})();
-
-/* =============================================================
-   CONTRATAR: pedido real → /api/pedidos (precios del servidor),
-   ficha en el CRM y factura proforma con enlace privado.
-   Sin servidor (web estática), el pedido llega por email.
-   ============================================================= */
-(function checkout() {
-  const dlg = $('#checkout');
-  const form = $('#form-pedido');
-  const status = $('#co-status');
-  function lineas() {
-    const { ids, maint } = Calc.selection();
-    const chosen = ids.map(svc);
-    const items = ids.includes('web') && ids.includes('wa') ? [PACK, ...chosen.filter(s => s.id !== 'web' && s.id !== 'wa')] : chosen;
-    return { ids, maint, items, total: items.reduce((a, s) => a + s.price, 0), monthly: maint ? items.reduce((a, s) => a + s.monthly, 0) : 0 };
-  }
-  function open() {
-    const l = lineas();
-    if (!l.items.length) return;
-    const box = $('#co-lines');
-    box.replaceChildren();
-    l.items.forEach(s => { const d = el('div'); d.append(el('span', {}, s.name), el('span', {}, eur(s.price))); box.append(d); });
-    const t = el('div', { class: 't' }); t.append(el('span', {}, 'Total (IVA incluido)'), el('span', {}, eur(l.total))); box.append(t);
-    if (l.monthly) { const m = el('div'); m.append(el('small', {}, 'Mantenimiento opcional, aparte'), el('small', {}, `${eur(l.monthly)}/mes`)); box.append(m); }
-    $('#co-form-view').hidden = false; $('#co-done-view').hidden = true; status.hidden = true;
-    dlg.showModal();
-    $('#p-nombre').focus();
-  }
-  $('#calc-buy').addEventListener('click', open);
-  dlg.addEventListener('click', e => { if (e.target === dlg || e.target.closest('[data-co-close]')) dlg.close(); });
-
-  form.addEventListener('submit', async e => {
+  $('#calc-book').addEventListener('click', e => {
     e.preventDefault();
-    if (!validate(form)) return;
-    const f = new FormData(form);
-    if (f.get('_honey')) return;
-    const l = lineas();
-    const cliente = Object.fromEntries(['nombre', 'nif', 'email', 'telefono', 'negocio', 'direccion'].map(k => [k, String(f.get(k) || '').trim()]));
-    const btn = $('#co-submit');
-    btn.disabled = true; btn.textContent = 'Generando tu pedido…';
-    let r = null, d = {};
-    try {
-      r = await fetch('/api/pedidos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ servicios: l.ids, mantenimiento: l.maint, cliente, nota: f.get('nota'), privacidad: true }) });
-      d = await r.json().catch(() => ({}));
-    } catch { r = null; }
-    btn.disabled = false; btn.textContent = 'Confirmar pedido';
-    const resumen = `${l.items.map(s => `• ${s.name}: ${eur(s.price)}`).join('\n')}\nTotal: ${eur(l.total)} (IVA incluido)${l.monthly ? `\nMantenimiento: ${eur(l.monthly)}/mes` : ''}`;
-    const datos = { Cliente: cliente.nombre, 'NIF/CIF': cliente.nif || '—', Email: cliente.email, Teléfono: cliente.telefono, Negocio: cliente.negocio || '—', Dirección: cliente.direccion || '—', Pedido: resumen, Nota: f.get('nota') || '—' };
-
-    if (r && r.ok && d.pedido) {
-      const url = `${location.origin}/documento/?p=${d.pedido}&t=${d.token}`;
-      sendToEmail(`Nuevo pedido nº ${d.pedido}: ${cliente.nombre} · ${eur(d.total / 100)}`, { ...datos, Documento: url, Panel: `${location.origin}/admin`, _replyto: cliente.email });
-      $('#co-done-num').textContent = `Pedido nº ${d.pedido} · ${eur(d.total / 100)} IVA incluido`;
-      $('#co-doc').href = url;
-      $('#co-doc').hidden = false;
-      $('#co-form-view').hidden = true; $('#co-done-view').hidden = false;
-      $('#co-doc').focus();
-      form.reset();
-      return;
-    }
-    if (r && [400, 429].includes(r.status)) { showFail(status, d.error || 'Revisa los datos.'); return; }
-    // Sin servidor: el pedido llega igualmente por email
-    const ok = await sendToEmail(`Nuevo pedido (web): ${cliente.nombre} · ${eur(l.total)}`, { ...datos, _replyto: cliente.email });
-    if (ok) {
-      $('#co-done-num').textContent = `Pedido enviado · ${eur(l.total)} IVA incluido. Te mandamos la factura proforma por email.`;
-      $('#co-doc').hidden = true;
-      $('#co-form-view').hidden = true; $('#co-done-view').hidden = false;
-      form.reset();
-    } else showFail(status, 'No se ha podido enviar. Puedes mandarlo así:', `Hola, quiero contratar:\n${resumen}\n\n${cliente.nombre} · ${cliente.email} · ${cliente.telefono}`);
+    selectTab($('#tab-reserva'));
+    const nota = $('#r-nota');
+    const resto = nota.value.split('\n').filter(l => !l.startsWith(PREFIJO)).join('\n').trim();
+    const lista = elegidos();
+    nota.value = [lista.length ? PREFIJO + lista.join(', ') : '', resto].filter(Boolean).join('\n');
+    $('#contacto').scrollIntoView();
+    ($('#res-days .choice') || $('#r-nombre')).focus({ preventScroll: true });
   });
+  sync();
+  return { toggle };
 })();
 
 /* --------------- Enlaces "Probar demo" de las tarjetas --------------- */
@@ -609,37 +519,37 @@ $('#portfolio-load').addEventListener('click', () => {
     es: {
       sub: 'responde al momento · también reserva',
       ph: 'Escribe tu pregunta', phName: 'Tu nombre', phTel: 'Tu teléfono o WhatsApp',
-      hello: 'Hola 👋 Soy el asistente de Lagoa. Te digo precios y plazos en un segundo, y puedo reservarte la consulta gratis aquí mismo.',
-      quick: [['precios', 'Precios'], ['reservar', 'Reservar consulta'], ['demo', 'Ver demos'], ['plazos', 'Plazos'], ['humano', 'Hablar con Nadia']],
-      b: { info: 'Detalles', demo: 'Probar demo', calc: 'Calcular', book: 'Reservar aquí', wa: 'WhatsApp con Nadia', cancel: 'Cancelar', ok: 'Confirmar', other: 'Otro día', add: 'Añadir al presupuesto', go: 'Ir al formulario' },
+      hello: 'Hola 👋 Soy el asistente de Lagoa. Te cuento qué hacemos y los plazos, y puedo reservarte aquí mismo la llamada gratis de presupuesto.',
+      quick: [['reservar', 'Reservar llamada'], ['precios', '¿Cuánto cuesta?'], ['demo', 'Ver demos'], ['plazos', 'Plazos'], ['humano', 'Hablar con Nadia']],
+      b: { info: 'Detalles', demo: 'Probar demo', calc: 'Pedir presupuesto', book: 'Reservar llamada', wa: 'WhatsApp con Nadia', cancel: 'Cancelar', ok: 'Confirmar', other: 'Otro día', add: 'Me interesa', go: 'Ir al formulario' },
       a: {
-        precios: () => `Precio cerrado, IVA incluido:\n${SERVICES.map(s => `• ${s.short}: ${eur(s.price)}`).join('\n')}\n• Pack Web + WhatsApp: ${eur(PACK.price)} (ahorras ${eur(PACK_SAVING)})`,
+        precios: () => 'Cada proyecto es a medida, así que no tenemos precios fijos. En una llamada gratis de 20 minutos vemos qué necesitas y te enviamos un presupuesto cerrado: lo que firmas es lo que pagas.',
         servicios: () => 'Hacemos 4 cosas: web con reservas, asistente de WhatsApp, tienda online y Google Maps. Y extras: IA para tu gestión diaria o algo a medida.',
         plazos: () => 'Google Maps 1 semana · WhatsApp 2-3 · Web 3-4 · Tienda 4-6 · Pack 5-7 semanas. Cuentan desde que tenemos tus textos y fotos.',
-        web: () => `Web con reservas: ${eur(svc('web').price)}. Tus clientes eligen servicio, día y hora; tú lo gestionas desde el móvil. La reserva de esta web es exactamente eso.`,
-        wa: () => `Asistente de WhatsApp: ${eur(svc('wa').price)}. Responde al momento, apunta citas y te pasa la conversación si duda.`,
-        shop: () => `Tienda online: ${eur(svc('shop').price)}. Catálogo, carrito, Bizum o tarjeta y aviso de cada pedido.`,
-        seo: () => `Google Maps y SEO local: ${eur(svc('seo').price)}, en 1 semana. Ficha completa, fotos y reseñas respondidas.`,
-        pack: () => `Pack Web + WhatsApp: ${eur(PACK.price)} en vez de 480 €. Comparten agenda: cero dobles reservas.`,
-        ia: () => 'Gestión diaria con IA: 150 € + 35 €/mes. Cada día te propone recordatorios y respuestas; tú apruebas.',
-        medida: () => 'También hacemos cosas a medida: stock, facturas, fidelización, apps… Se valora en la consulta gratis.',
-        mantenimiento: () => `Mantenimiento opcional y cancelable: web ${eur(15)}, WhatsApp/tienda ${eur(19)}, pack ${eur(29)} al mes. Copias, seguridad y cambios pequeños ilimitados.`,
-        iva: () => 'Todos los precios ya incluyen el IVA (21 %).',
+        web: () => 'Web con reservas: tus clientes eligen servicio, día y hora, y tú lo gestionas desde el móvil. La reserva de esta web es exactamente eso. Plazo orientativo: 3-4 semanas.',
+        wa: () => 'Asistente de WhatsApp: responde al momento, apunta citas y te pasa la conversación si duda. Plazo orientativo: 2-3 semanas.',
+        shop: () => 'Tienda online: catálogo, carrito, Bizum o tarjeta, factura automática y ficha de clientes. Plazo orientativo: 4-6 semanas.',
+        seo: () => 'Google Maps y SEO local: ficha completa, fotos y reseñas respondidas, en 1 semana.',
+        pack: () => 'Web + WhatsApp comparten agenda: reservan por la web o por el chat, sin dobles reservas. Juntos salen más ajustados en el presupuesto.',
+        ia: () => 'Gestión diaria con IA: cada día te propone recordatorios y respuestas; tú apruebas. Es una ampliación de la web o del WhatsApp.',
+        medida: () => 'También hacemos cosas a medida: stock, facturas, fidelización, apps… Lo vemos en la llamada de presupuesto.',
+        mantenimiento: () => 'Mantenimiento opcional y cancelable: copias, seguridad y cambios pequeños. La cuota depende de tu proyecto y va en el presupuesto.',
+        iva: () => 'El presupuesto lleva el IVA (21 %) desglosado, para que sepas exactamente qué pagas.',
         pago: () => 'Las condiciones de pago te las explica Nadia en persona. ¿Te paso con ella?',
         demo: () => 'Arriba tienes demos que funcionan: una tienda con carrito y panel de pedidos, un WhatsApp que reserva y una ficha de Google antes/después.',
         portfolio: () => 'Tienes sus proyectos publicados en la sección Portfolio.',
         zona: () => 'Trabajamos con negocios de toda España, en remoto: la consulta es por videollamada o teléfono.',
         idiomas: () => 'Nadia te atiende en galego, castellano, English, Deutsch y français.',
         propiedad: () => 'Todo queda a tu nombre y te enseña a gestionarlo.',
-        contratar: () => 'Puedes contratar online: marca los servicios en “Contrata online”, pulsa “Contratar ahora” y recibes al momento tu factura proforma. No se cobra nada hasta que hablamos.',
+        contratar: () => 'Así funciona: reservas una llamada gratis de 20 minutos, te enviamos un presupuesto cerrado y, si te encaja, empezamos.',
         wordpress: () => 'Nada de WordPress ni plugins: código a medida, ligero y sin actualizaciones pendientes. Por eso esta web carga al instante.',
-        hola: () => '¡Hola! ¿Qué quieres saber? Precios, plazos, demos… o reservo tu consulta.',
-        gracias: () => '¡A ti! Si quieres, reservo tu consulta gratis en un momento.',
+        hola: () => '¡Hola! ¿Qué quieres saber? Servicios, plazos, demos… o te reservo la llamada de presupuesto.',
+        gracias: () => '¡A ti! Si quieres, te reservo la llamada gratis de presupuesto en un momento.',
         humano: () => 'Claro. Pulsa y se abre WhatsApp con lo que hemos hablado.',
         fallback: () => 'Esa mejor te la responde Nadia. Te abro WhatsApp con tu pregunta ya escrita.'
       },
       f: {
-        mod: 'Genial. La consulta es gratis (20 min). ¿Cómo la prefieres?',
+        mod: 'Genial. La llamada de presupuesto es gratis (20 min). ¿Cómo la prefieres?',
         mods: ['Videollamada', 'Teléfono'],
         day: '¿Qué día? (hora de España)',
         hour: d => `Horas libres el ${d}:`,
@@ -658,7 +568,7 @@ $('#portfolio-load').addEventListener('click', () => {
   /* Palabras clave → tema. Gana el tema con más puntos (palabras largas pesan más). */
   const KEYS = {
     humano: ['hablar con', 'falar con', 'persona', 'persoa', 'humano', 'llamame', 'chamame', 'nadia'],
-    reservar: ['reserv', 'cita', 'consulta', 'reunion', 'quedar', 'cafe', 'llamada', 'chamada', 'videollamada', 'hueco', 'oco'],
+    reservar: ['reserv', 'presupuesto', 'cita', 'consulta', 'reunion', 'quedar', 'cafe', 'llamada', 'chamada', 'videollamada', 'hueco', 'oco'],
     precios: ['precio', 'prezo', 'cuesta', 'custa', 'cuanto', 'canto', 'vale', 'tarifa', 'coste', 'custo', 'euros', 'barato', 'caro'],
     plazos: ['plazo', 'prazo', 'tarda', 'semanas', 'tiempo', 'tempo', 'rapido'],
     servicios: ['servicio', 'servizo', 'que haces', 'que fas', 'ofreces', 'que vendes'],
@@ -690,11 +600,8 @@ $('#portfolio-load').addEventListener('click', () => {
       const s = words.reduce((a, w) => a + (q.includes(w) ? w.trim().length : 0), 0);
       if (s > score) { best = topic; score = s; }
     }
-    // "¿cuánto cuesta la tienda?" → mejor la respuesta del servicio, que ya lleva el precio
-    if (best === 'precios') {
-      const s = ['shop', 'wa', 'seo', 'pack', 'ia', 'mantenimiento', 'web'].find(t => KEYS[t].some(w => q.includes(w)));
-      if (s) return s;
-    }
+    // "¿cuánto cuesta la tienda?" → gana 'precios' (presupuesto a medida) aunque se nombre un servicio
+    if (best !== 'precios' && KEYS.precios.some(w => q.includes(w)) && ['shop', 'wa', 'seo', 'pack', 'ia', 'mantenimiento', 'web'].includes(best)) return 'precios';
     return best || 'fallback';
   }
 
@@ -744,7 +651,7 @@ $('#portfolio-load').addEventListener('click', () => {
     if (topic === 'demo') acts.push(['Tienda', () => goTo('#demo', () => window.Lab?.open('shop'))], ['WhatsApp', () => goTo('#demo', () => window.Lab?.open('wa'))], ['Google', () => goTo('#demo', () => window.Lab?.open('maps'))]);
     if (topic === 'precios' || topic === 'servicios') acts.push([T.b.calc, () => goTo('#presupuesto')]);
     if (topic === 'portfolio') acts.push(['Portfolio', () => goTo('#trabajos')]);
-    if (topic === 'contratar') acts.push(['Contratar', () => goTo('#presupuesto')]);
+    if (topic === 'contratar') acts.push([T.b.book, () => startBooking()]);
     if (['hola', 'gracias', 'precios', 'plazos', 'servicios', 'wordpress'].includes(topic)) acts.push([T.b.book, () => startBooking()]);
     if (['humano', 'fallback', 'pago', 'zona', 'medida'].includes(topic)) acts.push(waBtn());
     bubble('bot', T.a[topic](), acts.length ? buttons(acts) : null);

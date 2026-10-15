@@ -99,7 +99,7 @@ try {
   ok(c.r.length === 0, 'Meta repite el mismo mensaje → no se contesta dos veces');
 
   c = await cliente(A, texto('¿Cuánto cuesta una web?'));
-  ok(c.r.length === 1 && cuerpo(c.r[0]).includes('290') && cuerpo(c.r[0]).includes('IVA'), 'pregunta de precio → tarifas con IVA');
+  ok(c.r.length === 1 && cuerpo(c.r[0]).includes('presupuesto') && !/\d+ ?€/.test(cuerpo(c.r[0])), 'pregunta de precio → presupuesto a medida, sin precios fijos');
   ok(ids(c.r[0]).join() === 'tema:reservar,tema:menu,tema:nadia', 'debajo, botones Reservar / Menú / Hablar con Nadia');
   c = await cliente(A, fila('tema:plazos', 'Plazos'));
   ok(cuerpo(c.r[0]).includes('semanas'), 'opción Plazos del menú → plazos');
@@ -211,7 +211,7 @@ try {
   await cliente(Bnum, boton('tema:nadia'));
   a = await admin('/api/admin/whatsapp', { method: 'PATCH', body: { telefono: Bnum, modo: 'bot' } });
   c = await cliente(Bnum, texto('precio'));
-  ok(a.s === 200 && cuerpo(c.r[0]).includes('Tarifas'), 'Nadia devuelve el chat al bot desde el panel');
+  ok(a.s === 200 && cuerpo(c.r[0]).includes('presupuesto'), 'Nadia devuelve el chat al bot desde el panel');
 
   // ---------- 24 h window ----------
   const pg = (await import('../web-profesional/node_modules/pg/lib/index.js')).default;
@@ -224,13 +224,13 @@ try {
   // ---------- Galician + stale flow ----------
   const G = '34655555555';
   c = await cliente(G, texto('Ola! Canto custa unha tenda?'), { nombre: 'Xiana' });
-  ok(c.r.length === 2 && cuerpo(c.r[0]).startsWith('Ola, Xiana') && cuerpo(c.r[1]).includes('IVE'), 'cliente en gallego → contesta en gallego');
+  ok(c.r.length === 2 && cuerpo(c.r[0]).startsWith('Ola, Xiana') && cuerpo(c.r[1]).includes('orzamento'), 'cliente en gallego → contesta en gallego');
   c = await cliente(G, texto('castellano'));
   ok(c.r[0].interactive.action.button === 'Ver opciones', '"castellano" → cambia a castellano');
   await cliente(G, boton('tema:reservar'));
   await db.query(`UPDATE wa_chats SET actualizado = now() - interval '3 hours' WHERE telefono = $1`, [G]);
   c = await cliente(G, texto('precio'));
-  ok(cuerpo(c.r[0]).includes('Tarifas'), 'reserva abandonada hace horas → se olvida y contesta normal');
+  ok(cuerpo(c.r[0]).includes('presupuesto'), 'reserva abandonada hace horas → se olvida y contesta normal');
   await db.end();
 
   // ---------- Admin API is private ----------

@@ -33,12 +33,17 @@ for (let i = 2; i <= 14 && !hueco; i++) { const d = new Date(Date.now() + i * 86
 let r = await post('/api/reservas', { fecha: hueco[0], hora: hueco[1], modalidad: 'Videollamada', nombre: 'Antía, "la de la tienda"', telefono: '600 999 888', email: 'antia@ejemplo.es', nota: 'Línea 1\nLínea 2; con coma, y punto', privacidad: true });
 ok(r.status === 201, 'reserva → 201');
 await post('/api/mensajes', { nombre: 'Brais', email: 'brais@ejemplo.es', servicio: 'Asistente de WhatsApp', mensaje: '¿Funciona con mi número?', privacidad: true });
-await post('/api/pedidos', { servicios: ['seo'], cliente: { nombre: 'Bar Brais', email: 'brais@ejemplo.es', telefono: '611 222 333' }, privacidad: true });
+// Tras la llamada, Nadia crea el presupuesto en el panel
+const login = await fetch(B + '/api/admin/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: process.env.ADMIN_PASSWORD || 'contrasena-de-prueba' }) });
+const cookie = (login.headers.get('set-cookie') || '').split(';')[0];
+const crm = await (await fetch(B + '/api/admin/crm', { headers: { cookie } })).json();
+const brais = crm.clientes.find(c => c.nombre === 'Brais');
+await fetch(B + '/api/admin/crm', { method: 'POST', headers: { 'Content-Type': 'application/json', cookie }, body: JSON.stringify({ cliente_id: brais.id, lineas: [{ concepto: 'Google Maps y SEO local', importe: 120 }] }) });
 
 const ev = hooks.map(h => JSON.parse(h.body));
 ok(hooks.length === 3 && ev.map(e => e.evento).join() === 'cita.nueva,mensaje.nuevo,pedido.nuevo', `webhook recibe los 3 eventos en orden (${ev.map(e => e.evento)})`);
 ok(ev[0].datos.fecha === hueco[0] && ev[0].datos.hora === hueco[1] && ev[0].datos.email === 'antia@ejemplo.es', 'webhook: la cita lleva día, hora y contacto');
-ok(ev[2].datos.importe === 120 && ev[2].datos.enlace.includes('/documento/?p='), 'webhook: el pedido lleva importe y enlace a la factura');
+ok(ev[2].datos.importe === 120 && ev[2].datos.enlace.includes('/documento/?p='), 'webhook: el presupuesto lleva importe y enlace al documento');
 const firmaOk = hooks.every(h => h.firma === 'sha256=' + crypto.createHmac('sha256', 'secreto-hook').update(h.body).digest('hex'));
 ok(firmaOk, 'webhook: cada envío va firmado (X-Lagoa-Firma) con INTEGRACION_SECRETO');
 
@@ -47,7 +52,7 @@ const p0 = pages[0].body;
 ok(p0.parent.database_id === 'db1' && p0.properties.Asunto.title[0].text.content.startsWith('Cita nueva'), 'Notion: el título va en la columna de tipo título, se llame como se llame');
 ok(p0.properties.Fecha.date.start === `${hueco[0]}T${hueco[1]}:00` && p0.properties.Email.email === 'antia@ejemplo.es', 'Notion: fecha y email en sus columnas');
 ok(!('Estado' in p0.properties) && !('Negocio' in p0.properties), 'Notion: no envía columnas que tu base de datos no tiene');
-ok(pages[2].body.properties.Importe.number === 120, 'Notion: importe del pedido como número');
+ok(pages[2].body.properties.Importe.number === 120, 'Notion: importe del presupuesto como número');
 
 // Calendario .ics
 r = await fetch(B + '/api/calendario?t=mal');

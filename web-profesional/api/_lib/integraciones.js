@@ -22,7 +22,7 @@ import crypto from 'node:crypto';
 const TIEMPO_MAX = 4000; // ms por destino
 const TITULOS = {
   'cita.nueva': 'Cita nueva', 'cita.estado': 'Cita actualizada', 'mensaje.nuevo': 'Mensaje nuevo',
-  'pedido.nuevo': 'Pedido nuevo', 'pedido.estado': 'Pedido actualizado',
+  'pedido.nuevo': 'Presupuesto nuevo', 'pedido.estado': 'Presupuesto actualizado',
   'whatsapp.atencion': 'WhatsApp: quiere hablar contigo'
 };
 

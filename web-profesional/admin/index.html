@@ -188,6 +188,9 @@ dialog form { display: grid; gap: .8rem; }
 .checks { display: grid; gap: .35rem; }
 .checks label { display: flex; gap: .5rem; align-items: center; font-weight: 500; }
 .checks input { width: auto; }
+.lineas { display: grid; gap: .4rem; margin-bottom: .4rem; }
+.lineas__fila { display: grid; grid-template-columns: 1fr 8rem auto; gap: .4rem; }
+.lineas__total { font-size: .88rem; color: var(--ink-2); margin: .4rem 0; font-variant-numeric: tabular-nums; }
 </style>
 </head>
 <body>
@@ -231,7 +234,7 @@ dialog form { display: grid; gap: .8rem; }
     <button class="tab" type="button" data-filtro="todo" aria-selected="false">Todo</button>
     <label for="bandeja-canal" class="visually-hidden">Canal</label>
     <select id="bandeja-canal" style="width:auto;border-radius:999px;padding:.4rem .8rem">
-      <option value="">Todos los canales</option><option value="whatsapp">WhatsApp</option><option value="mensaje">Formulario</option><option value="cita">Citas</option><option value="pedido">Pedidos</option>
+      <option value="">Todos los canales</option><option value="whatsapp">WhatsApp</option><option value="mensaje">Formulario</option><option value="cita">Citas</option><option value="pedido">Presupuestos</option>
     </select>
   </div>
   <div id="bandeja-items" aria-live="polite"><p class="loading">Cargando…</p></div>
@@ -280,7 +283,7 @@ dialog form { display: grid; gap: .8rem; }
     <div class="kpis" id="crm-kpis"></div>
     <div class="subtabs" role="group" aria-label="Ver">
       <button class="tab" type="button" data-sub="mensajes" aria-selected="true">Mensajes<span class="badge" id="msg-badge" hidden></span></button>
-      <button class="tab" type="button" data-sub="pedidos" aria-selected="false">Pedidos</button>
+      <button class="tab" type="button" data-sub="pedidos" aria-selected="false">Presupuestos</button>
       <button class="tab" type="button" data-sub="clientes" aria-selected="false">Clientes</button>
       <label for="crm-buscar" class="visually-hidden">Buscar</label>
       <input type="search" id="crm-buscar" placeholder="Buscar por nombre, negocio, email o teléfono">
@@ -756,11 +759,11 @@ async function accionWa(boton, fn, textoOk) {
 /* =============================================================
    CLIENTES (CRM): pedidos, facturas y fichas
    ============================================================= */
-let crm = null, sub = 'mensajes', fichaAbierta = null;
+let crm = null, sub = 'mensajes', fichaAbierta = null, fichaActual = null;
 const euro = new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' });
 const dinero = c => euro.format((c || 0) / 100);
-const ESTADOS_PED = { pendiente_pago: 'Pendiente de pago', pagado: 'Pagado', en_curso: 'En curso', entregado: 'Entregado', cancelado: 'Anulado' };
-const SERVICIOS_PANEL = [['web', 'Web con galería y reservas'], ['wa', 'Asistente de WhatsApp'], ['shop', 'Tienda online pequeña'], ['seo', 'Google Maps y SEO local']];
+const ESTADOS_PED = { pendiente_pago: 'Presupuesto enviado', pagado: 'Pagado', en_curso: 'En curso', entregado: 'Entregado', cancelado: 'Anulado' };
+const CONCEPTOS = ['Web con reservas', 'Asistente de WhatsApp', 'Tienda online', 'Google Maps y SEO local', 'Gestión diaria con IA', 'Desarrollo a medida'];
 const docUrl = p => `/documento/?p=${p.id}&t=${p.token}`;
 const fechaCorta = iso => new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(iso));
 
@@ -803,7 +806,7 @@ function pintarCrm() {
     lista.forEach(m => cont.append(tarjetaMensaje(m, true)));
   } else if (sub === 'pedidos') {
     const lista = crm.pedidos.filter(p => coincide(`${p.nombre} ${p.negocio || ''} ${p.id}`));
-    if (!lista.length) cont.append(el('p', { class: 'day__closed' }, crm.pedidos.length ? 'Ningún pedido coincide.' : 'Aún no hay pedidos. Llegarán desde “Contratar” en la web, o créalos desde la ficha de un cliente.'));
+    if (!lista.length) cont.append(el('p', { class: 'day__closed' }, crm.pedidos.length ? 'Ningún presupuesto coincide.' : 'Aún no hay presupuestos. Créalos desde la ficha del cliente después de la llamada.'));
     lista.forEach(p => cont.append(tarjetaPedido(p, true)));
   } else {
     const lista = crm.clientes.filter(c => coincide(`${c.nombre} ${c.negocio || ''} ${c.email || ''} ${c.telefono || ''}`));
@@ -877,7 +880,17 @@ function tarjetaPedido(p, conCliente) {
       fichaAbierta ? await abrirFicha(fichaAbierta) : await cargarCrm();
     } catch (ex) { aviso(ex.message, true); sel.value = p.estado; sel.disabled = false; }
   });
-  acc.append(sel, el('a', { class: 'btn btn--ghost btn--sm', href: docUrl(p), target: '_blank', rel: 'noopener' }, (p.facturas || []).length ? 'Proforma y facturas' : 'Proforma'));
+  acc.append(sel, el('a', { class: 'btn btn--ghost btn--sm', href: docUrl(p), target: '_blank', rel: 'noopener' }, (p.facturas || []).length ? 'Presupuesto y facturas' : 'Ver presupuesto'));
+  if (p.estado === 'pendiente_pago' && p.token) {
+    const url = location.origin + docUrl(p);
+    const tel = p.telefono || (fichaActual && fichaActual.telefono);
+    const mail = p.email || (fichaActual && fichaActual.email);
+    if (tel) acc.append(el('a', { class: 'btn btn--wa btn--sm', href: `https://wa.me/${telefonoWa(tel)}?text=${encodeURIComponent(`Hola, te envío el presupuesto que hablamos en la llamada: ${url}\nSi te encaja, te paso los datos para empezar. ¡Gracias!`)}`, target: '_blank', rel: 'noopener' }, 'Enviar por WhatsApp'));
+    if (mail) acc.append(el('a', { class: 'btn btn--ghost btn--sm', href: `mailto:${mail}?subject=${encodeURIComponent(`Tu presupuesto · Lagoa (nº ${p.id})`)}&body=${encodeURIComponent(`Hola:\n\nAquí tienes el presupuesto que hablamos en la llamada:\n${url}\n\nSi te encaja, respóndeme a este email y empezamos.\n\nUn saludo,\nLagoa · Estudio digital`)}` }, 'Enviar por email'));
+    const cp = el('button', { class: 'btn btn--ghost btn--sm', type: 'button' }, 'Copiar enlace');
+    cp.addEventListener('click', async () => { try { await navigator.clipboard.writeText(url); aviso('Enlace copiado'); } catch { prompt('Copia el enlace:', url); } });
+    acc.append(cp);
+  }
   (p.facturas || []).forEach(f => acc.append(el('span', { class: `chip ${f.tipo === 'rectificativa' ? 'chip--cancelada' : 'chip--confirmada'}` }, f.codigo)));
   card.append(acc);
   return card;
@@ -901,6 +914,7 @@ async function abrirFicha(id) {
   f.hidden = false;
   f.replaceChildren();
   const c = d.cliente;
+  fichaActual = c;
   const head = el('div', { class: 'conv__head' });
   const volver = el('button', { class: 'btn btn--ghost btn--sm', type: 'button', 'aria-label': 'Volver a la lista' }, '←');
   volver.addEventListener('click', cerrarFicha);
@@ -949,24 +963,51 @@ async function abrirFicha(id) {
 
   // Pedidos + nuevo pedido
   const peds = el('section', { class: 'panel-box full' });
-  peds.append(el('h3', {}, `Pedidos (${d.pedidos.length})`));
+  peds.append(el('h3', {}, `Presupuestos y pedidos (${d.pedidos.length})`));
   d.pedidos.forEach(p => peds.append(tarjetaPedido({ ...p, facturas: d.facturas.filter(x => x.pedido_id === p.id) }, false)));
+  // Nuevo presupuesto: los conceptos e importes que acordéis en la llamada
   const det = el('details');
-  det.append(el('summary', { class: 'btn btn--ghost btn--sm', style: 'display:inline-flex' }, '+ Nuevo pedido'));
+  det.append(el('summary', { class: 'btn btn--sm', style: 'display:inline-flex' }, '+ Nuevo presupuesto'));
   const fp = el('form', { style: 'margin-top:.6rem' });
-  const checks = el('div', { class: 'checks' });
-  SERVICIOS_PANEL.forEach(([v, t]) => { const l = el('label'); l.append(el('input', { type: 'checkbox', name: 'servicios', value: v }), document.createTextNode(t)); checks.append(l); });
-  const lm = el('label'); lm.append(el('input', { type: 'checkbox', name: 'mantenimiento' }), document.createTextNode('Con mantenimiento mensual')); checks.append(lm);
-  const nota = el('input', { name: 'nota', type: 'text', placeholder: 'Nota (opcional)', 'aria-label': 'Nota del pedido' });
-  const bp = el('button', { class: 'btn btn--sm', type: 'submit' }, 'Crear pedido');
-  fp.append(checks, nota, bp);
+  const dl = el('datalist', { id: `conceptos-${id}` });
+  CONCEPTOS.forEach(c => dl.append(el('option', { value: c })));
+  const filas = el('div', { class: 'lineas' });
+  const total = el('p', { class: 'lineas__total' });
+  const recalcular = () => {
+    const t = [...filas.querySelectorAll('input[name=importe]')].reduce((a, i) => a + (Number(i.value) || 0), 0);
+    total.textContent = `Total: ${euro.format(t)} (IVA incluido · base ${euro.format(t / 1.21)} + IVA ${euro.format(t - t / 1.21)})`;
+  };
+  const nuevaFila = () => {
+    const f = el('div', { class: 'lineas__fila' });
+    const quitar = el('button', { type: 'button', class: 'btn btn--ghost btn--sm', 'aria-label': 'Quitar concepto' }, '×');
+    quitar.addEventListener('click', () => { if (filas.children.length > 1) { f.remove(); recalcular(); } });
+    f.append(el('input', { name: 'concepto', list: dl.id, placeholder: 'Concepto (ej.: Web con reservas)', 'aria-label': 'Concepto', required: '' }),
+      el('input', { name: 'importe', type: 'number', min: '0.01', step: '0.01', inputmode: 'decimal', placeholder: '€ con IVA', 'aria-label': 'Importe en euros, IVA incluido', required: '' }), quitar);
+    filas.append(f);
+    f.querySelector('input').focus();
+  };
+  filas.addEventListener('input', recalcular);
+  const otra = el('button', { type: 'button', class: 'btn btn--ghost btn--sm' }, '+ Otro concepto');
+  otra.addEventListener('click', nuevaFila);
+  const extra = el('div', { class: 'row-2' });
+  const wm = el('div', { class: 'field' }); wm.append(el('label', { for: `mens-${id}` }, 'Mantenimiento (€/mes, opcional)'), el('input', { id: `mens-${id}`, name: 'mensual', type: 'number', min: '0', step: '0.01', inputmode: 'decimal' }));
+  const wn = el('div', { class: 'field' }); wn.append(el('label', { for: `nota-${id}` }, 'Nota interna'), el('input', { id: `nota-${id}`, name: 'nota', type: 'text' }));
+  extra.append(wm, wn);
+  const bp = el('button', { class: 'btn btn--sm', type: 'submit' }, 'Crear presupuesto');
+  fp.append(dl, filas, otra, total, extra, bp);
   fp.addEventListener('submit', async e => {
     e.preventDefault();
-    const fd = new FormData(fp);
+    const conceptos = [...filas.querySelectorAll('input[name=concepto]')].map(i => i.value);
+    const importes = [...filas.querySelectorAll('input[name=importe]')].map(i => i.value);
+    const lineas = conceptos.map((c, k) => ({ concepto: c, importe: Number(importes[k]) }));
     bp.disabled = true;
-    try { await api('/api/admin/crm', { method: 'POST', body: { cliente_id: id, servicios: fd.getAll('servicios'), mantenimiento: fd.has('mantenimiento'), nota: fd.get('nota') } }); aviso('Pedido creado'); await abrirFicha(id); }
-    catch (ex) { aviso(ex.message, true); bp.disabled = false; }
+    try {
+      await api('/api/admin/crm', { method: 'POST', body: { cliente_id: id, lineas, mensual: Number(fp.mensual.value) || 0, nota: fp.nota.value } });
+      aviso('Presupuesto creado: ya puedes enviárselo');
+      await abrirFicha(id);
+    } catch (ex) { aviso(ex.message, true); bp.disabled = false; }
   });
+  det.addEventListener('toggle', () => { if (det.open && !filas.children.length) { nuevaFila(); recalcular(); } });
   det.append(fp);
   peds.append(det);
 
@@ -982,7 +1023,7 @@ async function abrirFicha(id) {
   const facs = el('section', { class: 'panel-box' });
   facs.append(el('h3', {}, `Facturas (${d.facturas.length})`));
   const ul = el('ul', { class: 'mini-list' });
-  if (!d.facturas.length) ul.append(el('li', {}, 'Se emiten al marcar un pedido como pagado.'));
+  if (!d.facturas.length) ul.append(el('li', {}, 'Se emiten al marcar un presupuesto como pagado.'));
   d.facturas.forEach(x => {
     const li = el('li');
     li.append(el('a', { href: `/documento/?p=${x.pedido_id}&t=${x.token}`, target: '_blank', rel: 'noopener' }, `${x.codigo}${x.tipo === 'rectificativa' ? ' (rectificativa)' : ''}`), el('span', {}, `${dinero(x.total)} · ${x.fecha}`));
@@ -1021,7 +1062,7 @@ $('#crm-nuevo').addEventListener('click', async () => {
    BANDEJA ÚNICA: formulario, WhatsApp, citas y pedidos juntos
    ============================================================= */
 let bandeja = null, filtro = 'pendiente';
-const CANALES = { whatsapp: 'WhatsApp', mensaje: 'Formulario', cita: 'Cita', pedido: 'Pedido' };
+const CANALES = { whatsapp: 'WhatsApp', mensaje: 'Formulario', cita: 'Cita', pedido: 'Presupuesto' };
 const QUE_FALTA = { whatsapp: 'Te espera', mensaje: 'Sin leer', cita: 'Por confirmar', pedido: 'Por cobrar' };
 
 async function cargarBandeja() {
