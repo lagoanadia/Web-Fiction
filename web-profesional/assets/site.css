@@ -583,7 +583,7 @@ textarea { resize: vertical; min-height: 64px; }
 .msg__actions { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .5rem; white-space: normal; }
 .msg__actions a, .msg__actions button { font-size: .8rem; padding: .35rem .75rem; border-radius: 999px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); font-weight: 600; text-decoration: none; cursor: pointer; }
 .msg__actions button:disabled { opacity: .45; cursor: default; }
-.msg__actions .wa { background: var(--wa); border-color: var(--wa); color: #fff; }
+.msg__actions .wa-link { background: var(--wa); border-color: var(--wa); color: #fff; }
 .chat .typing { background: var(--bg-2); border-radius: 16px; }
 .chat .typing i { background: var(--ink-2); }
 .chat__quick { display: flex; gap: .35rem; padding: .5rem .7rem 0; overflow-x: auto; scrollbar-width: none; }
