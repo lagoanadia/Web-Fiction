@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Lagoa · Carrusel negocios</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&family=Anton&family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,800;1,9..144,500&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#e8ecff; --ink:#0b0d12; --ink-2:#4a5161;
+    --accent:#1f3dff; --deep:#0a1a8f; --pastel:#c3ceff; --sky:#8fb4ff;
+    --sans:"Inter Tight",system-ui,sans-serif; --serif:"Instrument Serif",Georgia,serif; --mono:"JetBrains Mono",monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#999;display:flex;flex-direction:column;gap:40px;padding:40px;font-family:var(--sans);color:var(--ink)}
+  .slide{position:relative;width:1080px;height:1350px;overflow:hidden;background:var(--paper);flex:none}
+  .slide.dark{background:var(--ink);color:#eef1f8}
+  .slide.blue{background:var(--accent);color:#fff}
+  .grain{position:absolute;inset:0;opacity:.28;mix-blend-mode:multiply;pointer-events:none;z-index:50}
+  .dark .grain,.blue .grain{mix-blend-mode:overlay;opacity:.35}
+
+  .top{position:absolute;top:48px;left:60px;right:60px;display:flex;justify-content:space-between;align-items:center;z-index:5}
+  .brand{display:flex;align-items:center;gap:12px;font-weight:700;letter-spacing:.2em;font-size:22px}
+  .brand i{width:24px;height:24px;border-radius:50%;border:3px solid currentColor;display:grid;place-items:center}
+  .brand i::after{content:"";width:9px;height:9px;border-radius:50%;background:currentColor}
+  .slide:not(.dark):not(.blue) .brand i{border-color:var(--accent)}
+  .slide:not(.dark):not(.blue) .brand i::after{background:var(--accent)}
+  .count{font-family:var(--mono);font-size:19px;letter-spacing:.12em}
+
+  .foot{position:absolute;left:60px;right:60px;bottom:50px;display:flex;justify-content:space-between;align-items:center;
+    font-family:var(--mono);font-size:19px;letter-spacing:.04em;z-index:5}
+  .swipe{display:flex;align-items:center;gap:12px}
+  .swipe b{width:54px;height:54px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:24px}
+  .dark .swipe b{background:#fff;color:var(--ink)}
+
+  /* headings */
+  .kicker{font-family:var(--mono);font-size:20px;letter-spacing:.14em;text-transform:uppercase;display:inline-flex;gap:10px;align-items:center;
+    border:1.5px solid currentColor;border-radius:99px;padding:8px 18px}
+  .h{font-weight:900;letter-spacing:-.06em;line-height:.86}
+  .h em{font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:-.02em;color:var(--accent)}
+  .dark .h em{color:var(--sky)}
+  .line{font-size:30px;line-height:1.3;letter-spacing:-.015em;color:var(--ink-2);max-width:880px}
+  .dark .line{color:#aab2c6}
+  .line b{color:var(--ink);font-weight:700}
+  .dark .line b{color:#fff}
+
+  /* business slide layout */
+  .biz .txt{position:absolute;top:140px;left:60px;right:60px;z-index:4}
+  .biz .h{font-size:132px;margin-top:26px}
+  .biz .line{margin-top:26px}
+  .browser{position:absolute;left:90px;right:90px;top:640px;height:610px;border-radius:22px;overflow:hidden;z-index:3;
+    background:#fff;box-shadow:0 0 0 1.5px rgba(11,13,18,.12),0 40px 70px -30px rgba(10,26,143,.5);transform:rotate(-2deg)}
+  .bar{height:46px;background:#f1f2f5;display:flex;align-items:center;gap:8px;padding:0 18px;border-bottom:1px solid #e1e3ea}
+  .bar i{width:13px;height:13px;border-radius:50%;background:#d4d7df}
+  .bar span{margin-left:14px;flex:1;height:28px;border-radius:8px;background:#fff;font-family:var(--mono);font-size:14px;color:#6b7280;
+    display:flex;align-items:center;padding:0 14px}
+  .site{position:relative;height:calc(100% - 46px);overflow:hidden}
+
+  .style-chip{position:absolute;right:70px;top:585px;z-index:6;background:var(--ink);color:#fff;border-radius:16px;padding:14px 18px;
+    display:flex;align-items:center;gap:14px;font-family:var(--mono);font-size:15px;letter-spacing:.06em;transform:rotate(3deg);
+    box-shadow:0 16px 26px -14px rgba(11,13,18,.6)}
+  .style-chip .sw{display:flex}
+  .style-chip .sw u{width:26px;height:26px;border-radius:50%;border:2px solid var(--ink);margin-left:-8px}
+  .style-chip .sw u:first-child{margin-left:0}
+
+  /* ===== Fontanería ===== */
+  .plumb{background:#0f1b3d;color:#fff;font-family:"Inter Tight";height:100%}
+  .plumb .nav{display:flex;justify-content:space-between;align-items:center;padding:22px 34px;border-bottom:2px solid rgba(255,255,255,.1)}
+  .plumb .logo{font-family:"Anton";font-size:30px;letter-spacing:.02em}
+  .plumb .logo span{color:#ffd400}
+  .plumb .tel{background:#ffd400;color:#0f1b3d;font-weight:900;padding:10px 18px;border-radius:8px;font-size:18px}
+  .plumb .hero{padding:34px 34px 0;display:grid;grid-template-columns:1.25fr 1fr;gap:20px}
+  .plumb h3{font-family:"Anton";font-weight:400;font-size:86px;line-height:.92;text-transform:uppercase}
+  .plumb h3 span{color:#ffd400}
+  .plumb p{font-size:19px;color:#b9c2da;margin-top:16px;line-height:1.35}
+  .plumb .cta{margin-top:22px;display:inline-flex;gap:10px;background:#ffd400;color:#0f1b3d;font-weight:900;font-size:22px;padding:16px 26px;border-radius:10px;text-transform:uppercase}
+  .plumb .badges{display:flex;flex-direction:column;gap:12px;padding-top:10px}
+  .plumb .badge{border:2px solid rgba(255,255,255,.18);border-radius:12px;padding:14px 16px;font-weight:700;font-size:19px;display:flex;gap:12px;align-items:center}
+  .plumb .badge b{font-family:"Anton";font-weight:400;font-size:34px;color:#ffd400;min-width:72px}
+  .plumb .stripe{position:absolute;left:0;right:0;bottom:0;height:46px;background:repeating-linear-gradient(-45deg,#ffd400 0 22px,#0f1b3d 22px 44px)}
+
+  /* ===== Salón ===== */
+  .salon{background:#f7ebe6;color:#3b2a2a;height:100%;font-family:"Cormorant Garamond",serif}
+  .salon .nav{display:flex;justify-content:space-between;align-items:center;padding:24px 36px;font-family:"Inter Tight";font-size:14px;letter-spacing:.24em;text-transform:uppercase}
+  .salon .logo{font-family:"Cormorant Garamond";font-style:italic;font-size:34px;letter-spacing:0;text-transform:none}
+  .salon .hero{display:grid;grid-template-columns:1fr 1fr;gap:26px;padding:14px 36px 0}
+  .salon h3{font-weight:500;font-size:64px;line-height:.95}
+  .salon h3 i{color:#b36b6b}
+  .salon p{font-family:"Inter Tight";font-size:17px;color:#7a6262;margin-top:14px;line-height:1.45}
+  .salon .cta{margin-top:20px;display:inline-block;background:#3b2a2a;color:#f7ebe6;font-family:"Inter Tight";font-size:15px;letter-spacing:.2em;text-transform:uppercase;padding:16px 26px;border-radius:99px}
+  .salon .arch{height:420px;border-radius:200px 200px 18px 18px;position:relative;overflow:hidden;
+    background:radial-gradient(140px 120px at 60% 30%, #fff5f1, transparent 70%),linear-gradient(170deg,#e8c4bb,#c98f86)}
+  .salon .menu{position:absolute;left:18px;right:18px;bottom:18px;background:rgba(255,250,248,.93);border-radius:14px;padding:12px 16px;font-family:"Inter Tight";font-size:15px}
+  .salon .menu div{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #e0c9c2}
+  .salon .menu div:last-child{border:0}
+  .salon .menu b{font-family:"Cormorant Garamond";font-size:20px}
+
+  /* ===== Bar ===== */
+  .bar-site{background:#f3e9d6;color:#2d2416;height:100%;font-family:"Fraunces",serif}
+  .bar-site .nav{display:flex;justify-content:space-between;align-items:center;padding:20px 34px;border-bottom:2px solid #2d2416}
+  .bar-site .logo{font-weight:800;font-size:30px;font-style:italic}
+  .bar-site .nav span:last-child{font-family:"Inter Tight";font-weight:700;font-size:15px;background:#c2522d;color:#fff;padding:10px 16px;border-radius:99px}
+  .bar-site .hero{display:grid;grid-template-columns:1fr 1.1fr;gap:28px;padding:26px 34px 0}
+  .bar-site h3{font-weight:800;font-size:60px;line-height:.92;color:#c2522d}
+  .bar-site h3 i{font-weight:500;color:#2d6a4f}
+  .bar-site p{font-family:"Inter Tight";font-size:17px;color:#6b5c45;margin-top:14px;line-height:1.4}
+  .bar-site .card{background:#fffaf0;border:2px solid #2d2416;border-radius:14px;padding:16px 20px;box-shadow:6px 6px 0 #2d2416}
+  .bar-site .card h5{font-size:15px;letter-spacing:.24em;text-transform:uppercase;font-family:"Inter Tight";color:#c2522d;margin-bottom:8px}
+  .bar-site .card div{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:8px 0;border-bottom:1px dotted #b8a888;font-size:21px;font-weight:600}
+  .bar-site .card div:last-child{border:0}
+  .bar-site .card div span{font-family:"Inter Tight";font-weight:700;font-size:18px}
+  .bar-site .card small{display:block;font-family:"Inter Tight";font-weight:400;font-size:13px;color:#8a7a5e}
+  .bar-site .tags{display:flex;gap:8px;margin-top:20px}
+  .bar-site .tags span{font-family:"Inter Tight";font-size:14px;font-weight:700;border:2px solid #2d2416;border-radius:99px;padding:6px 12px}
+
+  /* cover */
+  .cover .h{font-size:168px}
+  .cover .stack{position:absolute;left:60px;right:60px;top:150px}
+  .mini{position:absolute;width:320px;height:250px;border-radius:16px;overflow:hidden;box-shadow:0 30px 50px -24px rgba(10,26,143,.55),0 0 0 1.5px rgba(11,13,18,.1)}
+  .mini .bar{height:28px;padding:0 10px;gap:5px}
+  .mini .bar i{width:8px;height:8px}
+  .mini .in{height:calc(100% - 28px);padding:18px}
+  .circle{position:absolute;overflow:visible;pointer-events:none}
+
+  /* list slide */
+  .chips{display:flex;flex-wrap:wrap;gap:14px;margin-top:50px}
+  .chips span{font-size:30px;font-weight:700;letter-spacing:-.02em;border:2px solid var(--ink);border-radius:99px;padding:12px 26px;background:#fff}
+  .chips span.a{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .chips span.d{background:var(--ink);color:#fff}
+  .chips span.p{background:var(--pastel);border-color:var(--pastel)}
+  .chips span.s{font-family:var(--serif);font-style:italic;font-weight:400;font-size:36px;padding:8px 26px}
+
+  .burst{position:absolute;z-index:1}
+</style>
+</head>
+<body>
+
+<!-- ===================== 01 COVER ===================== -->
+<section class="slide cover" id="s1">
+  <svg class="grain" width="1080" height="1350"><filter id="g1"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="3" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 .1  0 0 0 0 .12  0 0 0 0 .3  0 0 0 .55 0"/></filter><rect width="100%" height="100%" filter="url(#g1)"/></svg>
+  <div class="top"><div class="brand"><i></i>LAGOA</div><div class="count">01 / 06</div></div>
+
+  <div class="stack">
+    <div class="h">cada<br>negocio<br>tiene su <em>estilo.</em></div>
+    <p class="line" style="margin-top:40px">Tu web también debería tenerlo.<br><b>Pista: la plantilla que usa medio internet no lo tiene.</b></p>
+  </div>
+
+  <svg class="burst" style="left:760px;top:120px;width:200px;height:200px" viewBox="0 0 100 100"><polygon fill="#1f3dff" points="50,0 58,30 85,12 68,40 100,46 70,58 90,86 60,70 52,100 44,72 16,92 32,62 0,52 30,42 10,14 40,30"/></svg>
+
+  <div class="mini" style="left:56px;top:880px;transform:rotate(-6deg);background:#0f1b3d">
+    <div class="bar"><i></i><i></i><i></i></div>
+    <div class="in" style="color:#fff"><div style="font-family:Anton;font-size:44px;line-height:.95;text-transform:uppercase">¿Fuga?<br><span style="color:#ffd400">Llegamos ya.</span></div><div style="margin-top:14px;display:inline-block;background:#ffd400;color:#0f1b3d;font-weight:900;padding:8px 14px;border-radius:6px;font-size:15px">LLAMAR AHORA</div></div>
+  </div>
+  <div class="mini" style="left:382px;top:930px;transform:rotate(3deg);background:#f7ebe6;z-index:2">
+    <div class="bar"><i></i><i></i><i></i></div>
+    <div class="in" style="color:#3b2a2a"><div style="font-family:'Cormorant Garamond';font-size:46px;line-height:.95">Tu momento,<br><i style="color:#b36b6b">sin esperas.</i></div><div style="margin-top:14px;display:inline-block;background:#3b2a2a;color:#f7ebe6;padding:8px 16px;border-radius:99px;font-size:12px;letter-spacing:.2em">RESERVAR CITA</div></div>
+  </div>
+  <div class="mini" style="left:704px;top:870px;transform:rotate(-3deg);background:#f3e9d6">
+    <div class="bar"><i></i><i></i><i></i></div>
+    <div class="in" style="color:#2d2416;font-family:Fraunces"><div style="font-weight:800;font-size:44px;line-height:.92;color:#c2522d">Vermut<br><i style="font-weight:500;color:#2d6a4f">y croquetas.</i></div><div style="margin-top:14px;display:inline-block;border:2px solid #2d2416;padding:6px 14px;border-radius:99px;font-family:'Inter Tight';font-weight:700;font-size:14px;box-shadow:3px 3px 0 #2d2416">Ver la carta</div></div>
+  </div>
+
+  <div class="foot"><span>lagoa-webs.vercel.app</span><span class="swipe">desliza <b>→</b></span></div>
+</section>
+
+<!-- ===================== 02 FONTANEROS ===================== -->
+<section class="slide biz" id="s2">
+  <svg class="grain" width="1080" height="1350"><filter id="g2"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="3" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 .1  0 0 0 0 .12  0 0 0 0 .3  0 0 0 .55 0"/></filter><rect width="100%" height="100%" filter="url(#g2)"/></svg>
+  <div class="top"><div class="brand"><i></i>LAGOA</div><div class="count">02 / 06</div></div>
+  <div class="txt">
+    <span class="kicker">🔧 fontanería</span>
+    <div class="h">para los que<br>arreglan <em>marrones.</em></div>
+    <p class="line">Para que, cuando a alguien le reviente una tubería a las 3 de la mañana, <b>te llame a ti y no a la competencia.</b></p>
+  </div>
+  <div class="style-chip"><span class="sw"><u style="background:#0f1b3d"></u><u style="background:#ffd400"></u><u style="background:#fff"></u></span>directa · potente</div>
+  <div class="browser">
+    <div class="bar"><i></i><i></i><i></i><span>fontaneriaramirez.es</span></div>
+    <div class="site plumb">
+      <div class="nav"><div class="logo">RAMÍREZ<span>.</span></div><div class="tel">📞 600 123 456</div></div>
+      <div class="hero">
+        <div>
+          <h3>¿Fuga?<br><span>Llegamos<br>en 30 min.</span></h3>
+          <p>Urgencias 24 h en toda la ciudad. Presupuesto sin compromiso antes de tocar nada.</p>
+          <div class="cta">📞 Llamar ahora</div>
+        </div>
+        <div class="badges">
+          <div class="badge"><b>24h</b>Todos los días, también festivos</div>
+          <div class="badge"><b>4,9★</b>312 reseñas en Google</div>
+          <div class="badge"><b>0 €</b>Presupuesto y desplazamiento</div>
+        </div>
+      </div>
+      <div class="stripe"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 03 SALONES ===================== -->
+<section class="slide biz" id="s3">
+  <svg class="grain" width="1080" height="1350"><filter id="g3"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="3" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 .1  0 0 0 0 .12  0 0 0 0 .3  0 0 0 .55 0"/></filter><rect width="100%" height="100%" filter="url(#g3)"/></svg>
+  <div class="top"><div class="brand"><i></i>LAGOA</div><div class="count">03 / 06</div></div>
+  <div class="txt">
+    <span class="kicker">💅 salones de belleza</span>
+    <div class="h">reservas<br>mientras <em>duermes.</em></div>
+    <p class="line">Tus clientas eligen hora desde el sofá. <b>Tú dejas de contestar 40 WhatsApps al día.</b></p>
+  </div>
+  <div class="style-chip"><span class="sw"><u style="background:#f7ebe6"></u><u style="background:#c98f86"></u><u style="background:#3b2a2a"></u></span>delicada · elegante</div>
+  <div class="browser">
+    <div class="bar"><i></i><i></i><i></i><span>salonaurora.es</span></div>
+    <div class="site salon">
+      <div class="nav"><div class="logo">Aurora</div><div>Servicios · Equipo · Citas</div></div>
+      <div class="hero">
+        <div>
+          <h3>Tu momento,<br><i>sin esperas.</i></h3>
+          <p>Elige servicio, profesional y hora. Te mandamos un recordatorio el día antes.</p>
+          <div class="cta">Reservar cita</div>
+        </div>
+        <div class="arch">
+          <div class="menu">
+            <div><b>Corte &amp; peinado</b><span>28 €</span></div>
+            <div><b>Manicura semipermanente</b><span>22 €</span></div>
+            <div><b>Mechas balayage</b><span>65 €</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 04 BARES ===================== -->
+<section class="slide biz" id="s4">
+  <svg class="grain" width="1080" height="1350"><filter id="g4"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="3" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 .1  0 0 0 0 .12  0 0 0 0 .3  0 0 0 .55 0"/></filter><rect width="100%" height="100%" filter="url(#g4)"/></svg>
+  <div class="top"><div class="brand"><i></i>LAGOA</div><div class="count">04 / 06</div></div>
+  <div class="txt">
+    <span class="kicker">🍷 bares y restaurantes</span>
+    <div class="h">adiós al PDF<br><em>borroso.</em></div>
+    <p class="line">Una carta que se lee bien en el móvil y se cambia en un minuto. <b>Y reservas de mesa sin coger el teléfono en pleno servicio.</b></p>
+  </div>
+  <div class="style-chip"><span class="sw"><u style="background:#f3e9d6"></u><u style="background:#c2522d"></u><u style="background:#2d6a4f"></u></span>cálida · de toda la vida</div>
+  <div class="browser">
+    <div class="bar"><i></i><i></i><i></i><span>casamarea.es</span></div>
+    <div class="site bar-site">
+      <div class="nav"><div class="logo">Casa Marea</div><span>Reservar mesa</span></div>
+      <div class="hero">
+        <div>
+          <h3>Vermut,<br><i>croquetas</i><br>y sobremesa.</h3>
+          <p>Cocina de mercado desde 1987. Abierto de martes a domingo.</p>
+          <div class="tags"><span>Terraza</span><span>Sin gluten</span><span>Grupos</span></div>
+        </div>
+        <div class="card">
+          <h5>Hoy en la pizarra</h5>
+          <div>Croquetas de la abuela<span>9,50 €</span></div>
+          <div>Pulpo a la brasa<span>18 €</span></div>
+          <div>Arroz meloso de sepia<span>16 €</span></div>
+          <div>Tarta de queso<span>6 €</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 05 Y MÁS ===================== -->
+<section class="slide" id="s5">
+  <svg class="grain" width="1080" height="1350"><filter id="g5"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="3" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 .1  0 0 0 0 .12  0 0 0 0 .3  0 0 0 .55 0"/></filter><rect width="100%" height="100%" filter="url(#g5)"/></svg>
+  <div class="top"><div class="brand"><i></i>LAGOA</div><div class="count">05 / 06</div></div>
+  <div style="position:absolute;top:150px;left:60px;right:60px">
+    <span class="kicker">✦ y la lista sigue</span>
+    <div class="h" style="font-size:132px;margin-top:26px">si existe,<br>le hacemos <em>web.</em></div>
+    <div class="chips">
+      <span class="a">talleres</span><span>clínicas dentales</span><span class="s">fisioterapeutas</span>
+      <span class="d">academias</span><span class="p">tiendas de barrio</span><span>inmobiliarias</span>
+      <span class="s">fotógrafas</span><span class="a">gimnasios</span><span>floristerías</span>
+      <span class="p">psicólogas</span><span class="d">reformas</span><span>veterinarios</span><span class="s">y el tuyo…</span>
+    </div>
+    <p class="line" style="margin-top:50px">Cada una con su estilo. <b>Que tu web se parezca a ti, no a la del vecino.</b></p>
+  </div>
+  <svg class="burst" style="right:70px;top:150px;width:150px;height:150px" viewBox="0 0 100 100"><polygon fill="#8fb4ff" points="50,0 60,36 96,22 70,50 96,78 60,64 50,100 40,64 4,78 30,50 4,22 40,36"/></svg>
+  <div class="foot"><span>lagoa-webs.vercel.app</span><span class="swipe">una más <b>→</b></span></div>
+</section>
+
+<!-- ===================== 06 CTA ===================== -->
+<section class="slide blue" id="s6">
+  <svg class="grain" width="1080" height="1350"><filter id="g6"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="3" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .5 0"/></filter><rect width="100%" height="100%" filter="url(#g6)"/></svg>
+  <div class="top"><div class="brand"><i></i>LAGOA</div><div class="count">06 / 06</div></div>
+  <div style="position:absolute;top:200px;left:60px;right:60px">
+    <div class="h" style="font-size:176px">¿y tú a qué<br>te <em style="color:#fff">dedicas?</em></div>
+    <p class="line" style="color:#dfe4ff;margin-top:46px;font-size:34px">Cuéntanoslo y te enseñamos cómo quedaría tu web.<br><b style="color:#fff">Gratis y sin compromiso. Lo peor que puede pasar es que te guste.</b></p>
+  </div>
+  <svg class="burst" style="right:-60px;bottom:200px;width:440px;height:440px" viewBox="0 0 100 100"><polygon fill="#0a1a8f" points="50,0 58,30 85,12 68,40 100,46 70,58 90,86 60,70 52,100 44,72 16,92 32,62 0,52 30,42 10,14 40,30"/></svg>
+  <div style="position:absolute;left:60px;bottom:200px;z-index:4;display:flex;flex-direction:column;gap:18px;align-items:flex-start">
+    <div style="background:#fff;color:var(--ink);border-radius:26px 26px 26px 6px;padding:22px 30px;font-size:34px;font-weight:700;letter-spacing:-.02em;box-shadow:0 20px 30px -16px rgba(0,0,0,.4)">Escríbenos <span style="font-family:var(--serif);font-style:italic;font-weight:400;font-size:42px;color:var(--accent)">"WEB"</span> por DM 💬</div>
+    <div style="background:var(--ink);color:#fff;border-radius:99px;padding:16px 26px;font-family:var(--mono);font-size:24px">lagoa-webs.vercel.app</div>
+  </div>
+  <div class="foot" style="color:#dfe4ff"><span>consulta gratis · 20 min</span><span>guárdalo para luego ↓</span></div>
+</section>
+
+</body>
+</html>
