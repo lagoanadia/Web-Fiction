@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Lagoa · Post ghosting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,400;0,500;0,700;0,800;0,900;1,800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#e4e9ff;
+    --paper-2:#d3dbff;
+    --ink:#0b0d12;
+    --accent:#1f3dff;
+    --deep:#0a1a8f;
+    --pastel:#b9c6ff;
+    --sky:#8fb4ff;
+    --sans:"Inter Tight",system-ui,sans-serif;
+    --serif:"Instrument Serif",Georgia,serif;
+    --mono:"JetBrains Mono",ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1080px;height:1350px;background:var(--paper)}
+  .post{position:relative;width:1080px;height:1350px;overflow:hidden;
+    background:
+      radial-gradient(900px 700px at 85% 60%, #c9d3ff 0%, transparent 60%),
+      radial-gradient(600px 500px at 0% 0%, #f2f4ff 0%, transparent 70%),
+      var(--paper);
+    font-family:var(--sans);color:var(--ink)}
+  .grain{position:absolute;inset:0;opacity:.35;mix-blend-mode:multiply;pointer-events:none;z-index:50}
+
+  /* ---------- top bar ---------- */
+  .top{position:absolute;top:44px;left:56px;right:56px;display:flex;justify-content:space-between;align-items:center;
+    font-family:var(--mono);font-size:19px;letter-spacing:.14em;text-transform:uppercase}
+  .brand{display:flex;align-items:center;gap:12px;font-family:var(--sans);font-weight:700;letter-spacing:.2em;font-size:22px}
+  .brand i{width:24px;height:24px;border-radius:50%;border:3px solid var(--accent);display:grid;place-items:center}
+  .brand i::after{content:"";width:9px;height:9px;border-radius:50%;background:var(--accent)}
+  .pill-live{display:flex;align-items:center;gap:10px;border:1.5px solid var(--ink);border-radius:99px;padding:8px 16px;font-size:16px}
+  .pill-live b{width:10px;height:10px;border-radius:50%;background:#19c36b;box-shadow:0 0 0 4px rgba(25,195,107,.2)}
+
+  /* ---------- headline ---------- */
+  .head{position:absolute;top:118px;left:52px;z-index:5;line-height:.84}
+  .l1{font-weight:900;font-size:150px;letter-spacing:-.065em;display:block}
+  .l2{font-weight:800;font-size:92px;letter-spacing:-.06em;display:block;margin-top:6px}
+  .l2 .s{font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:-.02em;font-size:104px}
+  .l3{position:relative;display:inline-block;margin-top:-6px;margin-left:-4px;
+    font-family:var(--serif);font-style:italic;font-size:228px;letter-spacing:-.035em;color:var(--accent);line-height:.95}
+  .l3 .dot{color:var(--ink)}
+  .circle{position:absolute;left:-36px;top:-6px;width:calc(100% + 64px);height:118%;overflow:visible}
+  .sub{position:absolute;top:640px;left:58px;font-family:var(--mono);font-size:21px;line-height:1.5;max-width:420px;z-index:6}
+  .sub em{font-style:normal;background:var(--ink);color:var(--paper);padding:1px 8px}
+
+  /* ---------- starburst + phone ---------- */
+  .burst{position:absolute;right:-110px;top:470px;width:700px;height:700px;z-index:1}
+  .burst-small{position:absolute;left:470px;top:110px;width:120px;height:120px;z-index:4}
+  .burst-tiny{position:absolute;left:395px;top:1050px;width:70px;height:70px;z-index:4}
+  .phone-wrap{position:absolute;right:110px;top:500px;z-index:3;transform:rotate(6deg)}
+  .phone{width:290px;height:575px;border-radius:52px;background:#0b0d12;padding:12px;
+    box-shadow:0 0 0 9px #fff, 0 40px 60px -20px rgba(10,26,143,.55)}
+  .screen{width:100%;height:100%;border-radius:42px;overflow:hidden;position:relative;
+    background:linear-gradient(170deg,#f6f4ef 0%,#f6f4ef 55%,#e9eefc 100%)}
+  .notch{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:100px;height:28px;border-radius:20px;background:#0b0d12;z-index:2}
+  .site-nav{display:flex;justify-content:space-between;align-items:center;padding:52px 22px 0;font-size:12px;font-weight:700;letter-spacing:.12em}
+  .site-nav span:last-child{font-family:var(--mono);font-weight:400;letter-spacing:0}
+  .site-hero{margin:16px 12px 0;height:200px;border-radius:24px;position:relative;overflow:hidden;
+    background:
+      radial-gradient(120px 90px at 30% 30%, rgba(255,255,255,.55), transparent 70%),
+      linear-gradient(160deg,#8fb4ff 0%,#3b5cff 55%,#0a1a8f 100%)}
+  .site-hero::before{content:"";position:absolute;left:-20%;right:-20%;bottom:-30px;height:120px;border-radius:50%;
+    background:repeating-radial-gradient(circle at 50% 0, rgba(255,255,255,.35) 0 2px, transparent 2px 14px)}
+  .site-hero h4{position:absolute;left:18px;bottom:18px;color:#fff;font-family:var(--serif);font-weight:400;font-size:38px;line-height:.95}
+  .site-hero h4 i{display:block}
+  .site-copy{padding:16px 22px 0;font-size:13px;color:#4a5161;line-height:1.4}
+  .site-btn{margin:16px 22px 0;background:var(--accent);color:#fff;border-radius:99px;text-align:center;padding:14px;font-weight:700;font-size:15px}
+  .site-slots{display:flex;gap:8px;padding:14px 22px 0}
+  .site-slots span{flex:1;text-align:center;border:1.5px solid #c9cfdd;border-radius:10px;padding:8px 0;font-family:var(--mono);font-size:12px}
+  .site-slots span.on{border-color:var(--accent);color:var(--accent);background:#dfe4ff;font-weight:700}
+
+  /* ---------- notifications ---------- */
+  .notif{position:absolute;z-index:8;background:#fff;border-radius:22px;padding:14px 18px 14px 14px;
+    display:flex;gap:12px;align-items:center;box-shadow:0 18px 30px -14px rgba(10,26,143,.45), 0 0 0 1px rgba(11,13,18,.06);
+    font-size:17px;line-height:1.25;width:360px}
+  .notif .ic{flex:none;width:46px;height:46px;border-radius:12px;background:var(--accent);display:grid;place-items:center;color:#fff;font-size:24px}
+  .notif .ic.dark{background:var(--ink)}
+  .notif .ic.pastel{background:var(--pastel)}
+  .notif > div:last-child{flex:1;min-width:0}
+  .notif .row{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .notif b{font-size:15px;letter-spacing:.02em;white-space:nowrap}
+  .notif small{font-family:var(--mono);font-size:12px;color:#6b7280}
+  .n1{left:440px;top:600px;transform:rotate(-4deg);width:330px}
+  .n2{left:590px;top:950px;transform:rotate(3deg);width:350px}
+  .n3{left:400px;top:830px;transform:rotate(-2deg);width:310px}
+
+  /* ---------- tags ---------- */
+  .tags{position:absolute;left:52px;top:800px;display:flex;flex-direction:column;gap:12px;z-index:7;align-items:flex-start}
+  .tag{font-family:var(--mono);font-size:18px;text-transform:uppercase;letter-spacing:.06em;border-radius:99px;padding:9px 18px;
+    background:var(--accent);color:#fff;display:flex;align-items:center;gap:10px}
+  .tag.o{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
+  .tag.d{background:var(--ink)}
+  .tag.p{background:var(--pastel);color:var(--deep)}
+  .tag:nth-child(2){margin-left:26px}
+  .tag:nth-child(3){margin-left:8px}
+  .tag:nth-child(4){margin-left:40px}
+
+  /* ---------- ticket ---------- */
+  .ticket{position:absolute;right:58px;top:190px;z-index:6;transform:rotate(8deg);display:flex;
+    filter:drop-shadow(0 16px 18px rgba(10,26,143,.3))}
+  .ticket .t-main{background:var(--ink);color:#eef1f8;padding:18px 22px 16px;border-radius:14px 0 0 14px;font-family:var(--mono)}
+  .ticket .t-main small{display:block;font-size:13px;letter-spacing:.18em;color:var(--sky)}
+  .ticket .t-main strong{display:block;font-family:var(--sans);font-weight:800;font-size:34px;letter-spacing:-.04em;margin-top:4px;line-height:1}
+  .ticket .t-main strong i{font-family:var(--serif);font-weight:400;font-size:40px;letter-spacing:0}
+  .ticket .t-stub{background:var(--accent);color:#fff;border-radius:0 14px 14px 0;border-left:3px dashed var(--ink);
+    writing-mode:vertical-rl;font-family:var(--mono);font-size:13px;letter-spacing:.2em;padding:10px 12px;text-align:center}
+
+  /* ---------- note ---------- */
+  .note{position:absolute;left:60px;top:1060px;z-index:9;width:330px;background:#fff;padding:22px 24px 20px;transform:rotate(-3deg);
+    box-shadow:0 20px 30px -18px rgba(11,13,18,.45)}
+  .note::before{content:"";position:absolute;top:-16px;left:50%;width:110px;height:32px;transform:translateX(-50%) rotate(3deg);
+    background:rgba(143,180,255,.7)}
+  .note p{font-family:"Caveat",cursive;font-size:33px;line-height:1.02;color:var(--deep)}
+
+  /* ---------- bottom ---------- */
+  .tagline{position:absolute;right:56px;bottom:98px;text-align:right;z-index:9;line-height:.9}
+  .tagline .a{font-weight:800;font-size:56px;letter-spacing:-.05em;display:block}
+  .tagline .b{font-family:var(--serif);font-style:italic;font-size:76px;color:var(--accent);letter-spacing:-.02em;
+    background:var(--paper);padding:0 10px;display:inline-block;margin-top:2px}
+  .foot{position:absolute;left:0;right:0;bottom:0;height:78px;background:var(--ink);color:#eef1f8;z-index:10;
+    display:flex;align-items:center;justify-content:space-between;padding:0 56px;font-family:var(--mono);font-size:19px;letter-spacing:.04em}
+  .foot .cta{background:var(--accent);color:#fff;padding:9px 18px;border-radius:99px;font-weight:700}
+  .foot .cta i{font-style:normal}
+</style>
+</head>
+<body>
+<div class="post">
+
+  <svg class="grain" width="1080" height="1350"><filter id="g"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="3" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 .1  0 0 0 0 .12  0 0 0 0 .3  0 0 0 .55 0"/></filter><rect width="100%" height="100%" filter="url(#g)"/></svg>
+
+  <div class="top">
+    <div class="brand"><i></i>LAGOA</div>
+    <div class="pill-live"><b></b>agenda abierta</div>
+  </div>
+
+  <!-- starbursts -->
+  <svg class="burst" viewBox="0 0 100 100"><polygon fill="#1f3dff" points="50,0 58,30 85,12 68,40 100,46 70,58 90,86 60,70 52,100 44,72 16,92 32,62 0,52 30,42 10,14 40,30"/></svg>
+  <svg class="burst-small" viewBox="0 0 100 100"><polygon fill="#8fb4ff" points="50,0 60,36 96,22 70,50 96,78 60,64 50,100 40,64 4,78 30,50 4,22 40,36"/></svg>
+  <svg class="burst-tiny" viewBox="0 0 100 100"><polygon fill="#0b0d12" points="50,0 58,42 100,50 58,58 50,100 42,58 0,50 42,42"/></svg>
+
+  <div class="head">
+    <span class="l1">tu web</span>
+    <span class="l2">te está <span class="s">haciendo</span></span>
+    <span class="l3">ghosting<span class="dot">.</span>
+      <svg class="circle" viewBox="0 0 600 260" preserveAspectRatio="none"><path d="M40 150 C 30 60, 220 18, 340 22 C 470 26, 590 70, 575 140 C 560 215, 380 245, 250 238 C 120 230, 20 200, 32 128 C 40 85, 120 50, 200 38" fill="none" stroke="#0b0d12" stroke-width="4" stroke-linecap="round"/></svg>
+    </span>
+  </div>
+
+  <p class="sub">Entran, miran, se van.<br>Ni un <em>"hola"</em>. Ni una reserva.<br>Y tú, mirando el móvil. 📱</p>
+
+  <div class="phone-wrap">
+    <div class="phone"><div class="screen">
+      <div class="notch"></div>
+      <div class="site-nav"><span>OLA STUDIO</span><span>☰</span></div>
+      <div class="site-hero"><h4>Pilates<i>junto al mar</i></h4></div>
+      <p class="site-copy">Clases reducidas, sin permanencia. Reserva tu hueco en 10 segundos.</p>
+      <div class="site-slots"><span>09:00</span><span class="on">18:30</span><span>20:00</span></div>
+      <div class="site-btn">Reservar clase →</div>
+    </div></div>
+  </div>
+
+  <div class="notif n1"><div class="ic">🗓️</div><div><div class="row"><b>Nueva reserva</b><small>ahora</small></div>Laura · Jueves 18:30</div></div>
+  <div class="notif n3"><div class="ic dark">💬</div><div><div class="row"><b>Mensaje nuevo</b><small>2 min</small></div>"me encanta la web 😍"</div></div>
+  <div class="notif n2"><div class="ic pastel">🛍️</div><div><div class="row"><b>Pedido #0128 · 42,90 €</b><small>03:12</small></div>mientras tú dormías</div></div>
+
+  <div class="tags">
+    <span class="tag">✦ webs a medida</span>
+    <span class="tag o">reservas online</span>
+    <span class="tag d">tiendas que venden</span>
+    <span class="tag p">cero tecnicismos</span>
+  </div>
+
+  <div class="ticket"><div class="t-main"><small>ADMIT ONE ✦</small><strong>consulta <i>gratis</i></strong><small style="margin-top:6px;color:#9aa3b8">20 min · sin compromiso</small></div><div class="t-stub">Nº 001</div></div>
+
+  <div class="note"><p>pd: no usamos plantillas aburridas. ni jerga rara. palabrita 🤞</p></div>
+
+  <div class="tagline">
+    <span class="a">nosotros hacemos webs</span>
+    <span class="b">que sí contestan.</span>
+  </div>
+
+  <div class="foot">
+    <span>lagoa-webs.vercel.app</span>
+    <span class="cta">escríbenos <i>"WEB"</i> por DM →</span>
+  </div>
+</div>
+</body>
+</html>
