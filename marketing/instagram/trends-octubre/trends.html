@@ -68,17 +68,23 @@
 
   /* ====== TREND 3 · piedra, papel o tijera ====== */
   .t3{background:linear-gradient(180deg,#d9e0ff 0%,#c3ceff 100%)}
-  .t3 .photo{inset:0;border-radius:0;border-width:0}
-  .t3 .photo:not(.ok){background:repeating-linear-gradient(90deg,#c8d2ff 0 46px,#bcc8ff 46px 50px)}
+  .t3{background:#cfd3d2}
+  .t3 .photo.half{top:400px;bottom:0;width:540px;border:0;background-size:cover;background-position:center top;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 160px);mask-image:linear-gradient(to bottom,transparent 0,#000 160px)}
+  .t3 .photo.half.l{left:0}
+  .t3 .photo.half.r{right:0}
+  .t3 .divider{position:absolute;left:538px;top:560px;bottom:120px;width:4px;background:repeating-linear-gradient(180deg,var(--accent) 0 18px,transparent 18px 32px);z-index:4}
+  .t3 .tagx{position:absolute;bottom:70px;z-index:6;font-family:var(--mono);font-size:22px;letter-spacing:.08em;text-transform:uppercase;background:var(--ink);color:#fff;border-radius:99px;padding:10px 20px}
+  .t3 .tagx.win{background:var(--accent)}
   .t3 .sticker{position:absolute;left:50%;top:150px;transform:translateX(-50%) rotate(-1.5deg);background:#fff;padding:16px 34px;font-weight:700;font-size:40px;z-index:5;
     box-shadow:0 10px 20px -12px rgba(0,0,0,.4);white-space:nowrap}
   .t3 .sticker::before,.t3 .sticker::after{content:"";position:absolute;top:-10px;width:22px;height:22px;border-radius:50%;background:var(--accent)}
   .t3 .sticker::before{left:-10px}.t3 .sticker::after{right:-10px;top:auto;bottom:-10px}
-  .t3 .lbl{position:absolute;top:290px;z-index:5;font-weight:800;font-size:54px;letter-spacing:-.04em;line-height:.95;color:#fff;text-shadow:0 2px 18px rgba(10,26,143,.55)}
+  .t3 .lbl{position:absolute;top:270px;z-index:5;font-weight:800;font-size:54px;letter-spacing:-.04em;line-height:.95;color:var(--ink)}
+  .t3 .lbl.r{color:var(--accent)}
   .t3 .lbl.l{left:70px;width:400px}
   .t3 .lbl.r{right:70px;width:400px;text-align:right}
-  .t3 .lbl small{display:block;font-family:var(--serif);font-style:italic;font-weight:400;font-size:40px;letter-spacing:0;margin-top:8px}
-  .t3 .vs{position:absolute;left:50%;top:320px;transform:translateX(-50%);font-family:var(--serif);font-style:italic;font-size:64px;color:#fff;z-index:5}
+  .t3 .lbl small{display:block;font-family:var(--serif);font-style:italic;font-weight:400;font-size:38px;letter-spacing:0;margin-top:8px;color:#4a5161}
+  .t3 .vs{position:absolute;left:50%;top:330px;transform:translateX(-50%);font-family:var(--serif);font-style:italic;font-size:64px;color:var(--accent);z-index:5}
   .t3b{background:var(--accent);color:#fff}
   .t3b .h{position:absolute;left:60px;right:60px;top:300px;font-weight:900;font-size:150px;letter-spacing:-.06em;line-height:.88}
   .t3b .h em{font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:-.02em}
@@ -93,9 +99,9 @@
   .t4 .h{position:absolute;left:0;right:0;top:120px;text-align:center;font-weight:900;font-size:120px;letter-spacing:-.06em;line-height:.9;color:var(--accent);z-index:4}
   .t4 .h em{font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:-.02em;color:var(--deep)}
   .t4 .photo{left:120px;right:120px;bottom:0;top:430px;border-radius:40px 40px 0 0;border-bottom:0}
-  .t4 .photo.ok{left:0;right:0;top:360px;border-radius:0;background-size:contain;background-position:bottom center;background-repeat:no-repeat;background-color:transparent}
+  .t4 .photo.ok{left:0;right:0;top:400px;border-radius:0;background-size:contain;background-position:bottom center;background-repeat:no-repeat;background-color:transparent}
   .t4 .deco{position:absolute;font-size:70px;z-index:6}
-  .t4 .bubble-txt{position:absolute;z-index:6;background:#fff;border-radius:30px 30px 30px 8px;padding:20px 28px;font-size:34px;font-weight:700;letter-spacing:-.02em;
+  .t4 .bubble-txt{position:absolute;white-space:nowrap;z-index:6;background:#fff;border-radius:30px 30px 30px 8px;padding:20px 28px;font-size:34px;font-weight:700;letter-spacing:-.02em;
     box-shadow:0 20px 30px -16px rgba(10,26,143,.35)}
   .t4 .bubble-txt span{font-family:var(--serif);font-style:italic;font-weight:400;font-size:42px;color:var(--accent)}
   .t4 .sub{position:absolute;left:0;right:0;top:330px;text-align:center;font-size:34px;color:#4a5161;z-index:4}
@@ -153,11 +159,15 @@
 
 <!-- ============ TREND 3 · 1/2 ============ -->
 <section class="slide t3" data-name="trend3-piedra-papel-tijera-01">
-  <div class="photo" data-src="fotos/manos-piedra-tijera.jpg"><div class="ph"><b>📷</b>FOTO: dos manos jugando<br>tijera (izq.) vs piedra (dcha.)<br>fondo liso o de madera</div></div>
+  <div class="photo half l" data-src="fotos/px-9017564.jpg"></div>
+  <div class="photo half r" data-src="fotos/px-9017579.jpg"></div>
   <div class="sticker">piedra, papel o tijera</div>
   <div class="lbl l">que te la haga tu primo<small>"el que sabe de ordenadores"</small></div>
   <div class="vs">vs</div>
   <div class="lbl r">una web hecha por Lagoa<small>con tu estilo y sin sustos</small></div>
+  <div class="divider"></div>
+  <div class="tagx" style="left:60px">✌️ tijera</div>
+  <div class="tagx win" style="right:60px">✊ piedra · gana</div>
 </section>
 
 <!-- ============ TREND 3 · 2/2 ============ -->
@@ -181,8 +191,9 @@
 <section class="slide t4" data-name="trend4-oye-acercate-02">
   <div class="h" style="font-size:96px">¿tu negocio todavía<br><em>no tiene web?</em></div>
   <div class="photo" data-src="fotos/animal-2.png"><div class="ph"><b>📷</b>FOTO: el mismo animalito con cara triste / preocupada</div></div>
-  <div class="bubble-txt" style="left:70px;top:520px;transform:rotate(-4deg)">me pongo <span>triste</span> 🥺</div>
+  <div class="bubble-txt" style="left:60px;top:470px;transform:rotate(-4deg)">me pongo <span>triste</span> 🥺</div>
   <div class="bubble-txt" style="right:70px;top:760px;transform:rotate(3deg)">te buscan y <span>no te encuentran</span></div>
+  <div class="bubble-txt" style="right:180px;top:1240px;transform:rotate(-2deg);background:var(--accent);color:#fff">(desliza →)</div>
 </section>
 
 <!-- ============ TREND 4 · 3/3 ============ -->
