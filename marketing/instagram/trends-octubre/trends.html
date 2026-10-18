@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Lagoa · Trends octubre</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,400;0,500;0,700;0,800;0,900;1,800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&family=Anton&family=Gochi+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#e8ecff; --cream:#f6f7fd; --ink:#0b0d12; --accent:#1f3dff; --deep:#0a1a8f; --pastel:#c3ceff; --sky:#8fb4ff; --baby:#dfe6ff;
+    --sans:"Inter Tight",system-ui,sans-serif; --serif:"Instrument Serif",Georgia,serif; --mono:"JetBrains Mono",monospace;
+    --hand:"Gochi Hand",cursive; --marker:"Permanent Marker",cursive;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#888;display:flex;flex-wrap:wrap;gap:40px;padding:40px;font-family:var(--sans);color:var(--ink)}
+  .slide{position:relative;width:1080px;height:1350px;overflow:hidden;flex:none;background:var(--paper)}
+  .grain{position:absolute;inset:0;opacity:.25;mix-blend-mode:multiply;pointer-events:none;z-index:50}
+  .handle{position:absolute;right:56px;bottom:46px;font-family:var(--mono);font-size:20px;letter-spacing:.04em;opacity:.75;z-index:20}
+  .brand{position:absolute;left:56px;bottom:44px;display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.2em;font-size:20px;z-index:20}
+  .brand i{width:22px;height:22px;border-radius:50%;border:3px solid currentColor;display:grid;place-items:center}
+  .brand i::after{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+
+  /* ====== TREND 1 · la de las webs está de vacaciones ====== */
+  .t1{background:var(--baby)}
+  .t1 .hand{position:absolute;left:0;right:0;text-align:center;font-family:var(--hand);color:var(--accent);line-height:1}
+  .t1 .arrow{position:absolute;width:220px}
+  .t1 .face{position:absolute}
+  .t1 .tag{position:absolute;background:#fff;border:4px solid var(--ink);border-radius:18px;padding:24px 40px 22px 70px;transform:rotate(-6deg);
+    font-family:var(--marker);font-size:96px;color:var(--ink);box-shadow:10px 10px 0 var(--accent)}
+  .t1 .tag::before{content:"";position:absolute;left:24px;top:50%;width:24px;height:24px;margin-top:-12px;border-radius:50%;border:4px solid var(--ink);background:var(--baby)}
+  .t1 .tag small{display:block;font-family:var(--hand);font-size:34px;color:var(--accent);margin-top:-4px}
+
+  /* ====== TREND 2 · abre la foto ====== */
+  .t2a{background:var(--accent);color:#fff}
+  .t2a .big{position:absolute;left:0;right:0;top:330px;text-align:center;font-family:"Anton";font-size:200px;line-height:.9;text-transform:uppercase;letter-spacing:.005em}
+  .bubble{position:absolute;left:50%;transform:translateX(-50%);top:780px;width:500px;background:#fff;color:#111b21;border-radius:30px 30px 30px 30px;
+    padding:30px 34px 22px;display:flex;align-items:center;gap:22px;box-shadow:0 30px 50px -24px rgba(0,0,0,.45)}
+  .bubble::before{content:"";position:absolute;left:-14px;bottom:0;width:40px;height:40px;background:#fff;clip-path:polygon(100% 0,100% 100%,0 100%)}
+  .bubble .once{width:62px;height:62px;flex:none}
+  .bubble b{font-weight:500;font-size:46px}
+  .bubble small{position:absolute;right:30px;bottom:16px;font-size:26px;color:#667781}
+  .t2b{background:var(--ink);color:#eef1f8}
+  .t2b .h{position:absolute;left:60px;right:60px;top:120px;font-weight:900;font-size:132px;letter-spacing:-.06em;line-height:.88}
+  .t2b .h em{font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:-.02em;color:var(--sky)}
+  .t2b .sub{position:absolute;left:60px;right:60px;top:470px;font-size:34px;line-height:1.3;color:#aab2c6}
+  .t2b .sub b{color:#fff}
+  .t2b .mock{position:absolute;left:120px;right:120px;top:640px;height:470px;border-radius:24px;overflow:hidden;background:#fff;color:var(--ink);transform:rotate(-3deg);
+    box-shadow:0 0 0 2px rgba(255,255,255,.12),0 40px 70px -30px rgba(31,61,255,.6)}
+  .t2b .mock .bar{height:44px;background:#f1f2f5;display:flex;align-items:center;gap:8px;padding:0 18px}
+  .t2b .mock .bar i{width:12px;height:12px;border-radius:50%;background:#d4d7df}
+  .t2b .mock .bar span{margin-left:12px;font-family:var(--mono);font-size:15px;color:#6b7280;background:#fff;border-radius:8px;padding:4px 14px}
+  .t2b .mock .in{padding:34px 40px;position:relative;height:calc(100% - 44px);background:linear-gradient(160deg,#fff 0%,#eef1ff 100%)}
+  .t2b .mock h4{font-size:62px;font-weight:800;letter-spacing:-.05em;line-height:.95}
+  .t2b .mock p{font-size:20px;color:#4a5161;margin-top:14px}
+  .t2b .mock .btn{display:inline-block;margin-top:24px;background:var(--accent);color:#fff;font-weight:700;font-size:22px;padding:16px 28px;border-radius:99px}
+  .t2b .mock .stars{position:absolute;right:40px;top:40px;font-family:var(--mono);font-size:20px;background:var(--ink);color:#fff;border-radius:12px;padding:10px 14px}
+  .t2b .eyes{position:absolute;right:70px;top:560px;font-size:120px;transform:rotate(10deg);z-index:5}
+  .t2b .cta{position:absolute;left:60px;bottom:120px;font-size:34px;font-weight:700;letter-spacing:-.02em}
+  .t2b .cta span{font-family:var(--serif);font-style:italic;font-weight:400;font-size:44px;color:var(--sky)}
+
+  /* ====== shared photo slot ====== */
+  .photo{position:absolute;background-size:cover;background-position:center;display:grid;place-items:center;text-align:center;
+    border:4px dashed rgba(11,13,18,.35);background-color:rgba(255,255,255,.35)}
+  .photo.ok{border:0}
+  .photo .ph{font-family:var(--mono);font-size:24px;line-height:1.5;color:rgba(11,13,18,.6);padding:30px;max-width:620px}
+  .photo .ph b{display:block;font-size:56px;margin-bottom:8px}
+  .photo.ok .ph{display:none}
+
+  /* ====== TREND 3 · piedra, papel o tijera ====== */
+  .t3{background:linear-gradient(180deg,#d9e0ff 0%,#c3ceff 100%)}
+  .t3 .photo{inset:0;border-radius:0;border-width:0}
+  .t3 .photo:not(.ok){background:repeating-linear-gradient(90deg,#c8d2ff 0 46px,#bcc8ff 46px 50px)}
+  .t3 .sticker{position:absolute;left:50%;top:150px;transform:translateX(-50%) rotate(-1.5deg);background:#fff;padding:16px 34px;font-weight:700;font-size:40px;z-index:5;
+    box-shadow:0 10px 20px -12px rgba(0,0,0,.4);white-space:nowrap}
+  .t3 .sticker::before,.t3 .sticker::after{content:"";position:absolute;top:-10px;width:22px;height:22px;border-radius:50%;background:var(--accent)}
+  .t3 .sticker::before{left:-10px}.t3 .sticker::after{right:-10px;top:auto;bottom:-10px}
+  .t3 .lbl{position:absolute;top:290px;z-index:5;font-weight:800;font-size:54px;letter-spacing:-.04em;line-height:.95;color:#fff;text-shadow:0 2px 18px rgba(10,26,143,.55)}
+  .t3 .lbl.l{left:70px;width:400px}
+  .t3 .lbl.r{right:70px;width:400px;text-align:right}
+  .t3 .lbl small{display:block;font-family:var(--serif);font-style:italic;font-weight:400;font-size:40px;letter-spacing:0;margin-top:8px}
+  .t3 .vs{position:absolute;left:50%;top:320px;transform:translateX(-50%);font-family:var(--serif);font-style:italic;font-size:64px;color:#fff;z-index:5}
+  .t3b{background:var(--accent);color:#fff}
+  .t3b .h{position:absolute;left:60px;right:60px;top:300px;font-weight:900;font-size:150px;letter-spacing:-.06em;line-height:.88}
+  .t3b .h em{font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:-.02em}
+  .t3b .sub{position:absolute;left:60px;right:60px;top:720px;font-size:36px;line-height:1.3;color:#dfe4ff}
+  .t3b .sub b{color:#fff}
+  .t3b .pill{position:absolute;left:60px;top:960px;background:#fff;color:var(--ink);border-radius:26px 26px 26px 6px;padding:22px 30px;font-size:36px;font-weight:700}
+  .t3b .pill span{font-family:var(--serif);font-style:italic;font-weight:400;font-size:44px;color:var(--accent)}
+  .t3b .fist{position:absolute;right:60px;top:880px;font-size:200px;transform:rotate(-12deg)}
+
+  /* ====== TREND 4 · oye… acércate ====== */
+  .t4{background:var(--cream)}
+  .t4 .h{position:absolute;left:0;right:0;top:120px;text-align:center;font-weight:900;font-size:120px;letter-spacing:-.06em;line-height:.9;color:var(--accent);z-index:4}
+  .t4 .h em{font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:-.02em;color:var(--deep)}
+  .t4 .photo{left:120px;right:120px;bottom:0;top:430px;border-radius:40px 40px 0 0;border-bottom:0}
+  .t4 .photo.ok{left:0;right:0;top:360px;border-radius:0;background-size:contain;background-position:bottom center;background-repeat:no-repeat;background-color:transparent}
+  .t4 .deco{position:absolute;font-size:70px;z-index:6}
+  .t4 .bubble-txt{position:absolute;z-index:6;background:#fff;border-radius:30px 30px 30px 8px;padding:20px 28px;font-size:34px;font-weight:700;letter-spacing:-.02em;
+    box-shadow:0 20px 30px -16px rgba(10,26,143,.35)}
+  .t4 .bubble-txt span{font-family:var(--serif);font-style:italic;font-weight:400;font-size:42px;color:var(--accent)}
+  .t4 .sub{position:absolute;left:0;right:0;top:330px;text-align:center;font-size:34px;color:#4a5161;z-index:4}
+</style>
+</head>
+<body>
+
+<!-- ============ TREND 1 · 1/3 ============ -->
+<section class="slide t1" data-name="trend1-vacaciones-01">
+  <div class="hand" style="top:330px;font-size:150px">la de<br>las webs<br>está de<br>vacaciones</div>
+  <svg class="face" style="right:150px;top:220px" width="150" height="150" viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="none" stroke="#0b0d12" stroke-width="4"/><circle cx="36" cy="40" r="5"/><circle cx="64" cy="40" r="5"/><path d="M32 72 Q50 56 68 72" fill="none" stroke="#0b0d12" stroke-width="4" stroke-linecap="round"/></svg>
+  <svg class="arrow" style="right:170px;top:1020px" viewBox="0 0 220 60"><path d="M6 34 C 60 28, 130 26, 200 30" fill="none" stroke="#1f3dff" stroke-width="8" stroke-linecap="round"/><path d="M168 8 L 204 30 L 166 52" fill="none" stroke="#1f3dff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <div class="brand" style="color:var(--accent)"><i></i>LAGOA</div>
+</section>
+
+<!-- ============ TREND 1 · 2/3 ============ -->
+<section class="slide t1" data-name="trend1-vacaciones-02">
+  <div class="hand" style="top:200px;font-size:104px;color:var(--ink)">y se le ha olvidado<br>quitar este precio</div>
+  <svg style="position:absolute;left:150px;top:470px" width="120" height="150" viewBox="0 0 120 150"><path d="M90 6 C 40 30, 30 80, 50 130" fill="none" stroke="#0b0d12" stroke-width="6" stroke-linecap="round"/><path d="M26 108 L 50 136 L 74 112" fill="none" stroke="#0b0d12" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <div class="tag" style="left:240px;top:650px">web propia<br>120 €<small>pago único · con tu estética</small></div>
+  <div class="hand" style="top:1060px;font-size:62px">(nosotras no hemos dicho nada 🤐)</div>
+  <div class="brand" style="color:var(--accent)"><i></i>LAGOA</div>
+</section>
+
+<!-- ============ TREND 1 · 3/3 ============ -->
+<section class="slide t1" data-name="trend1-vacaciones-03">
+  <div class="hand" style="top:280px;font-size:130px">escríbenos<br><span style="font-family:var(--marker);color:var(--ink)">"WEB"</span><br>antes de<br>que vuelva</div>
+  <div class="hand" style="top:930px;font-size:120px">🤫</div>
+  <div class="hand" style="top:1100px;font-size:46px;color:var(--ink)">lagoa-webs.vercel.app</div>
+  <div class="brand" style="color:var(--accent)"><i></i>LAGOA</div>
+</section>
+
+<!-- ============ TREND 2 · 1/2 ============ -->
+<section class="slide t2a" data-name="trend2-abre-la-foto-01">
+  <div class="big">abre<br>la foto</div>
+  <div class="bubble">
+    <svg class="once" viewBox="0 0 64 64"><circle cx="32" cy="32" r="27" fill="none" stroke="#25a35a" stroke-width="5" stroke-dasharray="120 60" stroke-linecap="round" transform="rotate(-90 32 32)"/><circle cx="32" cy="32" r="27" fill="none" stroke="#25a35a" stroke-width="5" stroke-dasharray="2 10" stroke-dashoffset="-120" stroke-linecap="round" transform="rotate(-90 32 32)" opacity=".8"/><text x="32" y="42" text-anchor="middle" font-family="Inter Tight" font-weight="700" font-size="28" fill="#25a35a">1</text></svg>
+    <b>Foto</b><small>10:37</small>
+  </div>
+  <div class="brand" style="color:#fff"><i></i>LAGOA</div>
+</section>
+
+<!-- ============ TREND 2 · 2/2 ============ -->
+<section class="slide t2b" data-name="trend2-abre-la-foto-02">
+  <div class="h">tu competencia<br>ya tiene <em>web.</em></div>
+  <p class="sub">Y le está llegando el cliente que te buscaba a ti.<br><b>Mientras lees esto, sí.</b></p>
+  <div class="mock">
+    <div class="bar"><i></i><i></i><i></i><span>la-de-al-lado.es</span></div>
+    <div class="in"><div class="stars">★ 4,9 · 212 reseñas</div><h4>Reserva<br>en 10 segundos.</h4><p>Abierto hoy hasta las 20:00 · A 300 m de ti</p><div class="btn">Reservar ahora →</div></div>
+  </div>
+  <div class="eyes">👀</div>
+  <div class="cta">¿y tú? escríbenos <span>"WEB"</span> por DM</div>
+  <div class="handle" style="color:#aab2c6">lagoa-webs.vercel.app</div>
+</section>
+
+<!-- ============ TREND 3 · 1/2 ============ -->
+<section class="slide t3" data-name="trend3-piedra-papel-tijera-01">
+  <div class="photo" data-src="fotos/manos-piedra-tijera.jpg"><div class="ph"><b>📷</b>FOTO: dos manos jugando<br>tijera (izq.) vs piedra (dcha.)<br>fondo liso o de madera</div></div>
+  <div class="sticker">piedra, papel o tijera</div>
+  <div class="lbl l">que te la haga tu primo<small>"el que sabe de ordenadores"</small></div>
+  <div class="vs">vs</div>
+  <div class="lbl r">una web hecha por Lagoa<small>con tu estilo y sin sustos</small></div>
+</section>
+
+<!-- ============ TREND 3 · 2/2 ============ -->
+<section class="slide t3b" data-name="trend3-piedra-papel-tijera-02">
+  <div class="h">ya sabemos<br>quién <em>gana.</em></div>
+  <p class="sub">Tu primo es un amor, pero tu negocio merece una web que no se caiga en Navidad.<br><b>Diseño a medida y precio cerrado desde el primer día.</b></p>
+  <div class="pill">escríbenos <span>"WEB"</span> 💬</div>
+  <div class="fist">✊</div>
+  <div class="handle" style="color:#dfe4ff">lagoa-webs.vercel.app</div>
+</section>
+
+<!-- ============ TREND 4 · 1/3 ============ -->
+<section class="slide t4" data-name="trend4-oye-acercate-01">
+  <div class="h">oye…<br><em>acércate</em></div>
+  <div class="photo" data-src="fotos/animal-1.png"><div class="ph"><b>📷</b>FOTO: cachorro o animalito mirando a cámara, primer plano, fondo liso o recortado (PNG)</div></div>
+  <div class="deco" style="left:120px;top:520px">💙</div>
+  <div class="deco" style="right:130px;top:470px">✨</div>
+</section>
+
+<!-- ============ TREND 4 · 2/3 ============ -->
+<section class="slide t4" data-name="trend4-oye-acercate-02">
+  <div class="h" style="font-size:96px">¿tu negocio todavía<br><em>no tiene web?</em></div>
+  <div class="photo" data-src="fotos/animal-2.png"><div class="ph"><b>📷</b>FOTO: el mismo animalito con cara triste / preocupada</div></div>
+  <div class="bubble-txt" style="left:70px;top:520px;transform:rotate(-4deg)">me pongo <span>triste</span> 🥺</div>
+  <div class="bubble-txt" style="right:70px;top:760px;transform:rotate(3deg)">te buscan y <span>no te encuentran</span></div>
+</section>
+
+<!-- ============ TREND 4 · 3/3 ============ -->
+<section class="slide t4" data-name="trend4-oye-acercate-03">
+  <div class="h" style="font-size:104px">tiene arreglo.<br><em>escríbenos "WEB"</em></div>
+  <div class="photo" data-src="fotos/animal-3.png"><div class="ph"><b>📷</b>FOTO: el mismo animalito contento</div></div>
+  <div class="bubble-txt" style="left:80px;top:540px;transform:rotate(-3deg)">te hacemos una web <span>a tu medida</span> 💙</div>
+  <div class="bubble-txt" style="right:80px;top:740px;transform:rotate(4deg)">lagoa-webs.vercel.app</div>
+</section>
+
+<script>
+  document.querySelectorAll('.photo[data-src]').forEach(el => {
+    const img = new Image();
+    img.onload = () => { el.style.backgroundImage = `url("${el.dataset.src}")`; el.classList.add('ok'); };
+    img.src = el.dataset.src;
+  });
+</script>
+</body>
+</html>
